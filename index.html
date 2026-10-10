@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Recubation</title>
+  <link rel="stylesheet" href="style.css">
+  <script type="importmap">
+    { "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js" } }
+  </script>
+</head>
+<body>
+  <canvas id="view"></canvas>
+  <div id="labels"></div>
+
+  <div id="hud" hidden>
+    <header id="top">
+      <div id="mission"></div>
+      <div id="clock"></div>
+      <nav>
+        <button id="btn-speed" title="Animation speed (F)">1×</button>
+        <button id="btn-mute" title="Mute (M)">Sound</button>
+        <button id="btn-help" title="Help (H)">Help</button>
+        <button id="btn-abort" title="Abandon the mission">Abort</button>
+      </nav>
+    </header>
+    <aside id="squad"></aside>
+    <section id="panel"></section>
+    <button id="btn-end" title="End turn (Enter)">End turn</button>
+    <div id="banner"></div>
+    <div id="toast"></div>
+  </div>
+  <div id="tip" hidden></div>
+
+  <div id="screen" hidden></div>
+  <div id="fatal" hidden></div>
+
+  <script type="module" src="src/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,11 @@
+{
+  "name": "recubation",
+  "version": "0.1.0",
+  "private": true,
+  "description": "A browser squad-tactics game in the spirit of late-90s 3D turn-based strategy.",
+  "type": "module",
+  "scripts": {
+    "start": "node serve.mjs",
+    "test": "node test/sim.mjs"
+  }
+}
