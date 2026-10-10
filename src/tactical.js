@@ -55,7 +55,11 @@ export class Tactical {
     const b = this.battle;
     if (!b) return;
     if (this.sel && !this.sel.alive) this.sel = null;
-    if (!this.sel) { this.sel = b.marines().find(m => m.ap > 0) || b.marines()[0] || null; this.modeIdx = 0; this.armed = null; }
+    if (!this.sel) {
+      this.sel = b.marines().find(m => m.ap > 0) || b.marines()[0] || null;
+      this.modeIdx = 0; this.armed = null;
+      if (this.sel) this.view.focus(this.sel.x, this.sel.y);
+    }
     if (this.sel && this.modeIdx >= b.modes(this.sel).length) this.modeIdx = 0;
     if (this.armed && (this.armed.charges <= 0 || !this.sel || !this.sel.gear.includes(this.armed))) this.armed = null;
     const s = this.sel;
@@ -166,7 +170,7 @@ export class Tactical {
 
   select(u) {
     if (!this.battle || !u.alive) return;
-    if (this.sel !== u) { this.sel = u; this.modeIdx = 0; this.armed = null; }
+    if (this.sel !== u) { this.sel = u; this.modeIdx = 0; this.armed = null; this.view.focus(u.x, u.y); }
     sfx.click();
     this.refresh();
   }

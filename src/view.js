@@ -410,7 +410,8 @@ export class View {
     const p = this.pos(x, y);
     if (!force) {
       const s = p.clone().project(this.camera);
-      if (Math.abs(s.x) < 0.7 && Math.abs(s.y) < 0.6) return;
+      // Leave the camera alone unless the tile is near an edge or under the HUD.
+      if (Math.abs(s.x) < 0.62 && s.y > -0.5 && s.y < 0.6) return;
     }
     this.cam.goal.copy(p).setY(0);
   }
@@ -547,7 +548,7 @@ export class View {
   async step(u, from, to) {
     const o = this.objs.get(u.id);
     const a = this.pos(from.x, from.y), b = this.pos(to.x, to.y);
-    if (u.side === 'marine') { sfx.step(); this.syncLabel(o); } else sfx.skitter();
+    if (u.side === 'marine') { sfx.step(); this.syncLabel(o); this.focus(to.x, to.y); } else sfx.skitter();
     await this.tween(u.side === 'marine' ? 150 : 115, k => {
       o.group.position.lerpVectors(a, b, k);
       o.group.position.y += Math.sin(k * Math.PI) * 0.07;
