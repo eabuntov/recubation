@@ -43,6 +43,8 @@ export class View {
     this.raycaster = new THREE.Raycaster();
 
     this.cam = { target: new THREE.Vector3(), goal: new THREE.Vector3(), yaw: Math.PI / 6, yawGoal: Math.PI / 6, dist: 15, distGoal: 15, pitch: 0.95, shake: 0 };
+    this.camSeen = new THREE.Vector3();
+    this.onCameraMove = null;  // called after any frame in which the camera moved
     this.keys = new Set();
     this.tweens = [];
     this.speed = 1;
@@ -509,6 +511,11 @@ export class View {
     }
 
     this.renderer.render(this.scene, this.camera);
+
+    if (this.camera.position.distanceToSquared(this.camSeen) > 1e-8) {
+      this.camSeen.copy(this.camera.position);
+      if (this.onCameraMove) this.onCameraMove();
+    }
 
     // Project unit labels after the camera has settled for this frame.
     if (this.battle) {

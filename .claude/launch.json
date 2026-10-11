@@ -4,8 +4,8 @@
     {
       "name": "recubation",
       "runtimeExecutable": "node",
-      "runtimeArgs": ["serve.mjs", "8080"],
-      "port": 8080
+      "runtimeArgs": ["serve.mjs", "5180"],
+      "port": 5180
     }
   ]
 }

@@ -12,7 +12,7 @@ export function h(spec, props, ...kids) {
   const [tag, ...cls] = spec.split('.');
   const el = document.createElement(tag || 'div');
   if (cls.length) el.className = cls.join(' ');
-  if (props && (typeof props !== 'object' || props instanceof Node || Array.isArray(props))) { kids.unshift(props); props = null; }
+  if (props != null && (typeof props !== 'object' || props instanceof Node || Array.isArray(props))) { kids.unshift(props); props = null; }
   for (const k in props || {}) {
     const v = props[k];
     if (k === 'style') for (const p in v) p.startsWith('--') ? el.style.setProperty(p, v[p]) : (el.style[p] = v[p]);
@@ -115,9 +115,10 @@ export class UI {
     ));
   }
 
-  armory(state, { onBack, onChange }, pickId) {
+  armory(state, { onBack, onChange }, pickId, scroll = 0) {
     const s = state.squad.find(q => q.id === pickId) || state.squad[0];
-    const redraw = () => { onChange(); this.armory(state, { onBack, onChange }, s.id); };
+    // Rebuilding the sheet after a change must not throw the player back to the top of the list.
+    const redraw = () => { onChange(); this.armory(state, { onBack, onChange }, s.id, this.screen.querySelector('.body').scrollTop); };
     const st = soldierStats(s);
 
     const itemRow = (table, kind, id) => {
@@ -191,6 +192,7 @@ export class UI {
       ),
       h('footer', btn('Back to briefing', onBack, 'primary')),
     ));
+    this.screen.querySelector('.body').scrollTop = scroll;
   }
 
   debrief(report, mission, { onContinue, onRetry, onArmory }) {

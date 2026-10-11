@@ -17,7 +17,7 @@ export class Tactical {
     this.modeIdx = 0;
     this.armed = null;       // gear item waiting for a target
     this.hover = null;
-    this.mouse = { x: 0, y: 0, shift: false };
+    this.mouse = { x: 0, y: 0, shift: false, over: false };
     this.base = new Map();   // overlays that do not depend on the cursor
     this.reach = new Map();
     this.drag = null;
@@ -26,7 +26,8 @@ export class Tactical {
     c.addEventListener('pointerdown', e => this.onDown(e));
     c.addEventListener('pointermove', e => this.onMove(e));
     c.addEventListener('pointerup', e => this.onUp(e));
-    c.addEventListener('pointerleave', () => { this.hover = null; this.ui.tip(null); this.paint(); });
+    c.addEventListener('pointerleave', () => { this.mouse.over = false; this.hover = null; this.ui.tip(null); this.paint(); });
+    view.onCameraMove = () => { if (this.battle && !this.dragging) { this.repick(); this.onHover(); } };
     c.addEventListener('contextmenu', e => e.preventDefault());
     c.addEventListener('wheel', e => { e.preventDefault(); if (this.battle) view.zoom(e.deltaY); }, { passive: false });
     window.addEventListener('keydown', e => this.onKey(e));
@@ -48,6 +49,12 @@ export class Tactical {
 
   get ready() { const b = this.battle; return !!b && !b.busy && !b.over && b.phase === 'player'; }
   get mode() { return this.sel ? this.battle.modes(this.sel)[this.modeIdx] : null; }
+  get dragging() { return !!this.drag && this.drag.moved; }
+
+  // A cursor that has not moved can still end up over a different tile when the camera or a unit does.
+  repick() {
+    if (this.mouse.over && !this.dragging) this.hover = this.view.pick(this.mouse.x, this.mouse.y);
+  }
 
   // ---------------------------------------------------------------- state -> screen
 
@@ -92,6 +99,7 @@ export class Tactical {
       mode: i => { this.modeIdx = i; this.armed = null; this.refresh(); },
       gear: g => this.gear(g),
     });
+    this.repick();
     this.onHover();
   }
 
@@ -249,7 +257,7 @@ export class Tactical {
 
   onMove(e) {
     if (!this.battle) return;
-    this.mouse = { x: e.clientX, y: e.clientY, shift: e.shiftKey };
+    this.mouse = { x: e.clientX, y: e.clientY, shift: e.shiftKey, over: true };
     const d = this.drag;
     if (d) {
       if (!d.moved && Math.hypot(e.clientX - d.x, e.clientY - d.y) > DRAG_PX) d.moved = true;
@@ -267,7 +275,8 @@ export class Tactical {
   onUp(e) {
     const d = this.drag;
     this.drag = null;
-    if (!this.battle || !d || d.moved) return;
+    if (!this.battle || !d) return;
+    if (d.moved) { this.repick(); this.onHover(); return; }
     const hit = this.view.pick(e.clientX, e.clientY);
     if (!hit) return;
     if (d.button === 0) this.click(hit.x, hit.y, e.shiftKey);
