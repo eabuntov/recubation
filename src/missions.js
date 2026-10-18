@@ -11,6 +11,8 @@
 //
 // `raised` lists [x0, y0, x1, y1] rectangles lifted to level 1 (for tiles that hold something).
 
+import { t } from './i18n.js';
+
 export const MISSIONS = [
   {
     id: 'cold-start',
@@ -252,10 +254,9 @@ export const MISSIONS = [
 
 export function objectiveText(m) {
   const o = m.objective;
-  let s = o.type === 'eliminate' ? 'Eliminate all hostiles'
-    : o.type === 'exit' ? 'Move every surviving trooper into the extraction zone'
-    : o.type === 'survive' ? `Survive ${o.turns} turns`
-    : 'Kill the Matriarch';
-  if (m.turnLimit) s += ` within ${m.turnLimit} turns`;
-  return s;
+  const s = o.type === 'eliminate' ? t('Eliminate all hostiles')
+    : o.type === 'exit' ? t('Move every surviving trooper into the extraction zone')
+    : o.type === 'survive' ? t('Survive {n} turns', { n: o.turns })
+    : t('Kill the Matriarch');
+  return m.turnLimit ? t('{objective} within {n} turns', { objective: s, n: m.turnLimit }) : s;
 }

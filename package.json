@@ -6,6 +6,6 @@
   "type": "module",
   "scripts": {
     "start": "node serve.mjs",
-    "test": "node test/sim.mjs"
+    "test": "node test/sim.mjs && node test/i18n.mjs"
   }
 }

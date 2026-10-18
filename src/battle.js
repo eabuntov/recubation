@@ -2,6 +2,7 @@
 // reported through the async `fx` hooks so the same code runs headless in tests.
 
 import { DIRS, WEAPONS, ARMORS, GEAR, ALIENS, BAYONET, BASE_HP, BASE_AP } from './data.js';
+import { t as tr } from './i18n.js';
 
 export const key = (x, y) => x + ',' + y;
 
@@ -186,18 +187,18 @@ export class Battle {
   shotProblem(fx, fy, tx, ty, { range, minRange = 0, pattern = 'single', arc = false }, shooter = null) {
     if (pattern === 'melee') {
       const d = DIRS.findIndex(v => fx + v.x === tx && fy + v.y === ty);
-      return d >= 0 && this.stepOk(fx, fy, d) ? null : 'Not adjacent';
+      return d >= 0 && this.stepOk(fx, fy, d) ? null : tr('Not adjacent');
     }
     const dist = Math.hypot(tx - fx, ty - fy);
-    if (dist === 0) return 'Invalid target';
-    if (dist > range + 0.5) return 'Out of range';
-    if (dist < minRange) return 'Too close';
-    if (this.sightBlocked(fx, fy, tx, ty)) return 'No line of sight';
+    if (dist === 0) return tr('Invalid target');
+    if (dist > range + 0.5) return tr('Out of range');
+    if (dist < minRange) return tr('Too close');
+    if (this.sightBlocked(fx, fy, tx, ty)) return tr('No line of sight');
     if (pattern === 'single' && !arc && this.heightAt(fx, fy) === this.heightAt(tx, ty)) {
       for (const e of trace(fx, fy, tx, ty)) {
         if (e.corner) continue;
         const u = this.unitAt(e.x, e.y);
-        if (u && u !== shooter) return `Blocked by ${u.name}`;
+        if (u && u !== shooter) return tr('Blocked by {name}', { name: u.name });
       }
     }
     return null;
@@ -244,10 +245,10 @@ export class Battle {
 
   // Why this marine cannot use this fire mode right now, or null.
   fireProblem(u, mode) {
-    if (u.ap < mode.ap) return 'Not enough AP';
+    if (u.ap < mode.ap) return tr('Not enough AP');
     if (mode.pattern === 'melee') return null;
-    if (u.weapon.ammo < mode.ammo) return 'Out of ammo';
-    if (u.weapon.heat + mode.heat > u.weapon.def.maxHeat) return 'Weapon too hot';
+    if (u.weapon.ammo < mode.ammo) return tr('Out of ammo');
+    if (u.weapon.heat + mode.heat > u.weapon.def.maxHeat) return tr('Weapon too hot');
     return null;
   }
 
@@ -256,14 +257,14 @@ export class Battle {
     const dist = Math.hypot(target.x - attacker.x, target.y - attacker.y);
     if (mode.falloff) for (const [r, d] of mode.falloff) if (dist <= r) { dmg = d; break; }
     if (mode.pattern !== 'melee' && this.heightAt(attacker.x, attacker.y) > this.heightAt(target.x, target.y)) {
-      dmg += 1; note = 'high ground';
+      dmg += 1; note = tr('high ground');
     }
     const arc = this.arc(target, attacker.x, attacker.y);
-    if (arc === 'rear') { dmg = Math.ceil(dmg * 1.5); note = 'rear hit'; }
+    if (arc === 'rear') { dmg = Math.ceil(dmg * 1.5); note = tr('rear hit'); }
     const plate = target.def && target.def.frontArmor;
     if (plate && arc === 'front' && !mode.pierce) {
-      if (plate === 'immune') return { dmg: 0, note: 'deflected' };
-      dmg = Math.floor(dmg / 2); note = 'armour';
+      if (plate === 'immune') return { dmg: 0, note: tr('deflected') };
+      dmg = Math.floor(dmg / 2); note = tr('armour');
     }
     if (target.reduce) dmg = Math.max(1, dmg - target.reduce);
     return { dmg, note };
@@ -355,10 +356,10 @@ export class Battle {
 
   terminalProblem(u, tx, ty) {
     const t = this.tile(tx, ty);
-    if (!t || !t.terminal) return 'Nothing to use';
-    if (t.terminal.used) return 'Already activated';
-    if (Math.abs(tx - u.x) + Math.abs(ty - u.y) !== 1) return 'Stand next to it';
-    if (u.ap < 1) return 'Not enough AP';
+    if (!t || !t.terminal) return tr('Nothing to use');
+    if (t.terminal.used) return tr('Already activated');
+    if (Math.abs(tx - u.x) + Math.abs(ty - u.y) !== 1) return tr('Stand next to it');
+    if (u.ap < 1) return tr('Not enough AP');
     return null;
   }
 
@@ -380,28 +381,28 @@ export class Battle {
   }
 
   gearProblem(u, g, tx, ty) {
-    if (!g || !g.def.active) return 'Cannot be used';
-    if (g.charges <= 0) return 'No charges left';
-    if (u.ap < g.def.ap) return 'Not enough AP';
+    if (!g || !g.def.active) return tr('Cannot be used');
+    if (g.charges <= 0) return tr('No charges left');
+    if (u.ap < g.def.ap) return tr('Not enough AP');
     const kind = g.def.active;
-    if (kind === 'reload') return u.weapon.ammo >= u.weapon.def.ammo ? 'Magazine is full' : null;
+    if (kind === 'reload') return u.weapon.ammo >= u.weapon.def.ammo ? tr('Magazine is full') : null;
     if (kind === 'stim') return null;
-    if (tx == null) return 'Pick a target';
+    if (tx == null) return tr('Pick a target');
     if (kind === 'heal') {
       const v = this.unitAt(tx, ty);
-      if (!v || v.side !== 'marine') return 'Target a trooper';
-      if (Math.abs(tx - u.x) + Math.abs(ty - u.y) > 1) return 'Must be adjacent';
-      if (v.hp >= v.maxHp) return 'Not wounded';
+      if (!v || v.side !== 'marine') return tr('Target a trooper');
+      if (Math.abs(tx - u.x) + Math.abs(ty - u.y) > 1) return tr('Must be adjacent');
+      if (v.hp >= v.maxHp) return tr('Not wounded');
       return null;
     }
     if (kind === 'jump') {
-      if (!this.walkable(this.tile(tx, ty)) || this.unitAt(tx, ty)) return 'Cannot land there';
+      if (!this.walkable(this.tile(tx, ty)) || this.unitAt(tx, ty)) return tr('Cannot land there');
       const dist = Math.hypot(tx - u.x, ty - u.y);
-      if (dist > g.def.range + 0.5) return 'Too far';
-      if (this.sightBlocked(u.x, u.y, tx, ty)) return 'No clear arc';
+      if (dist > g.def.range + 0.5) return tr('Too far');
+      if (this.sightBlocked(u.x, u.y, tx, ty)) return tr('No clear arc');
       return null;
     }
-    return 'Cannot be used';
+    return tr('Cannot be used');
   }
 
   useGear(u, g, tx, ty) {
@@ -410,8 +411,8 @@ export class Battle {
       u.ap -= g.def.ap;
       g.charges--;
       const kind = g.def.active;
-      if (kind === 'reload') { u.weapon.ammo = u.weapon.def.ammo; await this.fx.note(u, 'RELOADED', 'good'); }
-      else if (kind === 'stim') { u.ap += 3; await this.fx.note(u, '+3 AP', 'good'); }
+      if (kind === 'reload') { u.weapon.ammo = u.weapon.def.ammo; await this.fx.note(u, tr('RELOADED'), 'good'); }
+      else if (kind === 'stim') { u.ap += 3; await this.fx.note(u, tr('+{n} AP', { n: 3 }), 'good'); }
       else if (kind === 'heal') {
         const v = this.unitAt(tx, ty);
         const amount = Math.min(v.maxHp - v.hp, 5 + 3 * u.medic);
@@ -448,8 +449,8 @@ export class Battle {
   async _startTurn() {
     this.turn++;
     const o = this.mission.objective;
-    if (o.type === 'survive' && this.turn > o.turns) return this._finish(true, 'The line held.');
-    if (this.mission.turnLimit && this.turn > this.mission.turnLimit) return this._finish(false, 'Out of time.');
+    if (o.type === 'survive' && this.turn > o.turns) return this._finish(true, tr('The line held.'));
+    if (this.mission.turnLimit && this.turn > this.mission.turnLimit) return this._finish(false, tr('Out of time.'));
     this.phase = 'player';
     for (const m of this.marines()) {
       m.ap = m.maxAp;
@@ -468,11 +469,11 @@ export class Battle {
   _checkEnd() {
     if (this.over) return;
     const marines = this.marines();
-    if (!marines.length) return this._finish(false, 'The squad has been wiped out.');
+    if (!marines.length) return this._finish(false, tr('The squad has been wiped out.'));
     const o = this.mission.objective;
-    if (o.type === 'eliminate' && !this.aliens().length && this.spawnLeft <= 0) this._finish(true, 'Area secured.');
-    else if (o.type === 'kill' && !this.aliens().some(a => a.kind === o.kind)) this._finish(true, 'Target destroyed.');
-    else if (o.type === 'exit' && marines.every(m => this.tile(m.x, m.y).exit)) this._finish(true, 'Squad extracted.');
+    if (o.type === 'eliminate' && !this.aliens().length && this.spawnLeft <= 0) this._finish(true, tr('Area secured.'));
+    else if (o.type === 'kill' && !this.aliens().some(a => a.kind === o.kind)) this._finish(true, tr('Target destroyed.'));
+    else if (o.type === 'exit' && marines.every(m => this.tile(m.x, m.y).exit)) this._finish(true, tr('Squad extracted.'));
   }
 
   async _move(u, path) {
@@ -491,10 +492,10 @@ export class Battle {
     const t = this.tile(u.x, u.y);
     if (t.pickup === 'ammo' && u.weapon.ammo < u.weapon.def.ammo) {
       u.weapon.ammo = u.weapon.def.ammo; t.pickup = null;
-      await this.fx.pickup(u, t, 'AMMO');
+      await this.fx.pickup(u, t, tr('AMMO'));
     } else if (t.pickup === 'med' && u.hp < u.maxHp) {
       u.hp = u.maxHp; t.pickup = null;
-      await this.fx.pickup(u, t, 'PATCHED UP');
+      await this.fx.pickup(u, t, tr('PATCHED UP'));
     }
   }
 
@@ -509,7 +510,7 @@ export class Battle {
   }
 
   async _damage(target, dmg, source, note) {
-    if (dmg <= 0) { await this.fx.note(target, 'DEFLECTED', 'bad'); return; }
+    if (dmg <= 0) { await this.fx.note(target, tr('DEFLECTED'), 'bad'); return; }
     target.hp = Math.max(0, target.hp - dmg);
     await this.fx.damage(target, dmg, note);
     if (target.hp <= 0) await this._kill(target, source);
@@ -546,7 +547,7 @@ export class Battle {
       if (!m.alive || !m.guard) continue;
       const mode = this.reactionMode(m, foe);
       if (!mode) continue;
-      await this.fx.note(m, 'REACTION', 'info');
+      await this.fx.note(m, tr('REACTION'), 'info');
       await this._attack(m, foe.x, foe.y, mode);
     }
   }
@@ -577,7 +578,7 @@ export class Battle {
           if (!t) break;
           await this._provoke(a);
           if (!a.alive || this.over) break;
-          await this._attack(a, t.x, t.y, { name: 'Claw', ...def.melee, pattern: 'melee' });
+          await this._attack(a, t.x, t.y, { name: tr('Claw'), ...def.melee, pattern: 'melee' });
         }
       }
     }
@@ -591,7 +592,7 @@ export class Battle {
     await this._reactions(a);
   }
 
-  _rangedMode(a) { return { name: 'Acid', ...a.def.ranged, pattern: 'single', fx: 'acid' }; }
+  _rangedMode(a) { return { name: tr('Acid'), ...a.def.ranged, pattern: 'single', fx: 'acid' }; }
 
   _shootTarget(a, fx, fy) {
     const mode = this._rangedMode(a);

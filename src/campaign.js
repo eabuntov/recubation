@@ -2,6 +2,7 @@
 
 import { WEAPONS, ARMORS, GEAR, SKILLS, SOLDIER_NAMES, SQUAD_COLORS, xpForLevel, meetsReq } from './data.js';
 import { MISSIONS } from './missions.js';
+import { t } from './i18n.js';
 
 const SAVE_KEY = 'recubation.save.v1';
 export const GEAR_SLOTS = 2;
@@ -91,9 +92,9 @@ export function raiseSkill(s, id) {
 // Swapping kit refunds the old item in full, so the price is just the difference.
 export function equipProblem(state, s, table, id, old) {
   const def = table[id];
-  if (!meetsReq(s.skills, def.req)) return 'Not qualified';
+  if (!meetsReq(s.skills, def.req)) return t('Not qualified');
   const delta = def.cost - (old ? table[old].cost : 0);
-  if (delta > state.rp) return 'Not enough requisition';
+  if (delta > state.rp) return t('Not enough requisition');
   return null;
 }
 

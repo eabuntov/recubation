@@ -6,6 +6,7 @@ import { DIRS } from './data.js';
 import { key } from './battle.js';
 import { buildMarine, buildAlien } from './models.js';
 import { sfx } from './audio.js';
+import { t as tr } from './i18n.js';
 
 const HU = 0.7;        // world height of one level
 const WALL_H = 1.1;
@@ -659,7 +660,7 @@ export class View {
   }
 
   async note(u, text, cls) {
-    if (text === 'DEFLECTED') { sfx.clang(); this.spark(this.above(u).setY(this.above(u).y - 0.5), 0xffffff, 0.2); }
+    if (text === tr('DEFLECTED')) { sfx.clang(); this.spark(this.above(u).setY(this.above(u).y - 0.5), 0xffffff, 0.2); }
     else if (cls === 'good') sfx.good();
     this.floatText(this.above(u), text, cls);
     this.syncLabel(this.objs.get(u.id));
@@ -680,7 +681,7 @@ export class View {
     if (this.selected === u) this.setSelected(null);
     if (u.side === 'marine') {
       sfx.down();
-      this.floatText(this.above(u), u.name + ' is down', 'dmg-us');
+      this.floatText(this.above(u), tr('{name} is down', { name: u.name }), 'dmg-us');
       await this.tween(420, k => { o.model.rotation.x = -k * Math.PI / 2; o.model.position.y = k * 0.12; });
       for (const m of o.mats) { m.color.multiplyScalar(0.35); m.emissive.setScalar(0); }
     } else {
@@ -712,13 +713,13 @@ export class View {
     const o = this.addUnit(u);
     sfx.spawn();
     this.focus(u.x, u.y);
-    this.floatText(this.pos(u.x, u.y, 1.2), 'HATCH', 'bad');
+    this.floatText(this.pos(u.x, u.y, 1.2), tr('HATCH'), 'bad');
     await this.tween(300, k => o.group.scale.setScalar(0.05 + 0.95 * k));
   }
 
   async hatchBlocked(t) {
     sfx.clang();
-    this.floatText(this.pos(t.x, t.y, 1.5), 'SEALED', 'good');
+    this.floatText(this.pos(t.x, t.y, 1.5), tr('SEALED'), 'good');
     await this.wait(200);
   }
 
@@ -735,7 +736,7 @@ export class View {
     term.screenMat.color.set(0x3dffa0); term.screenMat.emissive.set(0x3dffa0); term.light.color.set(0x3dffa0);
     sfx.good();
     this.syncLabels();
-    this.floatText(this.pos(t.x, t.y, 1.3), 'OVERRIDE ACCEPTED', 'good');
+    this.floatText(this.pos(t.x, t.y, 1.3), tr('OVERRIDE ACCEPTED'), 'good');
     if (!doors.length) return;
     sfx.door();
     this.focus(doors[0].x, doors[0].y);

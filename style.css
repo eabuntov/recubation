@@ -10,7 +10,7 @@
   --bad: #ff5546;
   --good: #4fe39a;
   --mono: ui-monospace, "Cascadia Mono", Consolas, "SF Mono", Menlo, monospace;
-  --sans: "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  --sans: "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, "Microsoft YaHei", "PingFang SC", "Hiragino Sans", "Yu Gothic UI", "Noto Sans CJK SC", sans-serif;
 }
 
 * { box-sizing: border-box; }
@@ -172,6 +172,8 @@ h3 { font-size: 11px; color: var(--dim); letter-spacing: 0.18em; margin: 18px 0 
 .title .sub { letter-spacing: 0.5em; margin-right: -0.5em; color: var(--warn); text-transform: uppercase; font-size: 13px; margin-top: 6px; }
 .title .menu { display: flex; flex-direction: column; gap: 10px; width: 260px; margin: 46px auto 0; }
 .title .menu button { padding: 14px; font-size: 13px; }
+.title .lang { display: flex; align-items: center; gap: 10px; margin-top: 14px; color: var(--dim); font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; }
+.title .lang select { flex: 1; text-transform: none; letter-spacing: 0; }
 .title .note { color: var(--dim); font-size: 11px; margin-top: 40px; max-width: 520px; margin-inline: auto; }
 
 .roster { display: flex; flex-direction: column; gap: 6px; }

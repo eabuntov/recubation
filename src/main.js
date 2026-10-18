@@ -7,6 +7,8 @@ import { Battle } from './battle.js';
 import { MISSIONS } from './missions.js';
 import { newCampaign, currentMission, reinforce, applyResult, save, load, clearSave } from './campaign.js';
 import { sfx, unlock, ambience } from './audio.js';
+import { t, initLang, setLang } from './i18n.js';
+import { localize } from './locale.js';
 
 const view = new View(document.getElementById('view'), document.getElementById('labels'));
 const ui = new UI();
@@ -17,7 +19,7 @@ let helpReturn = null;
 const tactical = new Tactical(view, ui, {
   help: () => showHelp(null),
   closeHelp: () => closeHelp(),
-  abort: () => { if (battle && tactical.ready && confirm('Abandon this mission? Nothing is lost; you return to the briefing.')) staging(); },
+  abort: () => { if (battle && tactical.ready && confirm(t('Abandon this mission? Nothing is lost; you return to the briefing.'))) staging(); },
 });
 
 window.addEventListener('pointerdown', unlock, { capture: true });
@@ -31,18 +33,18 @@ const fx = new Proxy({
   refresh() { tactical.refresh(); },
   async phase(name, b) {
     tactical.refresh();
-    if (name === 'alien') { sfx.alarm(); ui.banner('Hostile phase', 'alien'); await view.wait(650); return; }
+    if (name === 'alien') { sfx.alarm(); ui.banner(t('Hostile phase'), 'alien'); await view.wait(650); return; }
     const m = b.mission, left = m.turnLimit ? m.turnLimit - b.turn : null;
-    const sub = m.objective.type === 'survive' ? `${m.objective.turns - b.turn + 1} to hold`
-      : left != null && left <= 4 ? (left === 0 ? 'Final turn' : `${left + 1} turns remain`) : '';
+    const sub = m.objective.type === 'survive' ? t('{n} to hold', { n: m.objective.turns - b.turn + 1 })
+      : left != null && left <= 4 ? (left === 0 ? t('Final turn') : t('{n} turns remain', { n: left + 1 })) : '';
     sfx.turn();
-    ui.banner(`Turn ${b.turn}`, '', sub);
+    ui.banner(t('Turn {n}', { n: b.turn }), '', sub);
     await view.wait(450);
   },
   async finish(result) {
     ui.hud(battle, null, 0, null, {});
     (result.win ? sfx.win : sfx.lose)();
-    ui.banner(result.win ? 'Mission complete' : 'Mission failed', result.win ? 'win' : 'alien', result.text, true);
+    ui.banner(t(result.win ? 'Mission complete' : 'Mission failed'), result.win ? 'win' : 'alien', result.text, true);
     await view.wait(2200);
     const done = battle;
     const mission = done.mission;
@@ -87,12 +89,13 @@ function title() {
     hasSave: !!load(),
     onContinue: () => { state = load(); staging(); },
     onNew: () => {
-      if (load() && !confirm('Start over? The current campaign will be erased.')) return;
+      if (load() && !confirm(t('Start over? The current campaign will be erased.'))) return;
       clearSave();
       state = newCampaign();
       staging();
     },
     onHelp: () => showHelp(title),
+    onLang: async code => { await setLang(code, true); localize(); title(); },
   });
 }
 
@@ -135,11 +138,13 @@ window.addEventListener('error', e => fatal(e.message));
 window.addEventListener('unhandledrejection', e => fatal(e.reason && e.reason.stack || String(e.reason)));
 function fatal(msg) {
   const el = document.getElementById('fatal');
-  el.textContent = 'Something broke:\n\n' + msg + '\n\nReload the page to continue; campaign progress is saved between missions.';
+  el.textContent = t('Something broke:') + '\n\n' + msg + '\n\n' + t('Reload the page to continue; campaign progress is saved between missions.');
   el.hidden = false;
 }
 
 // Small hook for automated checks and the curious.
 window.recubation = { view, tactical, get battle() { return battle; }, get state() { return state; } };
 
+await initLang();
+localize();
 title();

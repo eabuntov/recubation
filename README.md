@@ -30,6 +30,10 @@ You can also set the `PORT` environment variable. The server listens on `127.0.0
 
 Campaign progress is saved automatically in your browser's `localStorage`. Use **Continue** on the title screen to pick up where you left off.
 
+## Languages
+
+The game is available in English, Russian, Ukrainian, German, French, Spanish, Portuguese, Polish, Simplified Chinese and Japanese. By default it follows your browser's language and falls back to English. To choose one yourself, use the **Language** menu on the title screen; the choice is remembered. Pick **Auto** to follow the browser again.
+
 ## Controls
 
 | Input | Action |
@@ -71,6 +75,12 @@ npm test
 
 This runs `test/sim.mjs`, which needs no browser. It validates every map (reachability, ramps, start positions) and auto-plays each mission with a simple bot, so rule or AI errors surface as exceptions.
 
+It then runs `test/i18n.mjs`, which checks that every language covers every string the game shows, with matching `{placeholders}` and all the plural forms its grammar needs. `node test/i18n.mjs --keys` prints the full list of English strings.
+
+### Adding or changing text
+
+Write player-facing text in English and wrap it in `t()` from `src/i18n.js`, for example `t('Out of range')` or `t('Blocked by {name}', { name })`. The English text is the lookup key. Names and descriptions in `data.js` and `missions.js` are translated automatically. Then add the string to each file in `src/lang/` and run `npm test` to find any gaps.
+
 ## Project layout
 
 ```
@@ -88,7 +98,11 @@ src/
   ui.js         Menus, armoury, debrief and HUD
   audio.js      Synthesised sound effects
   data.js       Weapons, armour, gear, skills, hostiles
+  i18n.js       Language detection, selection and t()
+  locale.js     Applies the language to data tables and the page
+  lang/         One dictionary per language
 test/sim.mjs    Headless map validation and auto-play
+test/i18n.mjs   Dictionary completeness check
 ```
 
 ## License

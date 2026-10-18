@@ -3,6 +3,7 @@
 import { DIRS } from './data.js';
 import { key } from './battle.js';
 import { sfx, toggleMute } from './audio.js';
+import { t as tr } from './i18n.js';
 
 const DRAG_PX = 6;
 const esc = s => String(s).replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
@@ -120,24 +121,25 @@ export class Tactical {
     extra.set(k, 'hover');
 
     if (u && u.side === 'alien') {
-      lines.push(`<b>${esc(u.name)}</b> <span class="dim">HP ${u.hp}/${u.maxHp}</span>`, `<span class="dim">${esc(u.def.desc)}</span>`);
+      lines.push(`<b>${esc(u.name)}</b> <span class="dim">${esc(tr('HP {hp}/{max}', { hp: u.hp, max: u.maxHp }))}</span>`, `<span class="dim">${esc(u.def.desc)}</span>`);
     } else if (u) {
-      lines.push(`<b>${esc(u.name)}</b> <span class="dim">HP ${u.hp}/${u.maxHp} · AP ${u.ap}</span>`, `<span class="dim">${esc(u.weapon.def.name)} · ${u.weapon.ammo} rds</span>`);
+      lines.push(`<b>${esc(u.name)}</b> <span class="dim">${esc(tr('HP {hp}/{max} · AP {ap}', { hp: u.hp, max: u.maxHp, ap: u.ap }))}</span>`, `<span class="dim">${esc(u.weapon.def.name)} · ${esc(tr('{n} rds', { n: u.weapon.ammo }))}</span>`);
     } else if (t.terminal) {
-      lines.push('<b>Terminal</b>', t.terminal.used ? '<span class="dim">Override accepted</span>' : '<span class="dim">Opens a blast door</span>');
-    } else if (t.type === 'door') lines.push('<b>Blast door</b>', '<span class="dim">Sealed. Find its terminal.</span>');
+      lines.push(`<b>${esc(tr('Terminal'))}</b>`, `<span class="dim">${esc(tr(t.terminal.used ? 'Override accepted' : 'Opens a blast door'))}</span>`);
+    } else if (t.type === 'door') lines.push(`<b>${esc(tr('Blast door'))}</b>`, `<span class="dim">${esc(tr('Sealed. Find its terminal.'))}</span>`);
     else if (t.hatch) {
       const n = b.nextSpawnIn();
-      lines.push('<b>Brood hatch</b>', `<span class="dim">${n == null ? 'Dormant' : n === 0 ? 'Opens this turn' : `Opens in ${n} turn${n === 1 ? '' : 's'}`}. Stand on it to seal it.</span>`);
-    } else if (t.pickup) lines.push(t.pickup === 'ammo' ? '<b>Ammunition</b>' : '<b>Aid station</b>', '<span class="dim">Walk over it to use it.</span>');
-    else if (t.exit) lines.push('<b>Extraction zone</b>');
-    else if (t.type === 'crate') lines.push('<b>Crate</b>', '<span class="dim">Blocks movement, not fire.</span>');
+      const when = n == null ? tr('Dormant') : n === 0 ? tr('Opens this turn') : tr('Opens in {n} turns', { n });
+      lines.push(`<b>${esc(tr('Brood hatch'))}</b>`, `<span class="dim">${esc(tr('{when}. Stand on it to seal it.', { when }))}</span>`);
+    } else if (t.pickup) lines.push(`<b>${esc(tr(t.pickup === 'ammo' ? 'Ammunition' : 'Aid station'))}</b>`, `<span class="dim">${esc(tr('Walk over it to use it.'))}</span>`);
+    else if (t.exit) lines.push(`<b>${esc(tr('Extraction zone'))}</b>`);
+    else if (t.type === 'crate') lines.push(`<b>${esc(tr('Crate'))}</b>`, `<span class="dim">${esc(tr('Blocks movement, not fire.'))}</span>`);
 
     if (s && this.ready) {
       if (this.armed) {
         const kind = this.armed.def.active;
         const problem = b.gearProblem(s, this.armed, hv.x, hv.y);
-        lines.push(problem ? `<span class="bad">${esc(this.armed.def.name)}: ${esc(problem)}</span>` : `<span class="good">${esc(this.armed.def.name)} (${this.armed.def.ap} AP)</span>`);
+        lines.push(problem ? `<span class="bad">${esc(this.armed.def.name)}: ${esc(problem)}</span>` : `<span class="good">${esc(this.armed.def.name)} (${esc(tr('{n} AP', { n: this.armed.def.ap }))})</span>`);
         extra.set(k, problem ? 'bad' : 'use');
         if (kind === 'jump' && !problem) extra.set(k, 'path');
       } else if ((u && u.side === 'alien') || (this.mouse.shift && this.mode.pattern !== 'single' && this.mode.pattern !== 'melee' && !u)) {
@@ -147,22 +149,22 @@ export class Tactical {
           for (const hit of p.hits) {
             const dead = hit.dmg >= hit.unit.hp;
             const cls = hit.unit.side === 'marine' ? 'bad' : hit.dmg ? 'good' : 'warn';
-            lines.push(`<span class="${cls}">${esc(mode.name)} → ${esc(hit.unit.name)}: ${hit.dmg ? hit.dmg + ' dmg' : 'no effect'}${hit.note ? ' (' + esc(hit.note) + ')' : ''}${dead ? ' · kills' : ''}</span>`);
+            lines.push(`<span class="${cls}">${esc(mode.name)} → ${esc(hit.unit.name)}: ${esc(hit.dmg ? tr('{n} dmg', { n: hit.dmg }) : tr('no effect'))}${hit.note ? ' (' + esc(hit.note) + ')' : ''}${dead ? ' · ' + esc(tr('kills')) : ''}</span>`);
           }
-          if (!p.hits.length) lines.push('<span class="dim">Nothing in the blast</span>');
-          lines.push(`<span class="dim">${mode.ap} AP</span>`);
+          if (!p.hits.length) lines.push(`<span class="dim">${esc(tr('Nothing in the blast'))}</span>`);
+          lines.push(`<span class="dim">${esc(tr('{n} AP', { n: mode.ap }))}</span>`);
         } else {
           lines.push(`<span class="bad">${esc(p.problem)}</span>`);
           extra.set(k, 'bad');
         }
       } else if (t.terminal && !t.terminal.used) {
         const problem = b.terminalProblem(s, hv.x, hv.y);
-        lines.push(problem ? `<span class="bad">${esc(problem)}</span>` : '<span class="good">Activate (1 AP)</span>');
+        lines.push(problem ? `<span class="bad">${esc(problem)}</span>` : `<span class="good">${esc(tr('Activate ({n} AP)', { n: 1 }))}</span>`);
       } else if (!u) {
         const n = this.reach.get(k);
         if (n && n.cost > 0) {
           for (const st of b.pathFrom(n)) extra.set(key(st.x, st.y), 'path');
-          lines.push(`Move <span class="dim">${n.cost} AP · ${s.ap - n.cost} left</span>`);
+          lines.push(`${esc(tr('Move'))} <span class="dim">${esc(tr('{n} AP · {left} left', { n: n.cost, left: s.ap - n.cost }))}</span>`);
         }
       }
     }
@@ -196,7 +198,11 @@ export class Tactical {
     this.refresh();
   }
 
-  mute() { document.getElementById('btn-mute').textContent = toggleMute() ? 'Muted' : 'Sound'; }
+  mute() {
+    const btn = document.getElementById('btn-mute');
+    btn.dataset.i18n = toggleMute() ? 'Muted' : 'Sound';
+    btn.textContent = tr(btn.dataset.i18n);
+  }
 
   fast() {
     this.view.speed = this.view.speed === 1 ? 2.5 : 1;
