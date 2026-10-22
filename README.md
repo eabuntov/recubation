@@ -30,6 +30,24 @@ You can also set the `PORT` environment variable. The server listens on `127.0.0
 
 Campaign progress is saved automatically in your browser's `localStorage`. Use **Continue** on the title screen to pick up where you left off.
 
+## Deploying to a server
+
+On a fresh Ubuntu machine, with the repo cloned:
+
+```bash
+sudo tools/deploy.sh
+```
+
+That installs nginx, publishes `index.html`, `style.css` and `src/` to `/var/www/recubation` and writes the site config. For a host name and an HTTPS certificate:
+
+```bash
+sudo tools/deploy.sh -d recubation.example.com --tls -e you@example.com
+```
+
+With `--repo https://github.com/eabuntov/recubation.git` the script clones the game itself, so you can copy just the script to the server. `--help` lists the other options (port, web root, branch, site name).
+
+Re-run it to publish a change. Anything you delete here is deleted on the server too. The config it writes pre-compresses the scripts and language files, and tells browsers to revalidate every file. File names carry no content hash, so a cached `main.js` paired with a fresh `battle.js` would otherwise fail with "does not provide an export named ...".
+
 ## Languages
 
 The game is available in English, Russian, Ukrainian, German, French, Spanish, Portuguese, Polish, Simplified Chinese and Japanese. By default it follows your browser's language and falls back to English. To choose one yourself, use the **Language** menu on the title screen; the choice is remembered. Pick **Auto** to follow the browser again.
@@ -103,6 +121,7 @@ src/
   lang/         One dictionary per language
 test/sim.mjs    Headless map validation and auto-play
 test/i18n.mjs   Dictionary completeness check
+tools/deploy.sh nginx deployment for an Ubuntu server
 ```
 
 ## License
