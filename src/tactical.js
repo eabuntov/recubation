@@ -93,7 +93,9 @@ export class Tactical {
         for (const m of b.marines()) if (!b.gearProblem(s, this.armed, m.x, m.y)) this.base.set(key(m.x, m.y), 'use');
       } else {
         this.reach = b.flood(s.x, s.y, s.ap);
-        for (const [k, n] of this.reach) if (n.cost > 0) this.base.set(k, 'move');
+        // Walkable tiles keep the reaction arc where the two overlap: the arc
+        // is the tactically meaningful layer there.
+        for (const [k, n] of this.reach) if (n.cost > 0 && !this.base.has(k)) this.base.set(k, 'move');
         for (const a of b.aliens()) if (b.preview(s, a.x, a.y, this.mode).ok) this.base.set(key(a.x, a.y), 'target');
         for (const d of DIRS) if (!b.terminalProblem(s, s.x + d.x, s.y + d.y)) this.base.set(key(s.x + d.x, s.y + d.y), 'use');
       }
