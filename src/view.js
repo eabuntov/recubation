@@ -14,9 +14,9 @@ const SLAB = 0.3;      // how far floor slabs extend below their surface
 const UP = new THREE.Vector3(0, 1, 0);
 
 const OVERLAY = {
-  move: [0x3fa9ff, 0.20],
+  move: [0x3fa9ff, 0.34],
   path: [0x7fd4ff, 0.55],
-  cone: [0xffd24a, 0.10],
+  cone: [0xffd24a, 0.19],
   target: [0xff4a3d, 0.42],
   blast: [0xff8a2a, 0.50],
   bad: [0xff2a2a, 0.25],
