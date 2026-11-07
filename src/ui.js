@@ -51,6 +51,7 @@ export class UI {
     this.toastTimer = 0;
     this.confirming = false;
     this.confirmYes = null;
+    this.confirmNo = null;
   }
 
   // ---------------------------------------------------------------- screens
@@ -66,9 +67,11 @@ export class UI {
   hide() { this.screen.hidden = true; this.screen.replaceChildren(); }
 
   // A styled stand-in for window.confirm. onYes runs only on explicit
-  // confirmation; Cancel and Esc both count as "no".
-  confirm(text, yesLabel, onYes) {
+  // confirmation; Cancel and Esc both count as "no". The dialog replaces
+  // whatever screen is up, so pass onNo when that screen must be redrawn.
+  confirm(text, yesLabel, onYes, onNo) {
     this.confirmYes = onYes;
+    this.confirmNo = onNo;
     this.confirming = true;
     this.show(h('div.sheet.confirm',
       h('div.body', h('p', text)),
@@ -81,9 +84,9 @@ export class UI {
   settleConfirm(yes) {
     if (!this.confirming) return;
     this.confirming = false;
-    const fn = this.confirmYes;
+    const fn = yes ? this.confirmYes : this.confirmNo;
     this.hide();
-    if (yes && fn) fn();
+    if (fn) fn();
   }
 
   // Esc's way out of an open confirmation; true when one was just closed.

@@ -94,7 +94,7 @@ function title() {
         clearSave();
         state = newCampaign();
         staging();
-      });
+      }, title);
     },
     onHelp: () => showHelp(title),
     onLang: async code => { await setLang(code, true); localize(); title(); },
