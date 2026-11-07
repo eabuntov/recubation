@@ -309,10 +309,7 @@ export class Tactical {
   }
 
   onKey(e) {
-    if (!this.battle || !document.getElementById('screen').hidden) {
-      if (e.code === 'Escape' && this.battle && document.getElementById('screen').classList.contains('modal')) this.handlers.closeHelp();
-      return;
-    }
+    if (!this.battle || !document.getElementById('screen').hidden) return;
     if (e.key === 'Shift') { this.mouse.shift = true; this.onHover(); return; }
     const b = this.battle;
     switch (e.code) {

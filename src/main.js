@@ -18,8 +18,16 @@ let helpReturn = null;
 
 const tactical = new Tactical(view, ui, {
   help: () => showHelp(null),
-  closeHelp: () => closeHelp(),
   abort: () => { if (battle && tactical.ready) ui.confirm(t('Abandon this mission? Nothing is lost; you return to the briefing.'), t('Abort'), staging); },
+});
+
+// Modal screens handle their keys at the document level: the title screen has
+// no battle for Tactical's own handler to lean on. Esc closes, Enter confirms.
+window.addEventListener('keydown', e => {
+  const screen = document.getElementById('screen');
+  if (screen.hidden || !screen.classList.contains('modal')) return;
+  if (e.code === 'Escape') { e.preventDefault(); closeHelp(); }
+  else if (e.code === 'Enter' && ui.confirming) { e.preventDefault(); ui.settleConfirm(true); }
 });
 
 window.addEventListener('pointerdown', unlock, { capture: true });
