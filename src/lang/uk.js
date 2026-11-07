@@ -322,6 +322,8 @@ export default {
   "Hits from behind do 50% more damage, to them and to you.": "Влучання в спину завдають на 50% більше шкоди — і їм, і вам.",
   "Standing on a brood hatch seals it.": "Боєць, що стоїть на люку виводка, запечатує його.",
   "Troopers killed on a successful mission are gone for good; replacements are free but green.": "Бійці, що загинули в успішній місії, втрачені назавжди; заміна безкоштовна, але недосвідчена.",
+  "Cancel": "Скасувати",
+
   "Close": "Закрити",
   "Left click": "Лівий клік",
   "Select a trooper · move to a blue tile · fire at a hostile · use a terminal": "Обрати бійця · іти на синю клітинку · стріляти по ворогу · використати термінал",

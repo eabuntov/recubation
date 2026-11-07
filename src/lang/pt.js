@@ -322,6 +322,8 @@ export default {
   "Hits from behind do 50% more damage, to them and to you.": "Acertos pelas costas causam 50% a mais de dano, neles e em você.",
   "Standing on a brood hatch seals it.": "Ficar em cima de uma escotilha da ninhada a sela.",
   "Troopers killed on a successful mission are gone for good; replacements are free but green.": "Soldados mortos numa missão bem-sucedida se vão para sempre; os substitutos são gratuitos, mas inexperientes.",
+  "Cancel": "Cancelar",
+
   "Close": "Fechar",
   "Left click": "Clique esquerdo",
   "Select a trooper · move to a blue tile · fire at a hostile · use a terminal": "Selecionar soldado · ir para uma casa azul · atirar num inimigo · usar um terminal",

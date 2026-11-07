@@ -154,6 +154,8 @@ h3 { font-size: 11px; color: var(--dim); letter-spacing: 0.18em; margin: 18px 0 
 }
 #screen.modal { background: rgba(5, 7, 10, 0.7); }
 .sheet { width: min(1080px, 100%); max-height: 100%; display: flex; flex-direction: column; background: var(--panel); border: 1px solid var(--line); }
+.sheet.confirm { width: min(460px, 100%); }
+.sheet.confirm > .body p { margin: 0; }
 .sheet > header { padding: 16px 22px; border-bottom: 1px solid var(--line); display: flex; align-items: baseline; gap: 16px; }
 .sheet > header h2 { font-size: 20px; flex: 1; }
 .sheet > header .tag { color: var(--dim); font: 12px var(--mono); }

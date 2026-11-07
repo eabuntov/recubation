@@ -322,6 +322,8 @@ export default {
   "Hits from behind do 50% more damage, to them and to you.": "背后命中多造成 50% 伤害，对它们和对你都一样。",
   "Standing on a brood hatch seals it.": "站在孵化口上就能封住它。",
   "Troopers killed on a successful mission are gone for good; replacements are free but green.": "在成功的任务中阵亡的队员将永远离开；补充兵免费，但毫无经验。",
+  "Cancel": "取消",
+
   "Close": "关闭",
   "Left click": "左键",
   "Select a trooper · move to a blue tile · fire at a hostile · use a terminal": "选择队员 · 移动到蓝色格子 · 向敌人开火 · 使用终端",

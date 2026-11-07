@@ -322,6 +322,8 @@ export default {
   "Hits from behind do 50% more damage, to them and to you.": "Treffer von hinten verursachen 50 % mehr Schaden – bei ihnen wie bei dir.",
   "Standing on a brood hatch seals it.": "Wer auf einer Brutluke steht, versiegelt sie.",
   "Troopers killed on a successful mission are gone for good; replacements are free but green.": "In einer erfolgreichen Mission gefallene Soldaten sind für immer verloren; Ersatz ist kostenlos, aber unerfahren.",
+  "Cancel": "Abbrechen",
+
   "Close": "Schließen",
   "Left click": "Linksklick",
   "Select a trooper · move to a blue tile · fire at a hostile · use a terminal": "Soldat wählen · auf blaues Feld bewegen · auf Feind feuern · Terminal benutzen",

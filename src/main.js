@@ -19,7 +19,7 @@ let helpReturn = null;
 const tactical = new Tactical(view, ui, {
   help: () => showHelp(null),
   closeHelp: () => closeHelp(),
-  abort: () => { if (battle && tactical.ready && confirm(t('Abandon this mission? Nothing is lost; you return to the briefing.'))) staging(); },
+  abort: () => { if (battle && tactical.ready) ui.confirm(t('Abandon this mission? Nothing is lost; you return to the briefing.'), t('Abort'), staging); },
 });
 
 window.addEventListener('pointerdown', unlock, { capture: true });
@@ -89,10 +89,12 @@ function title() {
     hasSave: !!load(),
     onContinue: () => { state = load(); staging(); },
     onNew: () => {
-      if (load() && !confirm(t('Start over? The current campaign will be erased.'))) return;
-      clearSave();
-      state = newCampaign();
-      staging();
+      if (!load()) { clearSave(); state = newCampaign(); staging(); return; }
+      ui.confirm(t('Start over? The current campaign will be erased.'), t('New campaign'), () => {
+        clearSave();
+        state = newCampaign();
+        staging();
+      });
     },
     onHelp: () => showHelp(title),
     onLang: async code => { await setLang(code, true); localize(); title(); },
@@ -131,6 +133,7 @@ function showHelp(back) {
 }
 
 function closeHelp() {
+  if (ui.closeConfirm()) return;
   if (helpReturn) helpReturn(); else ui.hide();
 }
 

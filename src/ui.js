@@ -49,6 +49,8 @@ export class UI {
     this.hudEl = $('hud');
     this.tipEl = $('tip');
     this.toastTimer = 0;
+    this.confirming = false;
+    this.confirmYes = null;
   }
 
   // ---------------------------------------------------------------- screens
@@ -62,6 +64,34 @@ export class UI {
   }
 
   hide() { this.screen.hidden = true; this.screen.replaceChildren(); }
+
+  // A styled stand-in for window.confirm. onYes runs only on explicit
+  // confirmation; Cancel and Esc both count as "no".
+  confirm(text, yesLabel, onYes) {
+    this.confirmYes = onYes;
+    this.confirming = true;
+    this.show(h('div.sheet.confirm',
+      h('div.body', h('p', text)),
+      h('footer',
+        btn(t('Cancel'), () => this.settleConfirm(false)),
+        btn(yesLabel, () => this.settleConfirm(true), 'primary')),
+    ), true);
+  }
+
+  settleConfirm(yes) {
+    if (!this.confirming) return;
+    this.confirming = false;
+    const fn = this.confirmYes;
+    this.hide();
+    if (yes && fn) fn();
+  }
+
+  // Esc's way out of an open confirmation; true when one was just closed.
+  closeConfirm() {
+    if (!this.confirming) return false;
+    this.settleConfirm(false);
+    return true;
+  }
 
   title({ hasSave, onNew, onContinue, onHelp, onLang }) {
     const picked = savedLang();

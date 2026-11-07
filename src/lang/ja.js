@@ -322,6 +322,8 @@ export default {
   "Hits from behind do 50% more damage, to them and to you.": "背後からの攻撃は 50% 増しのダメージ。敵にも味方にも適用される。",
   "Standing on a brood hatch seals it.": "孵化ハッチの上に立つと封鎖できる。",
   "Troopers killed on a successful mission are gone for good; replacements are free but green.": "成功した任務で戦死した隊員は二度と戻らない。補充兵は無料だが新米だ。",
+  "Cancel": "キャンセル",
+
   "Close": "閉じる",
   "Left click": "左クリック",
   "Select a trooper · move to a blue tile · fire at a hostile · use a terminal": "隊員を選択 · 青いマスへ移動 · 敵を射撃 · 端末を使用",
