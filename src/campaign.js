@@ -122,8 +122,41 @@ export function save(state) {
 export function load() {
   try {
     const s = JSON.parse(localStorage.getItem(SAVE_KEY));
-    return s && Array.isArray(s.squad) ? s : null;
+    return s && Array.isArray(s.squad) ? sanitize(s) : null;
   } catch { return null; }
+}
+
+// Saves may come from an older version of the game. Accept whatever shape
+// roughly matches and fall back to standard kit for anything unrecognised,
+// so an outdated save degrades gracefully instead of crashing mid-campaign.
+function sanitize(s) {
+  const int = (v, d, lo = 0) => (Number.isInteger(v) && v >= lo ? v : d);
+  s.mission = Math.min(int(s.mission, 0), MISSIONS.length);
+  s.rp = int(s.rp, 0);
+  s.nextId = int(s.nextId, s.squad.length + 1, 1);
+  s.fallen = Array.isArray(s.fallen) ? s.fallen : [];
+  s.names = Array.isArray(s.names) && s.names.length ? s.names : [...SOLDIER_NAMES];
+  s.squad = s.squad.filter(q => q && typeof q === 'object').map((q, i) => {
+    const skills = {};
+    for (const k in SKILLS) skills[k] = Math.min(int(q.skills && q.skills[k], 0), SKILLS[k].max);
+    return {
+      id: int(q.id, i + 1, 1),
+      name: typeof q.name === 'string' ? q.name : SOLDIER_NAMES[0],
+      color: int(q.color, SQUAD_COLORS[i % SQUAD_COLORS.length]),
+      level: Math.max(1, int(q.level, 1, 1)),
+      xp: int(q.xp, 0),
+      sp: int(q.sp, 0),
+      skills,
+      weapon: WEAPONS[q.weapon] ? q.weapon : 'carbine',
+      armor: ARMORS[q.armor] ? q.armor : 'none',
+      gear: Array.from({ length: GEAR_SLOTS }, (_, g) =>
+        Array.isArray(q.gear) && GEAR[q.gear[g]] ? q.gear[g] : null),
+      kills: int(q.kills, 0),
+      missions: int(q.missions, 0),
+    };
+  });
+  if (s.mission >= MISSIONS.length) s.complete = true;
+  return s;
 }
 
 export function clearSave() {
