@@ -134,7 +134,9 @@ function sanitize(s) {
   s.mission = Math.min(int(s.mission, 0), MISSIONS.length);
   s.rp = int(s.rp, 0);
   s.nextId = int(s.nextId, s.squad.length + 1, 1);
-  s.fallen = Array.isArray(s.fallen) ? s.fallen : [];
+  s.fallen = Array.isArray(s.fallen)
+    ? s.fallen.filter(f => f && typeof f === 'object' && typeof f.name === 'string')
+    : [];
   s.names = Array.isArray(s.names) && s.names.length ? s.names : [...SOLDIER_NAMES];
   s.squad = s.squad.filter(q => q && typeof q === 'object').map((q, i) => {
     const skills = {};
