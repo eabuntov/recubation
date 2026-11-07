@@ -529,13 +529,15 @@ export class Battle {
     this._checkEnd();
   }
 
-  // The first usable reaction for a guarding marine against `foe`, or null.
-  reactionMode(m, foe) {
-    if (!this.inCone(m, foe.x, foe.y)) return null;
+  // The first mode a guarding marine would fire at a hostile standing on
+  // (tx,ty), or null. The HUD asks the same question to draw the reaction arc.
+  reactionMode(m, tx, ty) {
+    if (!this.inCone(m, tx, ty)) return null;
     for (const mode of this.modes(m)) {
-      if (!this.preview(m, foe.x, foe.y, mode).ok) continue;
+      const p = this.preview(m, tx, ty, mode);
+      if (!p.ok) continue;
       if (mode.pattern !== 'single' && mode.pattern !== 'melee'
-        && this.affected(m, foe.x, foe.y, mode).some(h => h.unit.side === 'marine')) continue;
+        && p.hits.some(h => h.unit.side === 'marine')) continue;
       return mode;
     }
     return null;
@@ -545,7 +547,7 @@ export class Battle {
     for (const m of this.marines()) {
       if (!foe.alive || this.over) break;
       if (!m.alive || !m.guard) continue;
-      const mode = this.reactionMode(m, foe);
+      const mode = this.reactionMode(m, foe.x, foe.y);
       if (!mode) continue;
       await this.fx.note(m, tr('REACTION'), 'info');
       await this._attack(m, foe.x, foe.y, mode);

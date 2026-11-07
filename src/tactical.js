@@ -81,7 +81,7 @@ export class Tactical {
         const t = b.tile(x, y);
         if (!t || !b.walkable(t) || !b.inCone(s, x, y)) continue;
         if (Math.hypot(x - s.x, y - s.y) > range + 0.5 || b.sightBlocked(s.x, s.y, x, y)) continue;
-        if (!this.wouldReact(s, x, y)) continue;
+        if (!b.reactionMode(s, x, y)) continue;
         this.base.set(key(x, y), 'cone');
       }
       if (this.armed && this.armed.def.active === 'jump') {
@@ -114,20 +114,6 @@ export class Tactical {
     const styles = new Map(this.base);
     if (extra) for (const [k, v] of extra) styles.set(k, v);
     this.view.setOverlays(styles);
-  }
-
-  // Would this trooper's reaction fire trigger against a hostile standing here?
-  // Mirrors the rules engine's own acceptance check in Battle.reactionMode.
-  wouldReact(s, x, y) {
-    const b = this.battle;
-    for (const mode of b.modes(s)) {
-      const p = b.preview(s, x, y, mode);
-      if (!p.ok) continue;
-      if (mode.pattern !== 'single' && mode.pattern !== 'melee'
-        && p.hits.some(h => h.unit.side === 'marine')) continue;
-      return true;
-    }
-    return false;
   }
 
   // Recompute the cursor-dependent overlay and tooltip.
