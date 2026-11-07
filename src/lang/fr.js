@@ -34,7 +34,7 @@ export default {
   "Medkit": "Trousse de soins",
   "Heal yourself or an adjacent trooper for 5, +3 per Medic level. 2 uses.": "Soigne vous ou un soldat adjacent de 5, +3 par niveau d'infirmier. 2 utilisations.",
   "Jump Pack": "Réacteur dorsal",
-  "Leap up to 3 tiles over anything, onto any level. 3 uses.": "Bondit jusqu'à 3 cases par-dessus n'importe quoi, sur n'importe quel niveau. 3 utilisations.",
+  "Leap up to 3 tiles over troops and crates, onto any level. 3 uses.": "Bondit jusqu'à 3 cases par-dessus les soldats et les caisses, sur n'importe quel niveau. 3 utilisations.",
   "Combat Stim": "Stimulant de combat",
   "+3 action points right now. Single use.": "+3 points d'action immédiatement. Usage unique.",
   "Spare Magazine": "Chargeur de rechange",

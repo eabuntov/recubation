@@ -80,7 +80,7 @@ export const ARMORS = {
 // kind: passive gear modifies stats, active gear adds a button on the action bar.
 export const GEAR = {
   medkit: { name: 'Medkit', cost: 25, req: { medic: 1 }, charges: 2, ap: 2, active: 'heal', desc: 'Heal yourself or an adjacent trooper for 5, +3 per Medic level. 2 uses.' },
-  jump: { name: 'Jump Pack', cost: 60, req: { tech: 1 }, charges: 3, ap: 2, active: 'jump', range: 3, desc: 'Leap up to 3 tiles over anything, onto any level. 3 uses.' },
+  jump: { name: 'Jump Pack', cost: 60, req: { tech: 1 }, charges: 3, ap: 2, active: 'jump', range: 3, desc: 'Leap up to 3 tiles over troops and crates, onto any level. 3 uses.' },
   stim: { name: 'Combat Stim', cost: 20, req: {}, charges: 1, ap: 0, active: 'stim', desc: '+3 action points right now. Single use.' },
   mag: { name: 'Spare Magazine', cost: 15, req: {}, charges: 1, ap: 1, active: 'reload', desc: 'Fully reloads your weapon. Single use.' },
   servo: { name: 'Servo Harness', cost: 70, req: { tech: 2 }, apBonus: 1, desc: '+1 action point every turn.' },

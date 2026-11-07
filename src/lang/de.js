@@ -34,7 +34,7 @@ export default {
   "Medkit": "Medikit",
   "Heal yourself or an adjacent trooper for 5, +3 per Medic level. 2 uses.": "Heilt dich oder einen benachbarten Soldaten um 5, +3 pro Sanitäter-Stufe. 2 Anwendungen.",
   "Jump Pack": "Sprungmodul",
-  "Leap up to 3 tiles over anything, onto any level. 3 uses.": "Springe bis zu 3 Felder über alles hinweg, auf jede Ebene. 3 Anwendungen.",
+  "Leap up to 3 tiles over troops and crates, onto any level. 3 uses.": "Springe bis zu 3 Felder über Soldaten und Kisten hinweg, auf jede Ebene. 3 Anwendungen.",
   "Combat Stim": "Kampfstimulans",
   "+3 action points right now. Single use.": "Sofort +3 Aktionspunkte. Einmalig.",
   "Spare Magazine": "Ersatzmagazin",

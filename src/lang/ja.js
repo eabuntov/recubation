@@ -34,7 +34,7 @@ export default {
   "Medkit": "メディキット",
   "Heal yourself or an adjacent trooper for 5, +3 per Medic level. 2 uses.": "自分か隣接する隊員を 5 回復、衛生兵レベルごとに +3。2 回使用可能。",
   "Jump Pack": "ジャンプパック",
-  "Leap up to 3 tiles over anything, onto any level. 3 uses.": "何でも飛び越えて最大 3 マス跳躍、どの階層にも着地可能。3 回使用可能。",
+  "Leap up to 3 tiles over troops and crates, onto any level. 3 uses.": "隊員や木箱を飛び越えて最大 3 マス跳躍、どの階層にも着地可能。3 回使用可能。",
   "Combat Stim": "戦闘用興奮剤",
   "+3 action points right now. Single use.": "即座に行動ポイント +3。使い捨て。",
   "Spare Magazine": "予備弾倉",

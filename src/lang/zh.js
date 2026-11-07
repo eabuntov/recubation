@@ -34,7 +34,7 @@ export default {
   "Medkit": "医疗包",
   "Heal yourself or an adjacent trooper for 5, +3 per Medic level. 2 uses.": "为自己或相邻队员恢复 5 点生命，每级战地医疗 +3。可用 2 次。",
   "Jump Pack": "跳跃背包",
-  "Leap up to 3 tiles over anything, onto any level. 3 uses.": "越过任何障碍跳跃至多 3 格，可落到任意层。可用 3 次。",
+  "Leap up to 3 tiles over troops and crates, onto any level. 3 uses.": "越过队员和箱子跳跃至多 3 格，可落到任意层。可用 3 次。",
   "Combat Stim": "战斗兴奋剂",
   "+3 action points right now. Single use.": "立即获得 +3 行动点。一次性。",
   "Spare Magazine": "备用弹匣",

@@ -34,7 +34,7 @@ export default {
   "Medkit": "Botiquín",
   "Heal yourself or an adjacent trooper for 5, +3 per Medic level. 2 uses.": "Te cura a ti o a un soldado adyacente 5 puntos, +3 por nivel de médico. 2 usos.",
   "Jump Pack": "Mochila de salto",
-  "Leap up to 3 tiles over anything, onto any level. 3 uses.": "Salta hasta 3 casillas por encima de lo que sea, a cualquier nivel. 3 usos.",
+  "Leap up to 3 tiles over troops and crates, onto any level. 3 uses.": "Salta hasta 3 casillas por encima de soldados y cajas, a cualquier nivel. 3 usos.",
   "Combat Stim": "Estimulante de combate",
   "+3 action points right now. Single use.": "+3 puntos de acción al instante. Un solo uso.",
   "Spare Magazine": "Cargador de repuesto",

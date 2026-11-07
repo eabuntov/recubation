@@ -34,7 +34,7 @@ export default {
   "Medkit": "Аптечка",
   "Heal yourself or an adjacent trooper for 5, +3 per Medic level. 2 uses.": "Лікує вас або сусіднього бійця на 5, +3 за кожен рівень медика. 2 застосування.",
   "Jump Pack": "Стрибковий ранець",
-  "Leap up to 3 tiles over anything, onto any level. 3 uses.": "Стрибок до 3 клітинок через будь-які перешкоди, на будь-який рівень. 3 застосування.",
+  "Leap up to 3 tiles over troops and crates, onto any level. 3 uses.": "Стрибок до 3 клітинок через бійців та ящики, на будь-який рівень. 3 застосування.",
   "Combat Stim": "Бойовий стимулятор",
   "+3 action points right now. Single use.": "+3 очки дії просто зараз. Одноразовий.",
   "Spare Magazine": "Запасний магазин",

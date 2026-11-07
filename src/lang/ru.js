@@ -34,7 +34,7 @@ export default {
   "Medkit": "Аптечка",
   "Heal yourself or an adjacent trooper for 5, +3 per Medic level. 2 uses.": "Лечит вас или соседнего бойца на 5, +3 за каждый уровень медика. 2 применения.",
   "Jump Pack": "Прыжковый ранец",
-  "Leap up to 3 tiles over anything, onto any level. 3 uses.": "Прыжок до 3 клеток через любые препятствия, на любой уровень. 3 применения.",
+  "Leap up to 3 tiles over troops and crates, onto any level. 3 uses.": "Прыжок до 3 клеток через бойцов и ящики, на любой уровень. 3 применения.",
   "Combat Stim": "Боевой стимулятор",
   "+3 action points right now. Single use.": "+3 очка действия прямо сейчас. Одноразовый.",
   "Spare Magazine": "Запасной магазин",
