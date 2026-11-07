@@ -670,9 +670,12 @@ export class Battle {
     if (this.turn < sp.start || (this.turn - sp.start) % sp.every !== 0) return;
     for (const t of this.hatches) {
       if (this.spawnLeft <= 0) break;
+      const block = this.unitAt(t.x, t.y);
+      if (block && block.side === 'alien') continue; // the brood never clogs its own hatch
+      // A trooper standing on a hatch seals it, and that wave is lost.
       const kind = sp.pool[this.spawnCount++ % sp.pool.length];
       this.spawnLeft--;
-      if (this.unitAt(t.x, t.y)) { await this.fx.hatchBlocked(t); continue; }
+      if (block) { await this.fx.hatchBlocked(t); continue; }
       const u = this.addAlien(kind, t.x, t.y);
       this.faceNearest(u);
       await this.fx.spawn(u);
