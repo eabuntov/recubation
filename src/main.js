@@ -145,8 +145,18 @@ function closeHelp() {
   if (helpReturn) helpReturn(); else ui.hide();
 }
 
-window.addEventListener('error', e => fatal(e.message));
-window.addEventListener('unhandledrejection', e => fatal(e.reason && e.reason.stack || String(e.reason)));
+// The fatal screen is for the game's own bugs only. Browser extensions inject
+// code into the page as well; their crashes arrive as stacks of bare <anonymous>
+// frames naming no file of ours, and must not cover the game with this overlay.
+window.addEventListener('error', e => {
+  if (e.filename && new URL(e.filename, location.href).origin === location.origin) fatal(e.message);
+  else console.error('Non-game error ignored:', e.message);
+});
+window.addEventListener('unhandledrejection', e => {
+  const stack = e.reason && e.reason.stack;
+  if (stack && stack.includes(location.origin)) fatal(stack);
+  else console.warn('Non-game rejection ignored:', e.reason);
+});
 function fatal(msg) {
   const el = document.getElementById('fatal');
   el.textContent = t('Something broke:') + '\n\n' + msg + '\n\n' + t('Reload the page to continue; campaign progress is saved between missions.');
