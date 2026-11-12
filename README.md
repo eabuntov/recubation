@@ -1,6 +1,6 @@
 # Recubation
 
-A browser squad-tactics game in the spirit of late-90s 3D turn-based strategy. Lead a squad of troopers through an eight-mission campaign, from *Cold Start* to *Matriarch*. There are no dice: if you have line of sight and range, the shot lands for exactly the damage shown.
+A browser squad-tactics game in the spirit of late-90s 3D turn-based strategy. Lead a squad of troopers through a fifteen-mission campaign, from *Cold Start* to *Matriarch*, on Normal, Hard or Ironman (where a failed mission costs every trooper deployed on it). There are no dice: if you have line of sight and range, the shot lands for exactly the damage shown.
 
 ## Requirements
 
@@ -91,7 +91,7 @@ The in-game **How to play** screen (H) has the full rules.
 npm test
 ```
 
-This runs `test/sim.mjs`, which needs no browser. It validates every map (reachability, ramps, start positions) and auto-plays each mission with a simple bot, so rule or AI errors surface as exceptions.
+This runs `test/sim.mjs`, which needs no browser. It validates every map (reachability, ramps, start positions) and auto-plays the whole campaign with a simple bot on Normal and Hard, so rule or AI errors surface as exceptions.
 
 It then runs `test/i18n.mjs`, which checks that every language covers every string the game shows, with matching `{placeholders}` and all the plural forms its grammar needs. `node test/i18n.mjs --keys` prints the full list of English strings.
 

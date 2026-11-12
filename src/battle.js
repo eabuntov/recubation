@@ -1,7 +1,7 @@
 // Tactical rules engine. No rendering in here: every visible consequence is
 // reported through the async `fx` hooks so the same code runs headless in tests.
 
-import { DIRS, WEAPONS, ARMORS, GEAR, ALIENS, BAYONET, BASE_HP, BASE_AP } from './data.js';
+import { DIRS, WEAPONS, ARMORS, GEAR, ALIENS, BAYONET, BASE_HP, BASE_AP, DIFFICULTIES } from './data.js';
 import { t as tr } from './i18n.js';
 
 export const key = (x, y) => x + ',' + y;
@@ -10,6 +10,8 @@ const NOFX = new Proxy({}, { get: () => async () => {} });
 
 const RAMP_CHARS = { '^': 0, '>': 1, 'v': 2, '<': 3 };
 const ALIEN_CHARS = { s: 'skitter', p: 'spitter', k: 'carapace', b: 'bloater', t: 'stalker', M: 'behemoth' };
+// Uppercase letters place an elite of the same species: more health, more damage.
+const ELITE_CHARS = { S: 'skitter', P: 'spitter', K: 'carapace', B: 'bloater', T: 'stalker' };
 const DOOR_FOR_TERMINAL = { T: 'D', U: 'E' };
 
 export function parseMap(mission) {
@@ -37,6 +39,7 @@ export function parseMap(mission) {
       else if (c === 'H') { t.hatch = true; hatches.push(t); }
       else if (c >= '1' && c <= '9') starts.push({ x, y, slot: +c });
       else if (c in ALIEN_CHARS) aliens.push({ kind: ALIEN_CHARS[c], x, y });
+      else if (c in ELITE_CHARS) aliens.push({ kind: ELITE_CHARS[c], x, y, elite: true });
       row.push(t);
     }
     tiles.push(row);
@@ -71,9 +74,10 @@ export function trace(x0, y0, x1, y1) {
 }
 
 export class Battle {
-  constructor(mission, squad, fx = NOFX) {
+  constructor(mission, squad, fx = NOFX, difficulty = 'normal') {
     this.mission = mission;
     this.fx = fx;
+    this.diff = DIFFICULTIES[difficulty] || DIFFICULTIES.normal;
     const map = parseMap(mission);
     this.w = map.w; this.h = map.h; this.tiles = map.tiles; this.hatches = map.hatches;
     this.units = [];
@@ -84,11 +88,13 @@ export class Battle {
     this.over = false;
     this.result = null;
     this.announced = false;
-    this.spawnLeft = mission.spawn ? mission.spawn.total : 0;
+    this.spawnLeft = mission.spawn ? mission.spawn.total + this.diff.spawnExtra : 0;
     this.spawnCount = 0;
+    this.engaged = {};        // marine id -> alien attacks against them this phase
+    this._threatCache = null;
 
     squad.slice(0, map.starts.length).forEach((s, i) => this.addMarine(s, map.starts[i], i));
-    for (const a of map.aliens) this.addAlien(a.kind, a.x, a.y);
+    for (const a of map.aliens) this.addAlien(a.kind, a.x, a.y, a.elite);
     for (const a of this.aliens()) this.faceNearest(a);
   }
 
@@ -111,11 +117,20 @@ export class Battle {
     return u;
   }
 
-  addAlien(kind, x, y) {
+  // Per-mission scaling and the campaign difficulty bend every alien that
+  // enters play, spawned or placed; elites (uppercase map letters) on top.
+  addAlien(kind, x, y, elite = false) {
     const def = ALIENS[kind];
+    const sc = this.mission.scaling || {};
+    const hp = Math.max(1, Math.round(def.hp * (sc.hp || 1) * (elite ? 1.6 : 1) * this.diff.hpMul));
+    const ap = Math.max(1, def.ap + (sc.ap || 0) + (elite ? 1 : 0) + this.diff.apBonus);
+    const boost = atk => atk && { ...atk, dmg: atk.dmg + (elite ? 2 : 0) };
     const u = {
-      id: this.nextId++, side: 'alien', kind, name: def.name, def,
-      x, y, facing: 2, hp: def.hp, maxHp: def.hp, ap: def.ap, maxAp: def.ap, alive: true, reduce: 0,
+      id: this.nextId++, side: 'alien', kind, elite,
+      name: elite ? tr('Elite {name}', { name: def.name }) : def.name, def,
+      x, y, facing: 2, hp, maxHp: hp, ap, maxAp: ap, alive: true, reduce: 0,
+      melee: boost(def.melee), ranged: boost(def.ranged),
+      xpValue: Math.round(def.xp * (elite ? 2 : 1)),
     };
     this.units.push(u);
     return u;
@@ -434,6 +449,8 @@ export class Battle {
     return this._run(async () => {
       for (const m of this.marines()) m.guard = true;
       this.phase = 'alien';
+      this.engaged = {};        // focus-fire bookkeeping for the alien phase
+      this._threatCache = null; // guard arcs may have changed; recompute lazily
       await this.fx.phase('alien', this);
       for (const a of this.aliens()) {
         if (this.over) break;
@@ -502,6 +519,8 @@ export class Battle {
   async _attack(u, tx, ty, mode) {
     const hits = this.affected(u, tx, ty, mode);
     const tiles = this.footprint(u, tx, ty, mode);
+    if (u.side === 'alien') for (const h of hits)
+      if (h.unit.side === 'marine') this.engaged[h.unit.id] = (this.engaged[h.unit.id] || 0) + 1;
     u.ap -= mode.ap;
     if (u.side === 'marine' && mode.pattern !== 'melee') { u.weapon.ammo -= mode.ammo; u.weapon.heat += mode.heat; }
     u.facing = this.dirToward(u, tx, ty);
@@ -518,7 +537,7 @@ export class Battle {
 
   async _kill(target, source) {
     target.alive = false;
-    if (source && source.side === 'marine' && target.side === 'alien') { source.kills++; source.xp += target.def.xp; }
+    if (source && source.side === 'marine' && target.side === 'alien') { source.kills++; source.xp += target.xpValue ?? target.def.xp; }
     await this.fx.death(target);
     const ex = target.def && target.def.explode;
     if (ex) {
@@ -573,14 +592,14 @@ export class Battle {
           if (spot) { await this._move(a, this.pathFrom(spot)); if (a.alive && !this.over) shot = await this._tryShoot(a); }
         }
       }
-      if (a.alive && !this.over && def.melee && !(shot && def.skirmisher)) {
+      if (a.alive && !this.over && a.melee && !(shot && def.skirmisher)) {
         await this._approach(a, false);
-        while (a.alive && !this.over && a.ap >= def.melee.ap) {
+        while (a.alive && !this.over && a.ap >= a.melee.ap) {
           const t = this._meleeTarget(a);
           if (!t) break;
           await this._provoke(a);
           if (!a.alive || this.over) break;
-          await this._attack(a, t.x, t.y, { name: tr('Claw'), ...def.melee, pattern: 'melee' });
+          await this._attack(a, t.x, t.y, { name: tr('Claw'), ...a.melee, pattern: 'melee' });
         }
       }
     }
@@ -594,20 +613,48 @@ export class Battle {
     await this._reactions(a);
   }
 
-  _rangedMode(a) { return { name: tr('Acid'), ...a.def.ranged, pattern: 'single', fx: 'acid' }; }
+  _rangedMode(a) { return { name: tr('Acid'), ...a.ranged, pattern: 'single', fx: 'acid' }; }
+
+  // How badly this alien wants to hit that trooper: finish the wounded first,
+  // then whoever the brood is already pressing. Lower is tastier.
+  _targetScore(m, dmg) {
+    return (m.hp <= dmg ? -1000 : 0) + m.hp - this.diff.aiFocus * (this.engaged[m.id] || 0);
+  }
+
+  // Tiles a guarding marine can reach with reaction fire this phase.
+  _reactionThreat() {
+    if (this._threatCache) return this._threatCache;
+    const set = new Set();
+    for (const m of this.marines()) {
+      if (!m.guard) continue;
+      for (let y = 0; y < this.h; y++) for (let x = 0; x < this.w; x++) {
+        if (!this.walkable(this.tiles[y][x])) continue;
+        if (this.reactionMode(m, x, y)) set.add(key(x, y));
+      }
+    }
+    this._threatCache = set;
+    return set;
+  }
+
+  _nearestMarineDist(x, y) {
+    let d = Infinity;
+    for (const m of this.marines()) d = Math.min(d, Math.hypot(m.x - x, m.y - y));
+    return d;
+  }
 
   _shootTarget(a, fx, fy) {
     const mode = this._rangedMode(a);
-    let best = null;
+    let best = null, bestScore = Infinity;
     for (const m of this.marines()) {
       if (this.shotProblem(fx, fy, m.x, m.y, mode, a)) continue;
-      if (!best || m.hp < best.hp) best = m;
+      const score = this._targetScore(m, mode.dmg);
+      if (score < bestScore) { best = m; bestScore = score; }
     }
     return best;
   }
 
   async _tryShoot(a) {
-    const r = a.def.ranged;
+    const r = a.ranged;
     if (a.ap < r.ap || a.shots >= r.perTurn) return false;
     if (!this._shootTarget(a, a.x, a.y)) return false;
     await this._provoke(a);
@@ -619,22 +666,31 @@ export class Battle {
     return true;
   }
 
+  // Cheapest tile with a shot, kept off reaction arcs where possible and as
+  // far from the squad as the map allows, since spitters would rather not be
+  // walked up to.
   _firingSpot(a) {
-    const reach = this.flood(a.x, a.y, a.ap - a.def.ranged.ap);
-    let best = null;
+    const reach = this.flood(a.x, a.y, a.ap - a.ranged.ap);
+    const threat = this._reactionThreat();
+    let best = null, bestCost = Infinity;
     for (const n of reach.values()) {
-      if (n.cost === 0 || (best && n.cost >= best.cost)) continue;
-      if (this._shootTarget(a, n.x, n.y)) best = n;
+      if (n.cost === 0 || !this._shootTarget(a, n.x, n.y)) continue;
+      const cost = n.cost
+        + (threat.has(key(n.x, n.y)) ? this.diff.aiPenalty * 2 : 0)
+        - 0.01 * this._nearestMarineDist(n.x, n.y);
+      if (cost < bestCost) { best = n; bestCost = cost; }
     }
     return best;
   }
 
   _meleeTarget(a) {
-    let best = null;
+    let best = null, bestScore = Infinity;
     for (let d = 0; d < 4; d++) {
       if (!this.stepOk(a.x, a.y, d)) continue;
       const m = this.unitAt(a.x + DIRS[d].x, a.y + DIRS[d].y);
-      if (m && m.side === 'marine' && (!best || m.hp < best.hp)) best = m;
+      if (!m || m.side !== 'marine') continue;
+      const score = this._targetScore(m, a.melee.dmg);
+      if (score < bestScore) { best = m; bestScore = score; }
     }
     return best;
   }
@@ -652,12 +708,16 @@ export class Battle {
       }
     }
     if (goals.has(key(a.x, a.y))) return;
+    // Charging through a reaction arc is allowed but expensive, and costs more
+    // the higher the difficulty; the brood is dumb, not suicidal.
+    const threat = this._reactionThreat();
     const pick = reach => {
       let best = null;
       for (const [k, m] of goals) {
         const n = reach.get(k);
         if (!n) continue;
-        if (!best || n.cost < best.cost || (n.cost === best.cost && m.hp < best.hp)) best = { ...n, node: n, hp: m.hp };
+        const cost = n.cost + (threat.has(k) ? this.diff.aiPenalty : 0);
+        if (!best || cost < best.cost || (cost === best.cost && m.hp < best.hp)) best = { node: n, cost, hp: m.hp };
       }
       return best && best.node;
     };

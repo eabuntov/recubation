@@ -2,7 +2,7 @@
 // The tables keep their English text on the side so switching back and forth is lossless.
 
 import { t } from './i18n.js';
-import { WEAPONS, ARMORS, GEAR, SKILLS, ALIENS, RANKS, BAYONET } from './data.js';
+import { WEAPONS, ARMORS, GEAR, SKILLS, ALIENS, RANKS, BAYONET, DIFFICULTIES } from './data.js';
 import { MISSIONS } from './missions.js';
 
 const originals = new Map();
@@ -19,6 +19,7 @@ export function localize() {
   for (const table of [WEAPONS, ARMORS, GEAR, SKILLS, ALIENS]) {
     for (const def of Object.values(table)) apply(def, ['name', 'desc']);
   }
+  for (const def of Object.values(DIFFICULTIES)) apply(def, ['name', 'desc']);
   for (const w of Object.values(WEAPONS)) for (const m of w.modes) apply(m, ['name']);
   apply(BAYONET, ['name']);
   RANKS_EN.forEach((r, i) => { RANKS[i] = t(r); });
@@ -35,6 +36,7 @@ export function tableStrings() {
   for (const table of [WEAPONS, ARMORS, GEAR, SKILLS, ALIENS]) {
     for (const def of Object.values(table)) { add(def.name); add(def.desc); }
   }
+  for (const def of Object.values(DIFFICULTIES)) { add(def.name); add(def.desc); }
   for (const w of Object.values(WEAPONS)) for (const m of w.modes) add(m.name);
   add(BAYONET.name);
   RANKS_EN.forEach(add);

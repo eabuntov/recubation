@@ -18,7 +18,11 @@ let helpReturn = null;
 
 const tactical = new Tactical(view, ui, {
   help: () => showHelp(null),
-  abort: () => { if (battle && tactical.ready) ui.confirm(t('Abandon this mission? Nothing is lost; you return to the briefing.'), t('Abort'), staging); },
+  abort: () => {
+    if (!(battle && tactical.ready)) return;
+    if (state.difficulty === 'ironman') { ui.toast(t('On Ironman the mission has to be seen through.')); return; }
+    ui.confirm(t('Abandon this mission? Nothing is lost; you return to the briefing.'), t('Abort'), staging);
+  },
 });
 
 // Modal screens handle their keys at the document level: the title screen has
@@ -97,12 +101,15 @@ function title() {
     hasSave: !!load(),
     onContinue: () => { state = load(); staging(); },
     onNew: () => {
-      if (!load()) { clearSave(); state = newCampaign(); staging(); return; }
-      ui.confirm(t('Start over? The current campaign will be erased.'), t('New campaign'), () => {
-        clearSave();
-        state = newCampaign();
-        staging();
-      }, title);
+      const start = difficulty => {
+        if (!load()) { clearSave(); state = newCampaign(difficulty); staging(); return; }
+        ui.confirm(t('Start over? The current campaign will be erased.'), t('New campaign'), () => {
+          clearSave();
+          state = newCampaign(difficulty);
+          staging();
+        }, title);
+      };
+      ui.difficultyPick({ onPick: start, onCancel: title });
     },
     onHelp: () => showHelp(title),
     onLang: async code => { await setLang(code, true); localize(); title(); },
@@ -127,7 +134,7 @@ async function deploy() {
   ui.hide();
   document.body.classList.remove('menu');
   view.attract = false;
-  battle = new Battle(mission, state.squad, fx);
+  battle = new Battle(mission, state.squad, fx, state.difficulty);
   view.load(battle);
   tactical.start(battle);
   ui.hudShow(true);

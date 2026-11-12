@@ -1,6 +1,6 @@
 // DOM interface: menus, armoury, debrief and the tactical HUD.
 
-import { WEAPONS, ARMORS, GEAR, SKILLS, RANKS, BASE_HP, BASE_AP, xpForLevel, meetsReq, reqText } from './data.js';
+import { WEAPONS, ARMORS, GEAR, SKILLS, RANKS, BASE_HP, BASE_AP, xpForLevel, meetsReq, reqText, DIFFICULTIES } from './data.js';
 import { objectiveText, MISSIONS } from './missions.js';
 import { GEAR_SLOTS, canRaise, raiseSkill, skillCost, equip, equipProblem } from './campaign.js';
 import { sfx } from './audio.js';
@@ -115,12 +115,26 @@ export class UI {
     ));
   }
 
+  // Shown before a new campaign: pick once, it rides along in the save.
+  difficultyPick({ onPick, onCancel }) {
+    this.show(h('div.sheet', { style: { width: 'min(560px, 100%)' } },
+      h('header', h('h2', t('Choose the campaign difficulty'))),
+      h('div.body',
+        Object.entries(DIFFICULTIES).map(([id, d]) => h('div.item.diff', { onclick: click(() => onPick(id)) },
+          h('div', h('span.name', d.name)),
+          h('div.desc', d.desc),
+        ))),
+      h('footer', btn(t('Back'), onCancel)),
+    ));
+  }
+
   staging(state, mission, fresh, { onDeploy, onArmory, onQuit }) {
     const unspent = state.squad.some(s => s.sp > 0);
+    const diff = DIFFICULTIES[state.difficulty] || DIFFICULTIES.normal;
     this.show(h('div.sheet',
       h('header',
         h('h2', mission.name),
-        h('span.tag', t('Mission {n} of {total}', { n: state.mission + 1, total: MISSIONS.length })),
+        h('span.tag', t('Mission {n} of {total}', { n: state.mission + 1, total: MISSIONS.length }) + ' · ' + diff.name),
         h('span.rp', t('{n} RP', { n: state.rp })),
       ),
       h('div.body.cols',
@@ -252,7 +266,17 @@ export class UI {
         ))
       : h('div',
         h('p', report.text),
-        h('p', t('Command is treating that as a simulation run. The squad is intact and the mission can be attempted again; consider a different loadout.')));
+        h('p', report.ironmanLoss
+          ? t('There was no simulation. Every trooper deployed on this mission is gone; replacements are on the way down.')
+          : t('Command is treating that as a simulation run. The squad is intact and the mission can be attempted again; consider a different loadout.')),
+        report.ironmanLoss && h('table.report',
+          h('tr', h('th', t('Trooper')), h('th', t('Kills')), h('th', t('Status'))),
+          report.rows.map(r => h('tr',
+            h('td', r.soldier.name),
+            h('td.num', r.kills),
+            h('td', h('span.kia', t('Killed in action'))),
+          )),
+        ));
     this.show(h('div.sheet', { style: { width: 'min(720px, 100%)' } },
       h('header', h('h2', { style: { color: report.win ? 'var(--good)' : 'var(--bad)' } }, t(report.win ? 'Mission complete' : 'Mission failed')), h('span.tag', mission.name)),
       h('div.body', body),

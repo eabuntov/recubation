@@ -68,6 +68,11 @@ export const WEAPONS = {
     desc: 'Prototype. Burns a hole through everything between you and the far wall.',
     modes: [{ name: 'Beam', ap: 4, dmg: 18, ammo: 1, heat: 8, pattern: 'line', pierce: true, fx: 'plasma' }],
   },
+  rail: {
+    name: 'M-90 Railgun', cost: 160, req: { light: 3, tech: 2 }, range: 16, ammo: 6, maxHeat: 9, cool: 4,
+    desc: 'A tungsten slug at rail speed. Nothing in this colony walks it off.',
+    modes: [{ name: 'Slug', ap: 3, dmg: 15, ammo: 1, heat: 5, pattern: 'single' }],
+  },
 };
 
 export const ARMORS = {
@@ -75,6 +80,7 @@ export const ARMORS = {
   vest: { name: 'Flak Vest', cost: 20, req: {}, hp: 4, reduce: 0, desc: '+4 health.' },
   shell: { name: 'Combat Shell', cost: 50, req: {}, hp: 8, reduce: 0, desc: '+8 health.' },
   bulwark: { name: 'Bulwark Plate', cost: 95, req: { heavy: 1 }, hp: 10, reduce: 1, desc: '+10 health, every hit hurts 1 less.' },
+  aegis: { name: 'Aegis Plate', cost: 130, req: { heavy: 2 }, hp: 12, reduce: 2, desc: '+12 health, every hit hurts 2 less.' },
 };
 
 // kind: passive gear modifies stats, active gear adds a button on the action bar.
@@ -86,6 +92,7 @@ export const GEAR = {
   servo: { name: 'Servo Harness', cost: 70, req: { tech: 2 }, apBonus: 1, desc: '+1 action point every turn.' },
   coolant: { name: 'Coolant Sleeve', cost: 35, req: { tech: 1 }, coolBonus: 2, desc: 'Weapon sheds 2 extra heat per turn.' },
   scope: { name: 'Rangefinder', cost: 30, req: { light: 1 }, rangeBonus: 2, desc: '+2 weapon range.' },
+  targeter: { name: 'Marksman Optic', cost: 45, req: { light: 2 }, rangeBonus: 3, desc: '+3 weapon range.' },
 };
 
 export const SKILLS = {
@@ -93,15 +100,32 @@ export const SKILLS = {
   heavy: { name: 'Heavy Arms', max: 3, cost: l => l, desc: 'Qualifies for support weapons and plate armour.' },
   tech: { name: 'Technician', max: 3, cost: l => l, desc: 'Qualifies for jump packs, servos and prototypes.' },
   medic: { name: 'Field Medic', max: 3, cost: l => l, desc: 'Qualifies for medkits; each level heals +3.' },
-  vitality: { name: 'Vitality', max: 5, cost: () => 1, desc: '+2 maximum health per level.' },
-  reflexes: { name: 'Reflexes', max: 2, cost: () => 3, desc: '+1 action point per level.' },
+  vitality: { name: 'Vitality', max: 6, cost: () => 1, desc: '+2 maximum health per level.' },
+  reflexes: { name: 'Reflexes', max: 3, cost: () => 3, desc: '+1 action point per level.' },
 };
 
 export const RANKS = ['Recruit', 'Private', 'Lance', 'Corporal', 'Sergeant', 'Lieutenant', 'Captain', 'Major'];
-export const xpForLevel = level => 12 * level * (level + 1); // total xp needed to reach level+1
+export const xpForLevel = level => 14 * level * (level + 1); // total xp needed to reach level+1
 
 export const BASE_HP = 14;
 export const BASE_AP = 6;
+
+// Campaign difficulty. Aliens are built from these numbers in Battle.addAlien;
+// the requisition multiplier is applied in applyResult.
+export const DIFFICULTIES = {
+  normal: {
+    name: 'Normal', hpMul: 1, apBonus: 0, spawnExtra: 0, rpMul: 1, aiPenalty: 1, aiFocus: 1,
+    desc: 'The campaign as intended. A failed mission is a simulation run; the squad lives to try again.',
+  },
+  hard: {
+    name: 'Hard', hpMul: 1.25, apBonus: 1, spawnExtra: 8, rpMul: 0.85, aiPenalty: 2, aiFocus: 2,
+    desc: 'Tougher broods: more health, more action points, relentless hatches, thinner rewards.',
+  },
+  ironman: {
+    name: 'Ironman', hpMul: 1.25, apBonus: 1, spawnExtra: 8, rpMul: 0.85, aiPenalty: 2, aiFocus: 2, ironman: true,
+    desc: 'As Hard, and a failed mission costs every trooper deployed on it. There are no simulations down here.',
+  },
+};
 
 export const ALIENS = {
   skitter: {

@@ -1,0 +1,6 @@
+Recubation
+
+Code, art and writing: eabuntov
+Three.js (https://threejs.org) is loaded at runtime from the jsDelivr CDN;
+copyright its respective authors, MIT license.
+Licensed under the MIT License (see LICENSE).

@@ -334,6 +334,11 @@ export class View {
   addUnit(u) {
     const group = new THREE.Group();
     const built = u.side === 'marine' ? buildMarine(u.soldier.color) : buildAlien(u.kind);
+    // Elites get a hot tint so the player can read the threat off the board.
+    if (u.elite) for (const m of new Set(built.mats)) {
+      if (m.color) m.color.offsetHSL(-0.05, 0.25, 0.06);
+      if (m.emissive) m.emissive.offsetHSL(-0.05, 0.3, 0.05);
+    }
     group.add(built.model);
     group.position.copy(this.pos(u.x, u.y));
     group.rotation.y = angleFor(u.facing);

@@ -1,19 +1,19 @@
 // Campaign state: roster, progression, requisition, persistence.
 
-import { WEAPONS, ARMORS, GEAR, SKILLS, SOLDIER_NAMES, SQUAD_COLORS, xpForLevel, meetsReq } from './data.js';
+import { WEAPONS, ARMORS, GEAR, SKILLS, SOLDIER_NAMES, SQUAD_COLORS, xpForLevel, meetsReq, DIFFICULTIES } from './data.js';
 import { MISSIONS } from './missions.js';
 import { t } from './i18n.js';
 
 const SAVE_KEY = 'recubation.save.v1';
 export const GEAR_SLOTS = 2;
 
-export function newCampaign() {
+export function newCampaign(difficulty = 'normal') {
   const names = [...SOLDIER_NAMES];
   for (let i = names.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [names[i], names[j]] = [names[j], names[i]];
   }
-  return { mission: 0, rp: 0, squad: [], fallen: [], names, nextId: 1, complete: false };
+  return { mission: 0, difficulty: DIFFICULTIES[difficulty] ? difficulty : 'normal', rp: 0, squad: [], fallen: [], names, nextId: 1, complete: false };
 }
 
 export function currentMission(state) { return MISSIONS[state.mission] || null; }
@@ -44,8 +44,21 @@ export function reinforce(state) {
 
 export function applyResult(state, summary) {
   const mission = currentMission(state);
-  const report = { win: summary.win, text: summary.text, turns: summary.turns, reward: 0, rows: [] };
-  if (!summary.win) return report;
+  const diff = DIFFICULTIES[state.difficulty] || DIFFICULTIES.normal;
+  const report = { win: summary.win, text: summary.text, turns: summary.turns, reward: 0, rows: [], ironmanLoss: false };
+  if (!summary.win) {
+    // On ironman a failure is not a simulation: everyone deployed is gone.
+    if (diff.ironman) {
+      report.ironmanLoss = true;
+      for (const r of summary.marines) {
+        const s = state.squad.find(q => q.id === r.id);
+        if (!s) continue;
+        report.rows.push({ soldier: s, kills: r.kills, alive: false, xp: 0, levels: 0 });
+      }
+      buryDead(state, report, mission);
+    }
+    return report;
+  }
   const bonus = 10 + 5 * state.mission;
   for (const r of summary.marines) {
     const s = state.squad.find(q => q.id === r.id);
@@ -60,6 +73,15 @@ export function applyResult(state, summary) {
     }
     report.rows.push(row);
   }
+  buryDead(state, report, mission);
+  report.reward = Math.round(mission.reward * diff.rpMul);
+  state.rp += report.reward;
+  state.mission++;
+  if (state.mission >= MISSIONS.length) state.complete = true;
+  return report;
+}
+
+function buryDead(state, report, mission) {
   for (const row of report.rows) {
     if (row.alive) continue;
     state.squad = state.squad.filter(s => s !== row.soldier);
@@ -67,11 +89,6 @@ export function applyResult(state, summary) {
     // Their kit goes back to stores.
     state.rp += loadoutValue(row.soldier);
   }
-  report.reward = mission.reward;
-  state.rp += mission.reward;
-  state.mission++;
-  if (state.mission >= MISSIONS.length) state.complete = true;
-  return report;
 }
 
 export function loadoutValue(s) {
@@ -132,6 +149,7 @@ export function load() {
 function sanitize(s) {
   const int = (v, d, lo = 0) => (Number.isInteger(v) && v >= lo ? v : d);
   s.mission = Math.min(int(s.mission, 0), MISSIONS.length);
+  s.difficulty = DIFFICULTIES[s.difficulty] ? s.difficulty : 'normal';
   s.rp = int(s.rp, 0);
   s.nextId = int(s.nextId, s.squad.length + 1, 1);
   s.fallen = Array.isArray(s.fallen)

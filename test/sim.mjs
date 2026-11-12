@@ -85,8 +85,8 @@ async function botTurn(b) {
   }
 }
 
-async function play(m, squad) {
-  const b = new Battle(m, squad);
+async function play(m, squad, difficulty = 'normal') {
+  const b = new Battle(m, squad, undefined, difficulty);
   await b.begin();
   for (let i = 0; i < 60 && !b.over; i++) {
     await botTurn(b);
@@ -100,8 +100,10 @@ console.log('Validating maps');
 for (const m of MISSIONS) validate(m);
 
 console.log('Auto-playing campaign');
-const state = newCampaign();
-for (let guard = 0; guard < 40 && !state.complete; guard++) {
+async function runCampaign(difficulty) {
+  if (difficulty !== 'normal') console.log(`  --- ${difficulty} ---`);
+  const state = newCampaign(difficulty);
+  for (let guard = 0; guard < 40 && !state.complete; guard++) {
   reinforce(state);
   const m = MISSIONS[state.mission];
   // Spend points the way a cautious player might.
@@ -110,13 +112,16 @@ for (let guard = 0; guard < 40 && !state.complete; guard++) {
     for (const w of ['rifle', 'twin']) if (equip(state, s, 'weapon', w)) break;
     for (const a of ['shell', 'vest']) if (equip(state, s, 'armor', a)) break;
   }
-  const b = await play(m, state.squad);
+  const b = await play(m, state.squad, difficulty);
   const sum = b.summary();
   const alive = sum.marines.filter(r => r.alive).length;
   console.log(`  ${m.id.padEnd(16)} ${sum.win ? 'WIN ' : 'LOSS'} turn ${String(sum.turns).padStart(2)}  alive ${alive}/${sum.marines.length}  kills ${sum.marines.reduce((n, r) => n + r.kills, 0)}  (${sum.text})`);
   const report = applyResult(state, sum);
   if (!report.win) { state.mission++; if (state.mission >= MISSIONS.length) state.complete = true; }
+  }
 }
+await runCampaign('normal');
+await runCampaign('hard');
 
 console.log(failures ? `\n${failures} failure(s)` : '\nAll checks passed');
 process.exit(failures ? 1 : 0);
