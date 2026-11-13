@@ -88,13 +88,23 @@ export class Battle {
     this.over = false;
     this.result = null;
     this.announced = false;
-    this.spawnLeft = mission.spawn ? mission.spawn.total + this.diff.spawnExtra : 0;
+    this.countMul = this.diff.countMul || 1;
+    this.spawnLeft = mission.spawn ? Math.round(mission.spawn.total * this.countMul) + this.diff.spawnExtra : 0;
     this.spawnCount = 0;
     this.engaged = {};        // marine id -> alien attacks against them this phase
     this._threatCache = null;
 
     squad.slice(0, map.starts.length).forEach((s, i) => this.addMarine(s, map.starts[i], i));
-    for (const a of map.aliens) this.addAlien(a.kind, a.x, a.y, a.elite);
+    for (const a of map.aliens) {
+      this.addAlien(a.kind, a.x, a.y, a.elite);
+      // The Matriarch is one of a kind; everything else arrives with backup.
+      if (a.kind === 'behemoth') continue;
+      for (let n = 1; n < this.countMul; n++) {
+        const spot = this._freeTileNear(a.x, a.y);
+        if (!spot) break;
+        this.addAlien(a.kind, spot.x, spot.y, a.elite);
+      }
+    }
     for (const a of this.aliens()) this.faceNearest(a);
   }
 
@@ -726,6 +736,17 @@ export class Battle {
     if (node) await this._move(a, this.pathFrom(node).slice(0, a.ap));
   }
 
+  // Nearest unoccupied walkable tile that is not a hatch — the brood never
+  // clogs its own hatches. Null when the neighbourhood is full.
+  _freeTileNear(x, y, max = 4) {
+    let best = null;
+    for (const n of this.flood(x, y, max).values()) {
+      if (n.cost === 0) continue;
+      if (!this.tiles[n.y][n.x].hatch && (!best || n.cost < best.cost)) best = n;
+    }
+    return best ? { x: best.x, y: best.y } : null;
+  }
+
   async _spawn() {
     const sp = this.mission.spawn;
     if (!sp || this.spawnLeft <= 0) return;
@@ -734,13 +755,27 @@ export class Battle {
       if (this.spawnLeft <= 0) break;
       const block = this.unitAt(t.x, t.y);
       if (block && block.side === 'alien') continue; // the brood never clogs its own hatch
-      // A trooper standing on a hatch seals it, and that wave is lost.
-      const kind = sp.pool[this.spawnCount++ % sp.pool.length];
-      this.spawnLeft--;
-      if (block) { await this.fx.hatchBlocked(t); continue; }
-      const u = this.addAlien(kind, t.x, t.y);
-      this.faceNearest(u);
-      await this.fx.spawn(u);
+      // A trooper standing on a hatch seals it, and the whole wave it would
+      // have produced is lost.
+      if (block) {
+        for (let n = 0; n < this.countMul && this.spawnLeft > 0; n++) {
+          this.spawnCount++;
+          this.spawnLeft--;
+        }
+        await this.fx.hatchBlocked(t);
+        continue;
+      }
+      // The first of the wave comes up through the hatch; the rest squeeze
+      // out alongside it.
+      for (let n = 0; n < this.countMul && this.spawnLeft > 0; n++) {
+        const spot = n === 0 ? t : this._freeTileNear(t.x, t.y);
+        if (!spot) break;
+        const kind = sp.pool[this.spawnCount++ % sp.pool.length];
+        this.spawnLeft--;
+        const u = this.addAlien(kind, spot.x, spot.y);
+        this.faceNearest(u);
+        await this.fx.spawn(u);
+      }
     }
     this._checkEnd();
   }

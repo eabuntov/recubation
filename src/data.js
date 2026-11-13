@@ -112,17 +112,19 @@ export const BASE_AP = 6;
 
 // Campaign difficulty. Aliens are built from these numbers in Battle.addAlien;
 // the requisition multiplier is applied in applyResult.
+// countMul multiplies how many hostiles every mission fields: placed map
+// aliens are cloned in place, and every hatch releases countMul per wave.
 export const DIFFICULTIES = {
   normal: {
-    name: 'Normal', hpMul: 1, apBonus: 0, spawnExtra: 0, rpMul: 1, aiPenalty: 1, aiFocus: 1,
+    name: 'Normal', hpMul: 1, apBonus: 0, countMul: 2, spawnExtra: 0, rpMul: 1, aiPenalty: 1, aiFocus: 1,
     desc: 'The campaign as intended. A failed mission is a simulation run; the squad lives to try again.',
   },
   hard: {
-    name: 'Hard', hpMul: 1.25, apBonus: 1, spawnExtra: 8, rpMul: 0.85, aiPenalty: 2, aiFocus: 2,
+    name: 'Hard', hpMul: 1.25, apBonus: 1, countMul: 2, spawnExtra: 8, rpMul: 0.85, aiPenalty: 2, aiFocus: 2,
     desc: 'Tougher broods: more health, more action points, relentless hatches, thinner rewards.',
   },
   ironman: {
-    name: 'Ironman', hpMul: 1.25, apBonus: 1, spawnExtra: 8, rpMul: 0.85, aiPenalty: 2, aiFocus: 2, ironman: true,
+    name: 'Ironman', hpMul: 1.25, apBonus: 1, countMul: 2, spawnExtra: 8, rpMul: 0.85, aiPenalty: 2, aiFocus: 2, ironman: true,
     desc: 'As Hard, and a failed mission costs every trooper deployed on it. There are no simulations down here.',
   },
 };
