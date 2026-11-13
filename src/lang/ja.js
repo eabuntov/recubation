@@ -2,7 +2,7 @@
 export default {
   // Weapons
   "SC-4 Carbine": "SC-4 カービン",
-  "Standard issue. Reliable, forgiving, unremarkable.": "標準支給品。信頼性が高く、扱いやすく、特筆すべき点はない。",
+  "Standard issue. A small magazine, but it swaps fast.": "標準支給品。マガジンは小さいが、交換は素早い。",
   "SC-4D Twin Carbine": "SC-4D ツインカービン",
   "Two barrels on one frame. The double tap hits hard but runs hot.": "ひとつのフレームに銃身が二本。二連射は強烈だが、すぐに熱を持つ。",
   "Breacher Scattergun": "ブリーチャー散弾銃",
@@ -188,6 +188,7 @@ export default {
   "deflected": "跳弾",
   "armour": "装甲",
   "RELOADED": "装填完了",
+  "Reload": "装填",
   "+{n} AP": "+{n} AP",
   "AMMO": "弾薬",
   "PATCHED UP": "応急手当",
@@ -317,7 +318,7 @@ export default {
   "Moving costs 1 AP per tile. Each fire mode lists its AP cost.": "移動は 1 マスにつき 1 AP。各射撃モードには AP コストが表示されている。",
   "Unspent AP turn into reaction fire in the enemy phase, but only into the trooper's front arc (shown in yellow). Choose where everyone is looking before you end the turn.": "使わなかった AP は敵フェイズに反応射撃になるが、隊員の前方範囲（黄色で表示）にしか撃てない。ターンを終える前に、全員の向きを決めておこう。",
   "Weapons heat up as they fire and cool between turns. A gun at its limit will not fire, even on reaction.": "武器は撃つと熱を帯び、ターンの合間に冷える。限界に達した銃は撃てない。反応射撃でもだ。",
-  "Ammunition is finite. Walk over a yellow crate to reload; a green cross patches a trooper up.": "弾薬には限りがある。黄色の箱の上を通ると補給でき、緑の十字は隊員を手当てする。",
+  "Ammunition is finite. Reload (2 AP) swaps in a full magazine; a yellow crate refills it too, and a green cross patches a trooper up.": "弾薬には限りがある。装填（2 AP）で満タンのマガジンに交換できる。黄色の箱でも補給でき、緑の十字は隊員を手当てする。",
   "Bodies block bullets. Nobody shoots through a friend. Height lets you fire over heads and adds +1 damage.": "体は弾を遮る。味方越しに撃つことはできない。高所からは頭越しに撃て、ダメージも +1 される。",
   "Hits from behind do 50% more damage, to them and to you.": "背後からの攻撃は 50% 増しのダメージ。敵にも味方にも適用される。",
   "Standing on a brood hatch seals it.": "孵化ハッチの上に立つと封鎖できる。",

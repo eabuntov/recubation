@@ -1,6 +1,6 @@
 // DOM interface: menus, armoury, debrief and the tactical HUD.
 
-import { WEAPONS, ARMORS, GEAR, SKILLS, RANKS, BASE_HP, BASE_AP, xpForLevel, meetsReq, reqText, DIFFICULTIES } from './data.js';
+import { WEAPONS, ARMORS, GEAR, SKILLS, RANKS, BASE_HP, BASE_AP, RELOAD_AP, xpForLevel, meetsReq, reqText, DIFFICULTIES } from './data.js';
 import { objectiveText, MISSIONS } from './missions.js';
 import { GEAR_SLOTS, canRaise, raiseSkill, skillCost, equip, equipProblem } from './campaign.js';
 import { sfx } from './audio.js';
@@ -334,7 +334,7 @@ export class UI {
             h('li', t('Moving costs 1 AP per tile. Each fire mode lists its AP cost.')),
             h('li', t('Unspent AP turn into reaction fire in the enemy phase, but only into the trooper\'s front arc (shown in yellow). Choose where everyone is looking before you end the turn.')),
             h('li', t('Weapons heat up as they fire and cool between turns. A gun at its limit will not fire, even on reaction.')),
-            h('li', t('Ammunition is finite. Walk over a yellow crate to reload; a green cross patches a trooper up.')),
+            h('li', t('Ammunition is finite. Reload (2 AP) swaps in a full magazine; a yellow crate refills it too, and a green cross patches a trooper up.')),
             h('li', t('Bodies block bullets. Nobody shoots through a friend. Height lets you fire over heads and adds +1 damage.')),
             h('li', t('Hits from behind do 50% more damage, to them and to you.')),
             h('li', t('Standing on a brood hatch seals it.')),
@@ -406,6 +406,13 @@ export class UI {
             h('small', t('{dmg} dmg · {ap} AP', { dmg: mode.dmg, ap: mode.ap }) + (mode.heat ? ` · +${mode.heat}°` : '')),
           );
         }),
+        (() => {
+          const problem = battle.reloadProblem(sel);
+          return h('button.act', {
+            onclick: click(() => handlers.reload()), disabled: !!problem || !mineTurn, title: problem || '',
+          },
+            t('Reload'), h('small', t('{n} AP', { n: RELOAD_AP })));
+        })(),
         sel.gear.filter(g => g.def.active).map(g => {
           const problem = battle.gearProblem(sel, g, sel.x, sel.y);
           const blocked = g.charges <= 0 || sel.ap < g.def.ap || (g.def.active === 'reload' && problem);

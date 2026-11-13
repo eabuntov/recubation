@@ -57,6 +57,8 @@ async function botTurn(b) {
         if (foe) { acted = await b.attack(m, foe.x, foe.y, mode); break; }
       }
       if (acted) continue;
+      // A dry magazine is worth swapping when nothing can be shot.
+      if (m.weapon && m.weapon.ammo === 0 && !b.reloadProblem(m)) { await b.reload(m); continue; }
       // Terminals first, then exits, then the nearest hostile.
       let used = false;
       for (const d of DIRS) {

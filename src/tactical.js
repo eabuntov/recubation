@@ -104,6 +104,7 @@ export class Tactical {
       select: u => this.select(u),
       mode: i => { this.modeIdx = i; this.armed = null; this.refresh(); },
       gear: g => this.gear(g),
+      reload: () => this.reload(),
     });
     this.repick();
     this.onHover();
@@ -192,6 +193,14 @@ export class Tactical {
     if (kind === 'stim' || kind === 'reload') { b.useGear(s, g); return; }
     this.armed = this.armed === g ? null : g;
     this.refresh();
+  }
+
+  reload() {
+    if (!this.ready) return;
+    const b = this.battle, s = this.sel;
+    const problem = b.reloadProblem(s);
+    if (problem) return this.ui.toast(problem);
+    b.reload(s);
   }
 
   endTurn() {

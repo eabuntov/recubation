@@ -2,7 +2,7 @@
 export default {
   // Weapons
   "SC-4 Carbine": "Karabinek SC-4",
-  "Standard issue. Reliable, forgiving, unremarkable.": "Standardowe wyposażenie. Niezawodny, wyrozumiały, przeciętny.",
+  "Standard issue. A small magazine, but it swaps fast.": "Standardowe wyposażenie. Mały magazynek, ale szybko się zmienia.",
   "SC-4D Twin Carbine": "Podwójny karabinek SC-4D",
   "Two barrels on one frame. The double tap hits hard but runs hot.": "Dwie lufy na jednej ramie. Podwójny strzał mocno uderza, ale szybko się grzeje.",
   "Breacher Scattergun": "Strzelba szturmowa",
@@ -188,6 +188,7 @@ export default {
   "deflected": "odbite",
   "armour": "pancerz",
   "RELOADED": "PRZEŁADOWANO",
+  "Reload": "Przeładuj",
   "+{n} AP": "+{n} PA",
   "AMMO": "AMUNICJA",
   "PATCHED UP": "OPATRZONY",
@@ -317,7 +318,7 @@ export default {
   "Moving costs 1 AP per tile. Each fire mode lists its AP cost.": "Ruch kosztuje 1 PA za pole. Każdy tryb ognia podaje swój koszt w PA.",
   "Unspent AP turn into reaction fire in the enemy phase, but only into the trooper's front arc (shown in yellow). Choose where everyone is looking before you end the turn.": "Niewydane PA zamieniają się w ogień reakcyjny w fazie wroga, ale tylko w przednim łuku żołnierza (zaznaczonym na żółto). Ustal, gdzie każdy patrzy, zanim zakończysz turę.",
   "Weapons heat up as they fire and cool between turns. A gun at its limit will not fire, even on reaction.": "Broń nagrzewa się podczas strzelania i stygnie między turami. Broń na granicy nie wystrzeli, nawet w reakcji.",
-  "Ammunition is finite. Walk over a yellow crate to reload; a green cross patches a trooper up.": "Amunicja jest ograniczona. Przejdź po żółtej skrzyni, by uzupełnić; zielony krzyż opatrzy żołnierza.",
+  "Ammunition is finite. Reload (2 AP) swaps in a full magazine; a yellow crate refills it too, and a green cross patches a trooper up.": "Amunicja jest ograniczona. Przeładowanie (2 PA) wpisuje pełny magazynek; żółta skrzynia także ją uzupełnia, a zielony krzyż opatrzy żołnierza.",
   "Bodies block bullets. Nobody shoots through a friend. Height lets you fire over heads and adds +1 damage.": "Ciała blokują kule. Nikt nie strzela przez swojego. Wysokość pozwala strzelać nad głowami i dodaje +1 obrażeń.",
   "Hits from behind do 50% more damage, to them and to you.": "Trafienia od tyłu zadają o 50% więcej obrażeń — im i tobie.",
   "Standing on a brood hatch seals it.": "Stanięcie na włazie wylęgu zamyka go.",

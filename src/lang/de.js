@@ -2,7 +2,7 @@
 export default {
   // Weapons
   "SC-4 Carbine": "SC-4-Karabiner",
-  "Standard issue. Reliable, forgiving, unremarkable.": "Standardausrüstung. Zuverlässig, gutmütig, unauffällig.",
+  "Standard issue. A small magazine, but it swaps fast.": "Standardausrüstung. Kleines Magazin, aber schnell gewechselt.",
   "SC-4D Twin Carbine": "SC-4D-Zwillingskarabiner",
   "Two barrels on one frame. The double tap hits hard but runs hot.": "Zwei Läufe auf einem Rahmen. Der Doppelschuss trifft hart, wird aber schnell heiß.",
   "Breacher Scattergun": "Breacher-Schrotflinte",
@@ -188,6 +188,7 @@ export default {
   "deflected": "abgelenkt",
   "armour": "Panzerung",
   "RELOADED": "NACHGELADEN",
+  "Reload": "Nachladen",
   "+{n} AP": "+{n} AP",
   "AMMO": "MUNITION",
   "PATCHED UP": "VERARZTET",
@@ -317,7 +318,7 @@ export default {
   "Moving costs 1 AP per tile. Each fire mode lists its AP cost.": "Bewegung kostet 1 AP pro Feld. Jeder Feuermodus zeigt seine AP-Kosten.",
   "Unspent AP turn into reaction fire in the enemy phase, but only into the trooper's front arc (shown in yellow). Choose where everyone is looking before you end the turn.": "Nicht verbrauchte AP werden in der Feindphase zu Reaktionsfeuer, aber nur in den Frontbogen des Soldaten (gelb angezeigt). Lege fest, wohin alle blicken, bevor du die Runde beendest.",
   "Weapons heat up as they fire and cool between turns. A gun at its limit will not fire, even on reaction.": "Waffen erhitzen sich beim Feuern und kühlen zwischen den Runden ab. Eine Waffe am Limit feuert nicht, auch nicht als Reaktion.",
-  "Ammunition is finite. Walk over a yellow crate to reload; a green cross patches a trooper up.": "Munition ist begrenzt. Lauf über eine gelbe Kiste, um nachzuladen; ein grünes Kreuz flickt einen Soldaten zusammen.",
+  "Ammunition is finite. Reload (2 AP) swaps in a full magazine; a yellow crate refills it too, and a green cross patches a trooper up.": "Munition ist begrenzt. Nachladen (2 AP) setzt ein volles Magazin ein; eine gelbe Kiste füllt sie ebenfalls auf, und ein grünes Kreuz flickt einen Soldaten zusammen.",
   "Bodies block bullets. Nobody shoots through a friend. Height lets you fire over heads and adds +1 damage.": "Körper blockieren Kugeln. Niemand schießt durch einen Kameraden. Höhe erlaubt Feuer über Köpfe hinweg und gibt +1 Schaden.",
   "Hits from behind do 50% more damage, to them and to you.": "Treffer von hinten verursachen 50 % mehr Schaden – bei ihnen wie bei dir.",
   "Standing on a brood hatch seals it.": "Wer auf einer Brutluke steht, versiegelt sie.",

@@ -15,8 +15,8 @@ export const BAYONET = { id: 'bayonet', name: 'Bayonet', ap: 2, dmg: 4, ammo: 0,
 //          blast  = target tile plus the eight tiles around it (half damage)
 export const WEAPONS = {
   carbine: {
-    name: 'SC-4 Carbine', cost: 0, req: {}, range: 6, ammo: 20, maxHeat: 8, cool: 4,
-    desc: 'Standard issue. Reliable, forgiving, unremarkable.',
+    name: 'SC-4 Carbine', cost: 0, req: {}, range: 6, ammo: 6, maxHeat: 8, cool: 4,
+    desc: 'Standard issue. A small magazine, but it swaps fast.',
     modes: [{ name: 'Single', ap: 2, dmg: 3, ammo: 1, heat: 2, pattern: 'single' }],
   },
   twin: {
@@ -109,6 +109,9 @@ export const xpForLevel = level => 14 * level * (level + 1); // total xp needed 
 
 export const BASE_HP = 14;
 export const BASE_AP = 6;
+
+// What swapping a fresh magazine costs, for any weapon (see Battle.reload).
+export const RELOAD_AP = 2;
 
 // Campaign difficulty. Aliens are built from these numbers in Battle.addAlien;
 // the requisition multiplier is applied in applyResult.

@@ -2,7 +2,7 @@
 export default {
   // Weapons
   "SC-4 Carbine": "Carabina SC-4",
-  "Standard issue. Reliable, forgiving, unremarkable.": "De dotación estándar. Fiable, indulgente, del montón.",
+  "Standard issue. A small magazine, but it swaps fast.": "De dotación estándar. Cargador pequeño, pero se cambia rápido.",
   "SC-4D Twin Carbine": "Carabina doble SC-4D",
   "Two barrels on one frame. The double tap hits hard but runs hot.": "Dos cañones en un mismo armazón. El disparo doble pega fuerte, pero se calienta enseguida.",
   "Breacher Scattergun": "Escopeta de asalto",
@@ -188,6 +188,7 @@ export default {
   "deflected": "desviado",
   "armour": "blindaje",
   "RELOADED": "RECARGADO",
+  "Reload": "Recargar",
   "+{n} AP": "+{n} PA",
   "AMMO": "MUNICIÓN",
   "PATCHED UP": "REMENDADO",
@@ -317,7 +318,7 @@ export default {
   "Moving costs 1 AP per tile. Each fire mode lists its AP cost.": "Moverse cuesta 1 PA por casilla. Cada modo de disparo indica su coste en PA.",
   "Unspent AP turn into reaction fire in the enemy phase, but only into the trooper's front arc (shown in yellow). Choose where everyone is looking before you end the turn.": "Los PA sin gastar se convierten en fuego de reacción en la fase enemiga, pero solo hacia el arco frontal del soldado (en amarillo). Decide hacia dónde mira cada uno antes de terminar el turno.",
   "Weapons heat up as they fire and cool between turns. A gun at its limit will not fire, even on reaction.": "Las armas se calientan al disparar y se enfrían entre turnos. Un arma al límite no dispara, ni siquiera en reacción.",
-  "Ammunition is finite. Walk over a yellow crate to reload; a green cross patches a trooper up.": "La munición es limitada. Pasa por encima de una caja amarilla para recargar; una cruz verde remienda a un soldado.",
+  "Ammunition is finite. Reload (2 AP) swaps in a full magazine; a yellow crate refills it too, and a green cross patches a trooper up.": "La munición es limitada. Recargar (2 PA) coloca un cargador lleno; una caja amarilla también la repone, y una cruz verde remienda a un soldado.",
   "Bodies block bullets. Nobody shoots through a friend. Height lets you fire over heads and adds +1 damage.": "Los cuerpos bloquean las balas. Nadie dispara a través de un compañero. La altura permite disparar por encima de las cabezas y añade +1 de daño.",
   "Hits from behind do 50% more damage, to them and to you.": "Los impactos por la espalda hacen un 50 % más de daño, a ellos y a ti.",
   "Standing on a brood hatch seals it.": "Situarse sobre una escotilla de cría la sella.",

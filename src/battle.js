@@ -1,7 +1,7 @@
 // Tactical rules engine. No rendering in here: every visible consequence is
 // reported through the async `fx` hooks so the same code runs headless in tests.
 
-import { DIRS, WEAPONS, ARMORS, GEAR, ALIENS, BAYONET, BASE_HP, BASE_AP, DIFFICULTIES } from './data.js';
+import { DIRS, WEAPONS, ARMORS, GEAR, ALIENS, BAYONET, BASE_HP, BASE_AP, RELOAD_AP, DIFFICULTIES } from './data.js';
 import { t as tr } from './i18n.js';
 
 export const key = (x, y) => x + ',' + y;
@@ -377,6 +377,23 @@ export class Battle {
     u.facing = d;
     this.fx.turn(u);
     this.fx.refresh();
+  }
+
+  // Why this trooper cannot swap magazines right now, or null when they can.
+  reloadProblem(u) {
+    if (u.side !== 'marine' || !u.weapon) return tr('Cannot be used');
+    if (u.weapon.ammo >= u.weapon.def.ammo) return tr('Magazine is full');
+    if (u.ap < RELOAD_AP) return tr('Not enough AP');
+    return null;
+  }
+
+  reload(u) {
+    if (this.reloadProblem(u)) return Promise.resolve(false);
+    return this._run(async () => {
+      u.ap -= RELOAD_AP;
+      u.weapon.ammo = u.weapon.def.ammo;
+      await this.fx.note(u, tr('RELOADED'), 'good');
+    });
   }
 
   terminalProblem(u, tx, ty) {

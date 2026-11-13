@@ -2,7 +2,7 @@
 export default {
   // Weapons
   "SC-4 Carbine": "SC-4 卡宾枪",
-  "Standard issue. Reliable, forgiving, unremarkable.": "制式装备。可靠、好上手、平平无奇。",
+  "Standard issue. A small magazine, but it swaps fast.": "制式装备。弹匣虽小，换得快。",
   "SC-4D Twin Carbine": "SC-4D 双管卡宾枪",
   "Two barrels on one frame. The double tap hits hard but runs hot.": "一个枪架上两根枪管。双发威力大，但发热快。",
   "Breacher Scattergun": "破门霰弹枪",
@@ -188,6 +188,7 @@ export default {
   "deflected": "被弹开",
   "armour": "护甲",
   "RELOADED": "已装填",
+  "Reload": "装弹",
   "+{n} AP": "+{n} AP",
   "AMMO": "弹药",
   "PATCHED UP": "已包扎",
@@ -317,7 +318,7 @@ export default {
   "Moving costs 1 AP per tile. Each fire mode lists its AP cost.": "每移动一格消耗 1 AP。每种射击模式都标有其 AP 消耗。",
   "Unspent AP turn into reaction fire in the enemy phase, but only into the trooper's front arc (shown in yellow). Choose where everyone is looking before you end the turn.": "未用完的 AP 会在敌方阶段转为反应射击，但只针对队员的正面扇区（黄色显示）。结束回合前，决定好每个人看向哪里。",
   "Weapons heat up as they fire and cool between turns. A gun at its limit will not fire, even on reaction.": "武器射击时会升温，在回合之间冷却。达到上限的枪无法开火，反应射击也不行。",
-  "Ammunition is finite. Walk over a yellow crate to reload; a green cross patches a trooper up.": "弹药有限。走过黄色箱子可以补充弹药；绿色十字可以给队员治疗。",
+  "Ammunition is finite. Reload (2 AP) swaps in a full magazine; a yellow crate refills it too, and a green cross patches a trooper up.": "弹药有限。装弹（2 AP）换上满弹匣；黄色箱子也能补充弹药，绿色十字可以给队员治疗。",
   "Bodies block bullets. Nobody shoots through a friend. Height lets you fire over heads and adds +1 damage.": "身体会挡住子弹。没有人能隔着队友开枪。高处可以越过头顶射击，并且伤害 +1。",
   "Hits from behind do 50% more damage, to them and to you.": "背后命中多造成 50% 伤害，对它们和对你都一样。",
   "Standing on a brood hatch seals it.": "站在孵化口上就能封住它。",

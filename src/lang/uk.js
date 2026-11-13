@@ -2,7 +2,7 @@
 export default {
   // Weapons
   "SC-4 Carbine": "Карабін SC-4",
-  "Standard issue. Reliable, forgiving, unremarkable.": "Табельний зразок. Надійний, невибагливий, нічим не примітний.",
+  "Standard issue. A small magazine, but it swaps fast.": "Табельний зразок. Магазин малий, зате міняється швидко.",
   "SC-4D Twin Carbine": "Спарений карабін SC-4D",
   "Two barrels on one frame. The double tap hits hard but runs hot.": "Два стволи на одній рамі. Подвійний постріл б'є сильно, але швидко гріється.",
   "Breacher Scattergun": "Штурмова рушниця",
@@ -188,6 +188,7 @@ export default {
   "deflected": "відбито",
   "armour": "броня",
   "RELOADED": "ПЕРЕЗАРЯДЖЕНО",
+  "Reload": "Перезарядка",
   "+{n} AP": "+{n} ОД",
   "AMMO": "НАБОЇ",
   "PATCHED UP": "ПІДЛАТАНО",
@@ -317,7 +318,7 @@ export default {
   "Moving costs 1 AP per tile. Each fire mode lists its AP cost.": "Рух коштує 1 ОД за клітинку. Для кожного режиму вогню вказано його ціну в ОД.",
   "Unspent AP turn into reaction fire in the enemy phase, but only into the trooper's front arc (shown in yellow). Choose where everyone is looking before you end the turn.": "Невитрачені ОД перетворюються на вогонь у відповідь під час ходу ворога, але лише в передньому секторі бійця (показано жовтим). Вирішіть, куди дивиться кожен, перш ніж завершити хід.",
   "Weapons heat up as they fire and cool between turns. A gun at its limit will not fire, even on reaction.": "Зброя нагрівається під час стрільби й холоне між ходами. Ствол на межі не вистрелить — навіть у відповідь.",
-  "Ammunition is finite. Walk over a yellow crate to reload; a green cross patches a trooper up.": "Боєзапас обмежений. Пройдіть по жовтому ящику, щоб поповнити набої; зелений хрест підлатає бійця.",
+  "Ammunition is finite. Reload (2 AP) swaps in a full magazine; a yellow crate refills it too, and a green cross patches a trooper up.": "Боєзапас обмежений. Перезарядка (2 ОД) ставить повний магазин; жовтий ящик також поповнює боєзапас, а зелений хрест підлатає бійця.",
   "Bodies block bullets. Nobody shoots through a friend. Height lets you fire over heads and adds +1 damage.": "Тіла блокують кулі. Ніхто не стріляє крізь своїх. Висота дає змогу стріляти понад головами й додає +1 до шкоди.",
   "Hits from behind do 50% more damage, to them and to you.": "Влучання в спину завдають на 50% більше шкоди — і їм, і вам.",
   "Standing on a brood hatch seals it.": "Боєць, що стоїть на люку виводка, запечатує його.",
