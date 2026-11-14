@@ -95,6 +95,8 @@ export class Battle {
     this.maxAlive = (mission.spawn && mission.spawn.maxAlive) || 10;
     this.spawnCount = 0;
     this.engaged = {};        // marine id -> alien attacks against them this phase
+    this.mines = new Map();   // tile key -> {x, y}: armed, hostile-triggered
+    this.smoke = new Map();   // tile key -> turns of cloud left
     this._threatCache = null;
 
     squad.slice(0, map.starts.length).forEach((s, i) => this.addMarine(s, map.starts[i], i));
@@ -205,11 +207,14 @@ export class Battle {
     return path;
   }
 
+  smokeAt(x, y) { return this.smoke.has(key(x, y)); }
+
   sightBlocked(x0, y0, x1, y1) {
     for (const e of trace(x0, y0, x1, y1)) {
+      const opaque = (x, y) => this.blocksSight(x, y) || this.smokeAt(x, y);
       if (e.corner) {
-        if (this.blocksSight(...e.corner[0]) && this.blocksSight(...e.corner[1])) return true;
-      } else if (this.blocksSight(e.x, e.y)) return true;
+        if (opaque(...e.corner[0]) && opaque(...e.corner[1])) return true;
+      } else if (opaque(e.x, e.y)) return true;
     }
     return false;
   }
@@ -480,6 +485,22 @@ export class Battle {
       if (this.sightBlocked(u.x, u.y, tx, ty)) return tr('No clear arc');
       return null;
     }
+    if (kind === 'mine') {
+      const t = this.tile(tx, ty);
+      if (!t || !this.walkable(t) || this.unitAt(tx, ty) || this.mines.has(key(tx, ty))) return tr('Cannot place it there');
+      const dist = Math.hypot(tx - u.x, ty - u.y);
+      if (dist > g.def.range + 0.5) return tr('Too far');
+      if (this.sightBlocked(u.x, u.y, tx, ty)) return tr('No clear arc');
+      return null;
+    }
+    if (kind === 'smoke') {
+      const t = this.tile(tx, ty);
+      if (!t || t.type === 'wall' || t.type === 'void' || t.type === 'door') return tr('Cannot place it there');
+      const dist = Math.hypot(tx - u.x, ty - u.y);
+      if (dist > g.def.range + 0.5) return tr('Too far');
+      if (this.sightBlocked(u.x, u.y, tx, ty)) return tr('No clear arc');
+      return null;
+    }
     return tr('Cannot be used');
   }
 
@@ -504,6 +525,21 @@ export class Battle {
         await this.fx.jump(u, from, { x: tx, y: ty });
         await this._pickup(u);
         this._checkEnd();
+      } else if (kind === 'mine') {
+        u.facing = this.dirToward(u, tx, ty);
+        this.mines.set(key(tx, ty), { x: tx, y: ty });
+        await this.fx.mineSet(this.tile(tx, ty));
+      } else if (kind === 'smoke') {
+        u.facing = this.dirToward(u, tx, ty);
+        const tiles = [];
+        for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) {
+          const t = this.tile(tx + dx, ty + dy);
+          if (t && t.type !== 'wall' && t.type !== 'void' && t.type !== 'door') {
+            this.smoke.set(key(t.x, t.y), 2);
+            tiles.push(t);
+          }
+        }
+        await this.fx.smokeSet(this.tile(tx, ty), tiles);
       }
     });
   }
@@ -541,6 +577,18 @@ export class Battle {
       m.guard = false;
       m.weapon.heat = Math.max(0, m.weapon.heat - m.weapon.cool);
     }
+    // Clouds thin and drift apart at the top of each turn.
+    const clear = [];
+    for (const [k, n] of this.smoke) {
+      if (n <= 1) clear.push(k); else this.smoke.set(k, n - 1);
+    }
+    for (const k of clear) this.smoke.delete(k);
+    if (clear.length) {
+      await this.fx.smokeClear(clear.map(k => {
+        const [x, y] = k.split(',').map(Number);
+        return this.tile(x, y);
+      }));
+    }
     await this.fx.phase('player', this);
   }
 
@@ -568,8 +616,22 @@ export class Battle {
       u.facing = st.d; u.x = st.x; u.y = st.y; u.ap -= 1; u.moved = true;
       await this.fx.step(u, from, st);
       if (u.side === 'marine') { await this._pickup(u); this._checkEnd(); }
-      else await this._reactions(u);
+      else {
+        // The brood does not read minefield markings.
+        if (this.mines.has(key(st.x, st.y))) await this._detonate(st.x, st.y);
+        if (!u.alive || this.over) break;
+        await this._reactions(u);
+      }
     }
+  }
+
+  // A mine goes off: everything beside it bleeds, friendlies included.
+  async _detonate(x, y) {
+    this.mines.delete(key(x, y));
+    await this.fx.mineBoom(x, y);
+    const victims = this.units.filter(v => v.alive && Math.max(Math.abs(v.x - x), Math.abs(v.y - y)) <= 1);
+    for (const v of victims) if (v.alive) await this._damage(v, Math.max(1, 7 - v.reduce), null, 'blast');
+    this._checkEnd();
   }
 
   async _pickup(u) {
@@ -834,6 +896,8 @@ export class Battle {
         const u = this.addAlien(kind, spot.x, spot.y);
         this.faceNearest(u);
         await this.fx.spawn(u);
+        // A mine laid on the hatch takes the wave's firstborn with it.
+        if (this.mines.has(key(spot.x, spot.y))) await this._detonate(spot.x, spot.y);
       }
     }
     this._checkEnd();

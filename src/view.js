@@ -61,6 +61,8 @@ export class View {
     this.pickups = new Map();
     this.doors = new Map();
     this.terminals = new Map();
+    this.mineMeshes = new Map(); // tile key -> group (blinking light inside)
+    this.smokeMeshes = new Map(); // tile key -> group of puffs
     this.selected = null;
 
     this.overlayMats = {};
@@ -109,6 +111,7 @@ export class View {
     this.labels.replaceChildren();
     this.root = null; this.battle = null; this.selected = null;
     this.objs.clear(); this.overlays.clear(); this.dots.clear(); this.pickups.clear(); this.doors.clear(); this.terminals.clear();
+    this.mineMeshes.clear(); this.smokeMeshes.clear();
     this.pickables = []; this.tweens = []; this.hatchRings = []; this.exitMats = [];
   }
 
@@ -515,6 +518,9 @@ export class View {
       for (const m of this.exitMats || []) m.opacity = 0.16 + 0.2 * pulse;
       for (const m of this.hatchRings || []) m.color.setRGB(0.55 + 0.45 * pulse, 0.1, 0.1);
       for (const g of this.pickups.values()) { g.rotation.y += dt * 1.6; g.position.y += Math.sin(this.time * 2.4) * 0.0012; }
+      // Armed mines blink; smoke drifts in place.
+      for (const g of this.mineMeshes.values()) g.userData.pulse.color.setRGB(0.55 + 0.45 * pulse, 0.1, 0.1);
+      for (const g of this.smokeMeshes.values()) { g.rotation.y += dt * 0.25; g.position.y = this.battle.heightAt(Math.round(g.position.x), Math.round(g.position.z)) * HU + Math.sin(this.time * 0.8) * 0.03; }
 
       for (const o of this.objs.values()) {
         if (!o.u.alive) continue;
@@ -753,6 +759,57 @@ export class View {
     sfx.good();
     this.floatText(this.above(u), text, 'good');
     this.syncLabels();
+  }
+
+  // ---------------------------------------------------------------- mines and smoke
+
+  async mineSet(t) {
+    const g = new THREE.Group();
+    g.position.set(t.x, this.battle.heightAt(t.x, t.y) * HU + 0.05, t.y);
+    const body = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.2, 0.09, 10), new THREE.MeshStandardMaterial({ color: 0x39424b, roughness: 0.5, metalness: 0.6 }));
+    body.castShadow = true;
+    const light = new THREE.Mesh(new THREE.SphereGeometry(0.045, 8, 6), new THREE.MeshBasicMaterial({ color: 0xff3030 }));
+    light.position.y = 0.07;
+    g.add(body, light);
+    g.userData.pulse = light.material;
+    this.root.add(g);
+    this.mineMeshes.set(key(t.x, t.y), g);
+    sfx.clang();
+    this.floatText(this.pos(t.x, t.y, 0.9), tr('MINE SET'), 'info');
+    await this.wait(200);
+  }
+
+  async mineBoom(x, y) {
+    const g = this.mineMeshes.get(key(x, y));
+    if (g) { this.root.remove(g); this.mineMeshes.delete(key(x, y)); }
+    await this.explosion(x, y, 1);
+  }
+
+  async smokeSet(center, tiles) {
+    for (const t of tiles) {
+      if (this.smokeMeshes.has(key(t.x, t.y))) continue;
+      const g = new THREE.Group();
+      const mat = new THREE.MeshBasicMaterial({ color: 0x99a3ac, transparent: true, opacity: 0.5, depthWrite: false });
+      for (let i = 0; i < 3; i++) {
+        const s = new THREE.Mesh(new THREE.SphereGeometry(0.34, 10, 8), mat);
+        s.position.set((Math.random() - 0.5) * 0.42, 0.28 + Math.random() * 0.3, (Math.random() - 0.5) * 0.42);
+        s.scale.y = 0.8;
+        g.add(s);
+      }
+      g.position.set(t.x, this.battle.heightAt(t.x, t.y) * HU, t.y);
+      this.root.add(g);
+      this.smokeMeshes.set(key(t.x, t.y), g);
+    }
+    sfx.jet();
+    this.floatText(this.pos(center.x, center.y, 1.1), tr('SMOKE'), 'info');
+    await this.wait(220);
+  }
+
+  async smokeClear(tiles) {
+    for (const t of tiles) {
+      const g = this.smokeMeshes.get(key(t.x, t.y));
+      if (g) { this.root.remove(g); this.smokeMeshes.delete(key(t.x, t.y)); }
+    }
   }
 
   async terminal(u, t, doors) {

@@ -353,6 +353,8 @@ export class UI {
             h('li', t('Standing on a brood hatch seals it.')),
             h('li', t('Troopers killed on a successful mission are gone for good; replacements are free but green.')),
             h('li', t('Wounds carry over between missions: everyone heals a quarter of their maximum health per mission passed, plus another quarter for each mission spent on the bench.')),
+            h('li', t('Proximity mines detonate the moment a hostile steps on them, hurting everything nearby — your own troopers included.')),
+            h('li', t('Smoke blocks every line of sight through it, both ways, for two turns.')),
           ),
         ),
       ),

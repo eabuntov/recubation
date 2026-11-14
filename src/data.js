@@ -89,6 +89,8 @@ export const GEAR = {
   jump: { name: 'Jump Pack', cost: 60, req: { tech: 1 }, charges: 3, ap: 2, active: 'jump', range: 3, desc: 'Leap up to 3 tiles over troops and crates, onto any level. 3 uses.' },
   stim: { name: 'Combat Stim', cost: 20, req: {}, charges: 1, ap: 0, active: 'stim', desc: '+3 action points right now. Single use.' },
   mag: { name: 'Spare Magazine', cost: 15, req: {}, charges: 1, ap: 1, active: 'reload', desc: 'Fully reloads your weapon. Single use.' },
+  mine: { name: 'Proximity Mine', cost: 35, req: { traps: 1 }, charges: 2, ap: 2, active: 'mine', range: 3, desc: 'Throw an armed mine up to 3 tiles. It goes off the moment a hostile steps on it — everything next to it bleeds, friendlies included. 2 uses.' },
+  smoke: { name: 'Smoke Canister', cost: 25, req: { traps: 1 }, charges: 2, ap: 1, active: 'smoke', range: 4, desc: 'Pop a 3×3 smoke cloud on a tile for two turns. Nothing sees through it, in either direction. 2 uses.' },
   servo: { name: 'Servo Harness', cost: 70, req: { tech: 2 }, apBonus: 1, desc: '+1 action point every turn.' },
   coolant: { name: 'Coolant Sleeve', cost: 35, req: { tech: 1 }, coolBonus: 2, desc: 'Weapon sheds 2 extra heat per turn.' },
   scope: { name: 'Rangefinder', cost: 30, req: { light: 1 }, rangeBonus: 2, desc: '+2 weapon range.' },
@@ -101,6 +103,7 @@ export const SKILLS = {
   tech: { name: 'Technician', max: 3, cost: l => l, desc: 'Qualifies for jump packs, servos and prototypes.' },
   medic: { name: 'Field Medic', max: 3, cost: l => l, desc: 'Qualifies for medkits; each level heals +3.' },
   knives: { name: 'Knives', max: 3, cost: l => l, desc: 'The bayonet bites deeper: +2 damage per level, and level 3 stabs cost 1 AP less.' },
+  traps: { name: 'Traps', max: 3, cost: l => l, desc: 'Qualifies for mines and smoke canisters; level 2 for auto-turrets.' },
   vitality: { name: 'Vitality', max: 6, cost: () => 1, desc: '+2 maximum health per level.' },
   reflexes: { name: 'Reflexes', max: 3, cost: () => 3, desc: '+1 action point per level.' },
 };

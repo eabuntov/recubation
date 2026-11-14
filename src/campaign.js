@@ -26,7 +26,7 @@ function recruit(state) {
   const s = {
     id, name: state.names[(id - 1) % state.names.length], color: SQUAD_COLORS[(id - 1) % SQUAD_COLORS.length],
     level, xp: level > 1 ? xpForLevel(level - 1) : 0, sp: (level - 1) * 2,
-    skills: { light: 0, heavy: 0, tech: 0, medic: 0, knives: 0, vitality: 0, reflexes: 0 },
+    skills: { light: 0, heavy: 0, tech: 0, medic: 0, knives: 0, traps: 0, vitality: 0, reflexes: 0 },
     weapon: 'carbine', armor: 'none', gear: new Array(GEAR_SLOTS).fill(null),
     kills: 0, missions: 0, hp: null, missed: 0,
   };

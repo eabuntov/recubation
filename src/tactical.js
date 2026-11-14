@@ -86,7 +86,8 @@ export class Tactical {
         if (!b.reactionMode(s, x, y)) continue;
         this.base.set(key(x, y), 'cone');
       }
-      if (this.armed && this.armed.def.active === 'jump') {
+      const armed = this.armed && this.armed.def.active;
+      if (armed === 'jump' || armed === 'mine' || armed === 'smoke') {
         const r = this.armed.def.range;
         for (let y = s.y - r; y <= s.y + r; y++) for (let x = s.x - r; x <= s.x + r; x++) {
           if (!b.gearProblem(s, this.armed, x, y)) this.base.set(key(x, y), 'use');
@@ -165,6 +166,8 @@ export class Tactical {
       const when = n == null ? tr('Dormant') : n === 0 ? tr('Opens this turn') : tr('Opens in {n} turns', { n });
       lines.push(`<b>${esc(tr('Brood hatch'))}</b>`, `<span class="dim">${esc(tr('{when}. Stand on it to seal it.', { when }))}</span>`);
     } else if (t.pickup) lines.push(`<b>${esc(tr(t.pickup === 'ammo' ? 'Ammunition' : 'Aid station'))}</b>`, `<span class="dim">${esc(tr('Walk over it to use it.'))}</span>`);
+    else if (b.mines.has(k)) lines.push(`<b>${esc(tr('Proximity Mine'))}</b>`, `<span class="dim">${esc(tr('Armed. It goes off the moment a hostile steps on it.'))}</span>`);
+    else if (b.smoke.has(k)) lines.push(`<b>${esc(tr('Smoke'))}</b>`, `<span class="dim">${esc(tr('Blocks every line of sight through it, in both directions.'))}</span>`);
     else if (t.exit) lines.push(`<b>${esc(tr('Extraction zone'))}</b>`);
     else if (t.type === 'crate') lines.push(`<b>${esc(tr('Crate'))}</b>`, `<span class="dim">${esc(tr('Blocks movement, not fire.'))}</span>`);
 
