@@ -4,7 +4,7 @@ export default {
   "SC-4 Carbine": "SC-4 卡宾枪",
   "Standard issue. A small magazine, but it swaps fast.": "制式装备。弹匣虽小，换得快。",
   "SC-4D Twin Carbine": "SC-4D 双管卡宾枪",
-  "Two barrels on one frame. The double tap hits hard but runs hot.": "一个枪架上两根枪管。双发威力大，但发热快。",
+  "Two barrels on one frame. The double tap hits hard, runs hot, and takes twice as long to reload.": "一个枪架上两根枪管。双发威力大、发热快，装弹还要花两倍时间。",
   "Breacher Scattergun": "破门霰弹枪",
   "Devastating at arm's length, a rumour at four tiles.": "近身时毁天灭地，隔四格就只剩传说。",
   "AR-9 Assault Rifle": "AR-9 突击步枪",

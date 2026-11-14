@@ -380,18 +380,21 @@ export class Battle {
     this.fx.refresh();
   }
 
+  // Swapping magazines costs RELOAD_AP unless the weapon is slower about it.
+  reloadAp(u) { return u.weapon.def.reloadAp ?? RELOAD_AP; }
+
   // Why this trooper cannot swap magazines right now, or null when they can.
   reloadProblem(u) {
     if (u.side !== 'marine' || !u.weapon) return tr('Cannot be used');
     if (u.weapon.ammo >= u.weapon.def.ammo) return tr('Magazine is full');
-    if (u.ap < RELOAD_AP) return tr('Not enough AP');
+    if (u.ap < this.reloadAp(u)) return tr('Not enough AP');
     return null;
   }
 
   reload(u) {
     if (this.reloadProblem(u)) return Promise.resolve(false);
     return this._run(async () => {
-      u.ap -= RELOAD_AP;
+      u.ap -= this.reloadAp(u);
       u.weapon.ammo = u.weapon.def.ammo;
       await this.fx.note(u, tr('RELOADED'), 'good');
     });

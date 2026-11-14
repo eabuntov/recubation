@@ -4,7 +4,7 @@ export default {
   "SC-4 Carbine": "SC-4 カービン",
   "Standard issue. A small magazine, but it swaps fast.": "標準支給品。マガジンは小さいが、交換は素早い。",
   "SC-4D Twin Carbine": "SC-4D ツインカービン",
-  "Two barrels on one frame. The double tap hits hard but runs hot.": "ひとつのフレームに銃身が二本。二連射は強烈だが、すぐに熱を持つ。",
+  "Two barrels on one frame. The double tap hits hard, runs hot, and takes twice as long to reload.": "ひとつのフレームに銃身が二本。二連射は強烈だがすぐに熱を持ち、装填には倍の時間がかかる。",
   "Breacher Scattergun": "ブリーチャー散弾銃",
   "Devastating at arm's length, a rumour at four tiles.": "至近距離では壊滅的、4マス先では噂話程度。",
   "AR-9 Assault Rifle": "AR-9 アサルトライフル",

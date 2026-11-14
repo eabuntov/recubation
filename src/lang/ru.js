@@ -4,7 +4,7 @@ export default {
   "SC-4 Carbine": "Карабин SC-4",
   "Standard issue. A small magazine, but it swaps fast.": "Табельный образец. Магазин мал, зато меняется быстро.",
   "SC-4D Twin Carbine": "Спаренный карабин SC-4D",
-  "Two barrels on one frame. The double tap hits hard but runs hot.": "Два ствола на одной раме. Сдвоенный выстрел бьёт сильно, но быстро греется.",
+  "Two barrels on one frame. The double tap hits hard, runs hot, and takes twice as long to reload.": "Два ствола на одной раме. Сдвоенный выстрел бьёт сильно, но греется, а перезарядка вдвое дольше.",
   "Breacher Scattergun": "Штурмовой дробовик",
   "Devastating at arm's length, a rumour at four tiles.": "В упор — сокрушителен, за четыре клетки — одни слухи.",
   "AR-9 Assault Rifle": "Штурмовая винтовка AR-9",

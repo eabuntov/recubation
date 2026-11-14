@@ -411,7 +411,7 @@ export class UI {
           return h('button.act', {
             onclick: click(() => handlers.reload()), disabled: !!problem || !mineTurn, title: problem || '',
           },
-            t('Reload'), h('small', t('{n} AP', { n: RELOAD_AP })));
+            t('Reload'), h('small', t('{n} AP', { n: battle.reloadAp(sel) })));
         })(),
         sel.gear.filter(g => g.def.active).map(g => {
           const problem = battle.gearProblem(sel, g, sel.x, sel.y);

@@ -20,8 +20,8 @@ export const WEAPONS = {
     modes: [{ name: 'Single', ap: 2, dmg: 3, ammo: 1, heat: 2, pattern: 'single' }],
   },
   twin: {
-    name: 'SC-4D Twin Carbine', cost: 30, req: { light: 1 }, range: 6, ammo: 24, maxHeat: 9, cool: 4,
-    desc: 'Two barrels on one frame. The double tap hits hard but runs hot.',
+    name: 'SC-4D Twin Carbine', cost: 30, req: { light: 1 }, range: 6, ammo: 12, maxHeat: 9, cool: 4, reloadAp: 4,
+    desc: 'Two barrels on one frame. The double tap hits hard, runs hot, and takes twice as long to reload.',
     modes: [
       { name: 'Single', ap: 2, dmg: 3, ammo: 1, heat: 2, pattern: 'single' },
       { name: 'Double', ap: 3, dmg: 7, ammo: 2, heat: 4, pattern: 'single' },
@@ -111,6 +111,7 @@ export const BASE_HP = 14;
 export const BASE_AP = 6;
 
 // What swapping a fresh magazine costs, for any weapon (see Battle.reload).
+// A weapon def may override this with its own `reloadAp`.
 export const RELOAD_AP = 2;
 
 // Campaign difficulty. Aliens are built from these numbers in Battle.addAlien;

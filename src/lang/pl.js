@@ -4,7 +4,7 @@ export default {
   "SC-4 Carbine": "Karabinek SC-4",
   "Standard issue. A small magazine, but it swaps fast.": "Standardowe wyposażenie. Mały magazynek, ale szybko się zmienia.",
   "SC-4D Twin Carbine": "Podwójny karabinek SC-4D",
-  "Two barrels on one frame. The double tap hits hard but runs hot.": "Dwie lufy na jednej ramie. Podwójny strzał mocno uderza, ale szybko się grzeje.",
+  "Two barrels on one frame. The double tap hits hard, runs hot, and takes twice as long to reload.": "Dwie lufy na jednej ramie. Podwójny strzał mocno uderza i szybko się grzeje, a przeładowanie trwa dwa razy dłużej.",
   "Breacher Scattergun": "Strzelba szturmowa",
   "Devastating at arm's length, a rumour at four tiles.": "Z bliska niszczycielska, z czterech pól — już tylko plotka.",
   "AR-9 Assault Rifle": "Karabin szturmowy AR-9",
