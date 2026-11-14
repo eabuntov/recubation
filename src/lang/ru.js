@@ -422,4 +422,6 @@ export default {
   "Marksman Optic": "Снайперский оптический прицел",
   "+3 weapon range.": "+3 к дальности оружия.",
   "Slug": "Снаряд",
+  "Can strike: {names}": "Может достать: {names}",
+  "Nobody in reach": "Никто в пределах досягаемости",
 };

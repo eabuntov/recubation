@@ -422,4 +422,6 @@ export default {
   "Marksman Optic": "Scharfschützenoptik",
   "+3 weapon range.": "+3 Waffenreichweite.",
   "Slug": "Wolfram",
+  "Can strike: {names}": "Kann treffen: {names}",
+  "Nobody in reach": "Niemand in Reichweite",
 };

@@ -422,4 +422,6 @@ export default {
   "Marksman Optic": "Optyka strzelecka",
   "+3 weapon range.": "+3 do zasięgu broni.",
   "Slug": "Pocisk",
+  "Can strike: {names}": "Może dosięgnąć: {names}",
+  "Nobody in reach": "Nikogo w zasięgu",
 };

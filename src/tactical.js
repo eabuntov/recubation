@@ -21,6 +21,7 @@ export class Tactical {
     this.mouse = { x: 0, y: 0, shift: false, over: false };
     this.base = new Map();   // overlays that do not depend on the cursor
     this.reach = new Map();
+    this.dots = new Set();   // reachable tiles the current mode could fire from
     this.drag = null;
 
     const c = view.canvas;
@@ -72,6 +73,7 @@ export class Tactical {
 
     this.base = new Map();
     this.reach = new Map();
+    this.dots = new Set();
     if (s && this.ready) {
       const range = s.weapon.range;
       // Reaction arc: where this trooper would fire during the enemy phase.
@@ -98,6 +100,16 @@ export class Tactical {
         for (const [k, n] of this.reach) if (n.cost > 0 && !this.base.has(k)) this.base.set(k, 'move');
         for (const a of b.aliens()) if (b.preview(s, a.x, a.y, this.mode).ok) this.base.set(key(a.x, a.y), 'target');
         for (const d of DIRS) if (!b.terminalProblem(s, s.x + d.x, s.y + d.y)) this.base.set(key(s.x + d.x, s.y + d.y), 'use');
+        // A corner pip on every reachable tile the current fire mode could
+        // actually shoot from: where to stand, not just where to walk.
+        if (!b.fireProblem(s, this.mode)) {
+          const mode = this.mode;
+          for (const [k, n] of this.reach) {
+            if (!n.cost) continue;
+            const opts = { range: s.weapon.range, minRange: s.weapon.def.minRange, pattern: mode.pattern, arc: mode.arc };
+            if (b.aliens().some(a => !b.shotProblem(n.x, n.y, a.x, a.y, opts, s))) this.dots.add(k);
+          }
+        }
       }
     }
     this.ui.hud(b, s, this.modeIdx, this.armed, {
@@ -115,6 +127,7 @@ export class Tactical {
     const styles = new Map(this.base);
     if (extra) for (const [k, v] of extra) styles.set(k, v);
     this.view.setOverlays(styles);
+    this.view.setDots(this.dots);
   }
 
   // Recompute the cursor-dependent overlay and tooltip.
@@ -128,6 +141,20 @@ export class Tactical {
 
     if (u && u.side === 'alien') {
       lines.push(`<b>${esc(u.name)}</b> <span class="dim">${esc(tr('HP {hp}/{max}', { hp: u.hp, max: u.maxHp }))}</span>`, `<span class="dim">${esc(u.def.desc)}</span>`);
+      // The hovered hostile's next activation at a glance: how far it can walk
+      // and which troopers it could reach when it gets there.
+      const reach = b.flood(u.x, u.y, u.maxAp);
+      for (const [k, n] of reach) if (n.cost > 0) extra.set(k, 'threat');
+      const spend = u.melee ? u.melee.ap : 2;
+      const near = m => DIRS.some(d => {
+        const n = reach.get(key(m.x + d.x, m.y + d.y));
+        return !!n && n.cost <= u.maxAp - spend;
+      }) || (!!u.ranged && !b.shotProblem(u.x, u.y, m.x, m.y, { range: u.ranged.range, pattern: 'single' }, u));
+      const prey = b.marines().filter(near);
+      if (prey.length) {
+        lines.push(`<span class="bad">${esc(tr('Can strike: {names}', { names: prey.map(p => p.name).join(', ') }))}</span>`);
+        for (const m of prey) extra.set(key(m.x, m.y), 'bad');
+      } else lines.push(`<span class="dim">${esc(tr('Nobody in reach'))}</span>`);
     } else if (u) {
       lines.push(`<b>${esc(u.name)}</b> <span class="dim">${esc(tr('HP {hp}/{max} · AP {ap}', { hp: u.hp, max: u.maxHp, ap: u.ap }))}</span>`, `<span class="dim">${esc(u.weapon.def.name)} · ${esc(tr('{n} rds', { n: u.weapon.ammo }))}</span>`);
     } else if (t.terminal) {

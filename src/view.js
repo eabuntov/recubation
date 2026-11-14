@@ -22,6 +22,7 @@ const OVERLAY = {
   bad: [0xff2a2a, 0.25],
   use: [0x55ff9a, 0.45],
   hover: [0xffffff, 0.30],
+  threat: [0xff6a5a, 0.15],
 };
 
 const angleFor = d => -d * Math.PI / 2;
@@ -55,6 +56,7 @@ export class View {
     this.root = null;
     this.objs = new Map();     // unit id -> { group, model, label, ... }
     this.overlays = new Map(); // tile key -> mesh
+    this.dots = new Map();     // tile key -> "can fire from here" pip
     this.pickables = [];
     this.pickups = new Map();
     this.doors = new Map();
@@ -65,6 +67,7 @@ export class View {
     for (const k in OVERLAY) {
       this.overlayMats[k] = new THREE.MeshBasicMaterial({ color: OVERLAY[k][0], transparent: true, opacity: OVERLAY[k][1], depthWrite: false });
     }
+    this.dotMat = new THREE.MeshBasicMaterial({ color: 0xffd24a, transparent: true, opacity: 0.85, depthWrite: false });
 
     window.addEventListener('resize', () => this.resize());
     window.addEventListener('keydown', e => { if (!e.repeat) this.keys.add(e.code); });
@@ -105,7 +108,7 @@ export class View {
     }
     this.labels.replaceChildren();
     this.root = null; this.battle = null; this.selected = null;
-    this.objs.clear(); this.overlays.clear(); this.pickups.clear(); this.doors.clear(); this.terminals.clear();
+    this.objs.clear(); this.overlays.clear(); this.dots.clear(); this.pickups.clear(); this.doors.clear(); this.terminals.clear();
     this.pickables = []; this.tweens = []; this.hatchRings = []; this.exitMats = [];
   }
 
@@ -217,6 +220,16 @@ export class View {
       holder.add(o);
       root.add(holder);
       this.overlays.set(key(t.x, t.y), o);
+
+      // A corner pip marking "stand here and you have a shot". It rides the
+      // overlay quad so ramps tilt it for free.
+      const dot = new THREE.Mesh(plane, this.dotMat);
+      dot.scale.setScalar(0.16);
+      dot.position.set(0.30, 0.30, 0.002);
+      dot.visible = false;
+      dot.renderOrder = 3;
+      o.add(dot);
+      this.dots.set(key(t.x, t.y), dot);
 
       const lift = t.type === 'crate' ? 0.75 : t.type === 'terminal' ? 0.8 : t.type === 'door' ? WALL_H : 0;
       const p = new THREE.Mesh(new THREE.BoxGeometry(1, Math.max(0.05, lift), 1), pickMat);
@@ -397,6 +410,10 @@ export class View {
       mesh.visible = !!s;
       if (s) mesh.material = this.overlayMats[s];
     }
+  }
+
+  setDots(keys) {
+    for (const [k, mesh] of this.dots) mesh.visible = keys.has(k);
   }
 
   pick(clientX, clientY) {

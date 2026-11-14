@@ -422,4 +422,6 @@ export default {
   "Marksman Optic": "Ótica de atirador",
   "+3 weapon range.": "+3 de alcance de arma.",
   "Slug": "Projétil",
+  "Can strike: {names}": "Pode alcançar: {names}",
+  "Nobody in reach": "Ninguém ao alcance",
 };

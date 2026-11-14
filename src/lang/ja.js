@@ -422,4 +422,6 @@ export default {
   "Marksman Optic": "狙撃照準器",
   "+3 weapon range.": "武器射程+3。",
   "Slug": "タングステン弾",
+  "Can strike: {names}": "攻撃可能：{names}",
+  "Nobody in reach": "攻撃できる者がいない",
 };

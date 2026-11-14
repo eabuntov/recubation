@@ -422,4 +422,6 @@ export default {
   "Marksman Optic": "神射手瞄具",
   "+3 weapon range.": "+3武器射程。",
   "Slug": "钨弹",
+  "Can strike: {names}": "可打击：{names}",
+  "Nobody in reach": "无人可达",
 };

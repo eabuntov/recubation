@@ -422,4 +422,6 @@ export default {
   "Marksman Optic": "Lunette de tireur d’élite",
   "+3 weapon range.": "+3 de portée d’arme.",
   "Slug": "Obus",
+  "Can strike: {names}": "Peut frapper : {names}",
+  "Nobody in reach": "Personne à portée",
 };
