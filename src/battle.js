@@ -90,6 +90,9 @@ export class Battle {
     this.announced = false;
     this.countMul = this.diff.countMul || 1;
     this.spawnLeft = mission.spawn ? Math.round(mission.spawn.total * this.countMul) + this.diff.spawnExtra : 0;
+    // Hatches hold the rest of the brood back while the map is already crowded:
+    // the wave is delayed, not cancelled, so holding still costs something.
+    this.maxAlive = (mission.spawn && mission.spawn.maxAlive) || 10;
     this.spawnCount = 0;
     this.engaged = {};        // marine id -> alien attacks against them this phase
     this._threatCache = null;
@@ -778,6 +781,8 @@ export class Battle {
     if (this.turn < sp.start || (this.turn - sp.start) % sp.every !== 0) return;
     for (const t of this.hatches) {
       if (this.spawnLeft <= 0) break;
+      // A crowded map delays the rest of the wave, it does not cancel it.
+      if (this.aliens().length >= this.maxAlive) break;
       const block = this.unitAt(t.x, t.y);
       if (block && block.side === 'alien') continue; // the brood never clogs its own hatch
       // A trooper standing on a hatch seals it, and the whole wave it would

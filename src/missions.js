@@ -108,7 +108,7 @@ export const MISSIONS = [
     squad: 4,
     reward: 70,
     objective: { type: 'survive', turns: 8 },
-    spawn: { start: 1, every: 2, total: 20, pool: ['skitter', 'skitter', 'spitter', 'skitter', 'bloater'] },
+    spawn: { start: 1, every: 2, total: 10, maxAlive: 8, pool: ['skitter', 'skitter', 'spitter', 'skitter', 'bloater'] },
     brief: [
       'The evacuation lift needs eight minutes to cycle and the junction it opens onto is ringed with hatches. They are coming up through the floor.',
       'Hold the junction until the lift arrives. Nobody has to be a hero. Everybody has to be alive.',
@@ -128,7 +128,7 @@ export const MISSIONS = [
       '#...##.......##.....#',
       '#...##...c...##.....#',
       '#........#..........#',
-      '#H.......#....H....H#',
+      '#........#.........H#',
       '#####################',
     ],
   },
