@@ -105,6 +105,12 @@ export const SKILLS = {
 };
 
 export const RANKS = ['Recruit', 'Private', 'Lance', 'Corporal', 'Sergeant', 'Lieutenant', 'Captain', 'Major'];
+
+// Troopers of one rank share one colour, on the board and in the HUD, so the
+// pecking order reads at a glance. Promotions re-tint between missions; the
+// per-soldier colour a save carries is kept but no longer displayed.
+export const RANK_COLORS = [0x9aa7b0, 0x7fd18b, 0x4fc3f7, 0x4dd0c4, 0xffb74d, 0xba68c8, 0xf06292, 0xffd54f];
+export const rankColor = level => RANK_COLORS[Math.min(RANK_COLORS.length, Math.max(1, level)) - 1];
 export const xpForLevel = level => 14 * level * (level + 1); // total xp needed to reach level+1
 
 export const BASE_HP = 14;

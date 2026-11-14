@@ -2,7 +2,7 @@
 // animates what the rules engine reports, and answers "which tile is under the cursor".
 
 import * as THREE from 'three';
-import { DIRS } from './data.js';
+import { DIRS, rankColor } from './data.js';
 import { key } from './battle.js';
 import { buildMarine, buildAlien } from './models.js';
 import { sfx } from './audio.js';
@@ -333,7 +333,7 @@ export class View {
 
   addUnit(u) {
     const group = new THREE.Group();
-    const built = u.side === 'marine' ? buildMarine(u.soldier.color) : buildAlien(u.kind);
+    const built = u.side === 'marine' ? buildMarine(rankColor(u.soldier.level)) : buildAlien(u.kind);
     // Elites get a hot tint so the player can read the threat off the board.
     if (u.elite) for (const m of new Set(built.mats)) {
       if (m.color) m.color.offsetHSL(-0.05, 0.25, 0.06);
@@ -350,7 +350,7 @@ export class View {
     this.pickables.push(hit);
 
     if (u.side === 'marine') {
-      const base = new THREE.Mesh(new THREE.RingGeometry(0.3, 0.35, 32), new THREE.MeshBasicMaterial({ color: u.soldier.color, transparent: true, opacity: 0.7, side: THREE.DoubleSide, depthWrite: false }));
+      const base = new THREE.Mesh(new THREE.RingGeometry(0.3, 0.35, 32), new THREE.MeshBasicMaterial({ color: rankColor(u.soldier.level), transparent: true, opacity: 0.7, side: THREE.DoubleSide, depthWrite: false }));
       base.rotation.x = -Math.PI / 2;
       base.position.y = 0.03;
       const nose = new THREE.Mesh(new THREE.CircleGeometry(0.1, 3), base.material);

@@ -1,6 +1,6 @@
 // DOM interface: menus, armoury, debrief and the tactical HUD.
 
-import { WEAPONS, ARMORS, GEAR, SKILLS, RANKS, BASE_HP, BASE_AP, RELOAD_AP, xpForLevel, meetsReq, reqText, DIFFICULTIES } from './data.js';
+import { WEAPONS, ARMORS, GEAR, SKILLS, RANKS, BASE_HP, BASE_AP, rankColor, xpForLevel, meetsReq, reqText, DIFFICULTIES } from './data.js';
 import { objectiveText, MISSIONS } from './missions.js';
 import { GEAR_SLOTS, canRaise, raiseSkill, skillCost, equip, equipProblem } from './campaign.js';
 import { sfx } from './audio.js';
@@ -150,7 +150,7 @@ export class UI {
           h('h3', { style: { marginTop: 0 } }, t('Squad · {n} deploy', { n: mission.squad })),
           h('div.roster', state.squad.slice(0, mission.squad).map(s => {
             const st = soldierStats(s);
-            return h('div.card', { style: { '--c': hex(s.color) } },
+            return h('div.card', { style: { '--c': hex(rankColor(s.level)) } },
               h('div.row',
                 h('span.name', s.name, fresh.includes(s) && h('span.badge.new', t('NEW')), s.sp > 0 && h('span.badge', t('{n} SP', { n: s.sp }))),
                 h('span.num', `${rankOf(s)} · ${t('L{n}', { n: s.level })}`)),
@@ -212,7 +212,7 @@ export class UI {
     this.show(h('div.sheet',
       h('header', h('h2', t('Armoury')), h('span.tag', t('Kit can be swapped freely; old items are refunded in full.')), h('span.rp', t('{n} RP', { n: state.rp }))),
       h('div.body.armory',
-        h('div.roster', state.squad.map(q => h('div.card' + (q === s ? '.sel' : ''), { style: { '--c': hex(q.color) }, onclick: click(() => this.armory(state, { onBack, onChange }, q.id)) },
+        h('div.roster', state.squad.map(q => h('div.card' + (q === s ? '.sel' : ''), { style: { '--c': hex(rankColor(q.level)) }, onclick: click(() => this.armory(state, { onBack, onChange }, q.id)) },
           h('div.row', h('span.name', q.name), q.sp > 0 && h('span.badge', t('{n} SP', { n: q.sp }))),
           h('div.num', `${rankOf(q)} · ${t('L{n}', { n: q.level })}`),
         ))),
@@ -370,7 +370,7 @@ export class UI {
 
     const mine = battle.units.filter(u => u.side === 'marine');
     $('squad').replaceChildren(...mine.map(u => h('div.card' + (u === sel ? '.sel' : '') + (u.alive ? '' : '.dead'), {
-      style: { '--c': hex(u.soldier.color) },
+      style: { '--c': hex(rankColor(u.soldier.level)) },
       onclick: () => u.alive && handlers.select && handlers.select(u),
     },
       h('div.row', h('span.name', u.name), h('span.num', u.alive ? `${u.hp}/${u.maxHp}` : t('KIA'))),
