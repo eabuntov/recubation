@@ -4,7 +4,7 @@
 
 import { MISSIONS } from '../src/missions.js';
 import { Battle, parseMap, key } from '../src/battle.js';
-import { newCampaign, reinforce, applyResult, raiseSkill, equip } from '../src/campaign.js';
+import { newCampaign, reinforce, applyResult, raiseSkill, equip, maxHpOf } from '../src/campaign.js';
 import { DIRS } from '../src/data.js';
 
 let failures = 0;
@@ -115,7 +115,11 @@ async function runCampaign(difficulty) {
     for (const w of ['rifle', 'twin']) if (equip(state, s, 'weapon', w)) break;
     for (const a of ['shell', 'vest']) if (equip(state, s, 'armor', a)) break;
   }
-  const b = await play(m, state.squad, difficulty);
+  // Rotate like a cautious player would: march the healthiest first and let
+  // the wounded heal on the bench.
+  const pool = [...state.squad].sort((a, b) =>
+    (b.hp == null ? maxHpOf(b) : b.hp) / maxHpOf(b) - (a.hp == null ? maxHpOf(a) : a.hp) / maxHpOf(a));
+  const b = await play(m, pool.slice(0, m.squad), difficulty);
   const sum = b.summary();
   const alive = sum.marines.filter(r => r.alive).length;
   console.log(`  ${m.id.padEnd(16)} ${sum.win ? 'WIN ' : 'LOSS'} turn ${String(sum.turns).padStart(2)}  alive ${alive}/${sum.marines.length}  kills ${sum.marines.reduce((n, r) => n + r.kills, 0)}  (${sum.text})`);

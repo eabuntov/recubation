@@ -117,28 +117,41 @@ function title() {
   });
 }
 
+let deployIds = null; // soldier ids picked for the next drop; null = front of the roster
+
 function staging() {
   if (battle) endBattle();
   if (!view.attract) backdrop();
   if (state.complete) { ui.ending(state, { onDone: () => { clearSave(); title(); } }); return; }
+  const mission = currentMission(state);
   const fresh = reinforce(state);
   save(state);
-  ui.staging(state, currentMission(state), fresh, { onDeploy: deploy, onArmory: () => armory(), onQuit: title });
+  // Keep what the player last picked; bury whoever has since been lost, and
+  // fall back to the front of the roster when nobody picked survives.
+  const alive = new Set(state.squad.map(s => s.id));
+  deployIds = new Set([...(deployIds || state.squad.slice(0, mission.squad).map(s => s.id))].filter(id => alive.has(id)));
+  if (!deployIds.size) deployIds = new Set(state.squad.slice(0, mission.squad).map(s => s.id));
+  ui.staging(state, mission, fresh, {
+    onDeploy: () => deploy(state.squad.filter(s => deployIds.has(s.id))),
+    onArmory: () => armory(),
+    onQuit: () => { deployIds = null; title(); },
+  }, deployIds, (id, add) => { add ? deployIds.add(id) : deployIds.delete(id); staging(); });
 }
 
 function armory() {
   ui.armory(state, { onBack: staging, onChange: () => save(state) });
 }
 
-async function deploy() {
+async function deploy(soldiers) {
   const mission = currentMission(state);
   // A retry can arrive with an under-strength roster (an Ironman wipe empties
   // it); replacements step in so the drop is never fielded empty.
   reinforce(state);
+  const squad = soldiers && soldiers.length ? soldiers : state.squad.slice(0, mission.squad);
   ui.hide();
   document.body.classList.remove('menu');
   view.attract = false;
-  battle = new Battle(mission, state.squad, fx, state.difficulty);
+  battle = new Battle(mission, squad, fx, state.difficulty);
   view.load(battle);
   tactical.start(battle);
   ui.hudShow(true);

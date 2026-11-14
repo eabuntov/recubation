@@ -1,6 +1,6 @@
 // Campaign state: roster, progression, requisition, persistence.
 
-import { WEAPONS, ARMORS, GEAR, SKILLS, SOLDIER_NAMES, SQUAD_COLORS, xpForLevel, meetsReq, DIFFICULTIES } from './data.js';
+import { WEAPONS, ARMORS, GEAR, SKILLS, SOLDIER_NAMES, SQUAD_COLORS, BASE_HP, xpForLevel, meetsReq, DIFFICULTIES } from './data.js';
 import { MISSIONS } from './missions.js';
 import { t } from './i18n.js';
 
@@ -28,17 +28,23 @@ function recruit(state) {
     level, xp: level > 1 ? xpForLevel(level - 1) : 0, sp: (level - 1) * 2,
     skills: { light: 0, heavy: 0, tech: 0, medic: 0, knives: 0, vitality: 0, reflexes: 0 },
     weapon: 'carbine', armor: 'none', gear: new Array(GEAR_SLOTS).fill(null),
-    kills: 0, missions: 0,
+    kills: 0, missions: 0, hp: null, missed: 0,
   };
   state.squad.push(s);
   return s;
 }
 
-// Top the roster up to what the next mission needs. Returns the new arrivals.
+// Health a trooper brings into the field with their current kit.
+export function maxHpOf(s) {
+  return BASE_HP + (s.skills.vitality || 0) * 2 + ARMORS[s.armor].hp;
+}
+
+// Top the roster up to two above what the next mission fields, so the wounded
+// can sit a battle out. Returns the new arrivals.
 export function reinforce(state) {
   const m = currentMission(state);
   const fresh = [];
-  while (m && state.squad.length < m.squad) fresh.push(recruit(state));
+  while (m && state.squad.length < m.squad + 2) fresh.push(recruit(state));
   return fresh;
 }
 
@@ -63,7 +69,7 @@ export function applyResult(state, summary) {
   for (const r of summary.marines) {
     const s = state.squad.find(q => q.id === r.id);
     if (!s) continue;
-    const row = { soldier: s, kills: r.kills, alive: r.alive, xp: 0, levels: 0 };
+    const row = { soldier: s, kills: r.kills, alive: r.alive, xp: 0, levels: 0, hp: r.hp };
     s.kills += r.kills;
     s.missions++;
     if (r.alive) {
@@ -74,6 +80,17 @@ export function applyResult(state, summary) {
     report.rows.push(row);
   }
   buryDead(state, report, mission);
+  // Wounds carry over: survivors keep whatever they walked out with, and
+  // everyone heals a quarter of their maximum health per mission boundary —
+  // plus another quarter for every mission they sat out on the bench.
+  for (const s of state.squad) {
+    const row = report.rows.find(r => r.soldier === s && r.alive);
+    if (row) { s.hp = row.hp; s.missed = 0; }
+    else s.missed = (s.missed || 0) + 1;
+    const max = maxHpOf(s);
+    const now = s.hp == null ? max : Math.min(s.hp, max);
+    s.hp = Math.min(max, now + Math.round(max / 4) * (1 + (s.missed || 0)));
+  }
   report.reward = Math.round(mission.reward * diff.rpMul);
   state.rp += report.reward;
   state.mission++;
@@ -173,6 +190,8 @@ function sanitize(s) {
         Array.isArray(q.gear) && GEAR[q.gear[g]] ? q.gear[g] : null),
       kills: int(q.kills, 0),
       missions: int(q.missions, 0),
+      hp: Number.isInteger(q.hp) && q.hp > 0 ? q.hp : null,
+      missed: int(q.missed, 0),
     };
   });
   if (s.mission >= MISSIONS.length) s.complete = true;

@@ -257,7 +257,6 @@ export default {
   "NEW": "НОВЫЙ",
   "{n} SP": "{n} ОН",
   "L{n}": "Ур. {n}",
-  "{hp} HP · {ap} AP": "{hp} ОЗ · {ap} ОД",
   "In memoriam: {names}.": "Вечная память: {names}.",
   "Main menu": "Главное меню",
   "Armoury · points to spend": "Арсенал · есть очки",
@@ -428,4 +427,8 @@ export default {
   "The bayonet bites deeper: +2 damage per level, and level 3 stabs cost 1 AP less.": "Штык режет глубже: +2 к урону за уровень, а на 3-м уровне удар ещё и на 1 ОД дешевле.",
   "A crate or a body beside the target soaks part of the hit: shots skimming cover deal 2 less damage.": "Ящик или тело рядом с целью гасят часть удара: выстрелы вскользь через укрытие наносят на 2 меньше.",
   "cover": "укрытие",
+  "RESTING": "ОТДЫХАЕТ",
+  "The drop ship takes at most {n}.": "Челнок берёт не больше {n}.",
+  "Wounds carry over between missions: everyone heals a quarter of their maximum health per mission passed, plus another quarter for each mission spent on the bench.": "Раны переносятся между миссиями: каждый боец восстанавливает четверть максимального здоровья за прошедшую миссию и ещё четверть за каждую миссию, пропущенную на скамейке.",
+  "HP {hp}/{max} · {ap} AP": "ОЗ {hp}/{max} · {ap} ОД",
 };

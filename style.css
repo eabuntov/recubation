@@ -183,9 +183,11 @@ h3 { font-size: 11px; color: var(--dim); letter-spacing: 0.18em; margin: 18px 0 
 
 .roster { display: flex; flex-direction: column; gap: 6px; }
 .roster .card { cursor: default; }
+.roster .card.pick { cursor: pointer; }
 .roster .card .kit { color: var(--dim); font-size: 12px; }
 .badge { font: 600 10px var(--mono); padding: 1px 5px; border: 1px solid var(--warn); color: var(--warn); margin-left: 6px; }
 .badge.new { border-color: var(--good); color: var(--good); }
+.badge.rest { border-color: var(--dim); color: var(--dim); }
 
 .armory { grid-template-columns: 200px 1fr; align-items: start; }
 .armory .roster .card { cursor: pointer; }

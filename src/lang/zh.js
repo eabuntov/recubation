@@ -257,7 +257,6 @@ export default {
   "NEW": "新",
   "{n} SP": "{n} 技能点",
   "L{n}": "{n}级",
-  "{hp} HP · {ap} AP": "{hp} HP · {ap} AP",
   "In memoriam: {names}.": "永远铭记：{names}。",
   "Main menu": "主菜单",
   "Armoury · points to spend": "军械库 · 有点数可用",
@@ -428,4 +427,8 @@ export default {
   "The bayonet bites deeper: +2 damage per level, and level 3 stabs cost 1 AP less.": "刺刀咬得更深：每级 +2 伤害，3 级时突刺还减少 1 点行动消耗。",
   "A crate or a body beside the target soaks part of the hit: shots skimming cover deal 2 less damage.": "目标旁边的箱子或躯体会吸收部分伤害：擦过掩体的射击伤害降低 2 点。",
   "cover": "掩体",
+  "RESTING": "休养中",
+  "The drop ship takes at most {n}.": "登陆艇最多搭载 {n} 人。",
+  "Wounds carry over between missions: everyone heals a quarter of their maximum health per mission passed, plus another quarter for each mission spent on the bench.": "伤痛会跨任务延续：每经过一个任务恢复最大生命值的四分之一，坐板凳跳过的任务每个再多恢复四分之一。",
+  "HP {hp}/{max} · {ap} AP": "HP {hp}/{max} · {ap} AP",
 };

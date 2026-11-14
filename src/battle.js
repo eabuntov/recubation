@@ -119,10 +119,13 @@ export class Battle {
     const bonus = k => gear.reduce((n, g) => n + (g.def[k] || 0), 0);
     const maxHp = BASE_HP + (s.skills.vitality || 0) * 2 + armor.hp;
     const maxAp = BASE_AP + (s.skills.reflexes || 0) + bonus('apBonus');
+    // Wounds from earlier missions walk in with the trooper; a null hp means
+    // untouched, and an out-of-range value (new armour since) clamps.
+    const hp = s.hp == null ? maxHp : Math.max(1, Math.min(maxHp, s.hp));
     const u = {
       id: this.nextId++, side: 'marine', kind: 'marine', name: s.name, soldier: s, slot,
       x: pos.x, y: pos.y, facing: this.mission.facing ?? 1,
-      hp: maxHp, maxHp, ap: maxAp, maxAp, alive: true, reduce: armor.reduce, guard: false,
+      hp, maxHp, ap: maxAp, maxAp, alive: true, reduce: armor.reduce, guard: false,
       weapon: { id: s.weapon, def: wdef, ammo: wdef.ammo, heat: 0, range: wdef.range + bonus('rangeBonus'), cool: wdef.cool + bonus('coolBonus') },
       gear, medic: s.skills.medic || 0, kills: 0, xp: 0,
     };
@@ -841,7 +844,7 @@ export class Battle {
       win: !!(this.result && this.result.win),
       text: this.result ? this.result.text : '',
       turns: this.turn,
-      marines: this.units.filter(u => u.side === 'marine').map(u => ({ id: u.soldier.id, alive: u.alive, kills: u.kills, xp: u.xp })),
+      marines: this.units.filter(u => u.side === 'marine').map(u => ({ id: u.soldier.id, alive: u.alive, kills: u.kills, xp: u.xp, hp: u.hp })),
     };
   }
 }

@@ -257,7 +257,6 @@ export default {
   "NEW": "NOUVEAU",
   "{n} SP": "{n} PC",
   "L{n}": "N{n}",
-  "{hp} HP · {ap} AP": "{hp} PV · {ap} PA",
   "In memoriam: {names}.": "In memoriam : {names}.",
   "Main menu": "Menu principal",
   "Armoury · points to spend": "Armurerie · points à dépenser",
@@ -428,4 +427,8 @@ export default {
   "The bayonet bites deeper: +2 damage per level, and level 3 stabs cost 1 AP less.": "La baïonnette mord plus profond : +2 dégâts par niveau, et au niveau 3 le coup coûte 1 PA de moins.",
   "A crate or a body beside the target soaks part of the hit: shots skimming cover deal 2 less damage.": "Une caisse ou un corps à côté de la cible absorbe une partie du coup : les tirs qui frôlent un couvert infligent 2 dégâts de moins.",
   "cover": "couvert",
+  "RESTING": "AU REPOS",
+  "The drop ship takes at most {n}.": "La navette embarque au maximum {n}.",
+  "Wounds carry over between missions: everyone heals a quarter of their maximum health per mission passed, plus another quarter for each mission spent on the bench.": "Les blessures persistent entre les missions : chacun récupère un quart de sa santé maximale par mission écoulée, plus un quart supplémentaire par mission passée sur le banc.",
+  "HP {hp}/{max} · {ap} AP": "PV {hp}/{max} · {ap} PA",
 };

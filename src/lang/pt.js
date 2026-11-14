@@ -257,7 +257,6 @@ export default {
   "NEW": "NOVO",
   "{n} SP": "{n} PH",
   "L{n}": "N{n}",
-  "{hp} HP · {ap} AP": "{hp} PV · {ap} PA",
   "In memoriam: {names}.": "In memoriam: {names}.",
   "Main menu": "Menu principal",
   "Armoury · points to spend": "Arsenal · pontos para gastar",
@@ -428,4 +427,8 @@ export default {
   "The bayonet bites deeper: +2 damage per level, and level 3 stabs cost 1 AP less.": "A baioneta morde mais fundo: +2 de dano por nível, e no nível 3 a estocada custa 1 PA a menos.",
   "A crate or a body beside the target soaks part of the hit: shots skimming cover deal 2 less damage.": "Uma caixa ou um corpo ao lado do alvo absorve parte do golpe: tiros que roçam a cobertura causam 2 de dano a menos.",
   "cover": "cobertura",
+  "RESTING": "DESCANSANDO",
+  "The drop ship takes at most {n}.": "A nave de desembarque leva no máximo {n}.",
+  "Wounds carry over between missions: everyone heals a quarter of their maximum health per mission passed, plus another quarter for each mission spent on the bench.": "Os ferimentos atravessam as missões: cada um recupera um quarto da saúde máxima por missão passada, mais outro quarto por cada missão no banco.",
+  "HP {hp}/{max} · {ap} AP": "PV {hp}/{max} · {ap} PA",
 };

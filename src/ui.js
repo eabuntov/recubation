@@ -2,7 +2,7 @@
 
 import { WEAPONS, ARMORS, GEAR, SKILLS, RANKS, BASE_HP, BASE_AP, rankColor, xpForLevel, meetsReq, reqText, DIFFICULTIES } from './data.js';
 import { objectiveText, MISSIONS } from './missions.js';
-import { GEAR_SLOTS, canRaise, raiseSkill, skillCost, equip, equipProblem } from './campaign.js';
+import { GEAR_SLOTS, maxHpOf, canRaise, raiseSkill, skillCost, equip, equipProblem } from './campaign.js';
 import { sfx } from './audio.js';
 import { t, LANGS, savedLang, browserLang } from './i18n.js';
 
@@ -34,7 +34,7 @@ const btn = (label, fn, cls = '', props = {}) => h('button' + (cls ? '.' + cls :
 function soldierStats(s) {
   const gear = s.gear.filter(Boolean).map(g => GEAR[g]);
   return {
-    hp: BASE_HP + s.skills.vitality * 2 + ARMORS[s.armor].hp,
+    hp: maxHpOf(s),
     ap: BASE_AP + s.skills.reflexes + gear.reduce((n, g) => n + (g.apBonus || 0), 0),
   };
 }
@@ -129,7 +129,9 @@ export class UI {
     ));
   }
 
-  staging(state, mission, fresh, { onDeploy, onArmory, onQuit }) {
+  // `picked` is the set of soldier ids marching on this drop; clicking a card
+  // toggles them through onPick (up to what the mission fields).
+  staging(state, mission, fresh, { onDeploy, onArmory, onQuit }, picked = new Set(), onPick = null) {
     const unspent = state.squad.some(s => s.sp > 0);
     const diff = DIFFICULTIES[state.difficulty] || DIFFICULTIES.normal;
     this.show(h('div.sheet',
@@ -148,14 +150,23 @@ export class UI {
         ),
         h('div',
           h('h3', { style: { marginTop: 0 } }, t('Squad · {n} deploy', { n: mission.squad })),
-          h('div.roster', state.squad.slice(0, mission.squad).map(s => {
+          h('div.roster', state.squad.map(s => {
             const st = soldierStats(s);
-            return h('div.card', { style: { '--c': hex(rankColor(s.level)) } },
+            const hp = s.hp == null ? st.hp : Math.max(1, Math.min(st.hp, s.hp));
+            const on = picked.has(s.id);
+            return h('div.card.pick' + (on ? '.sel' : ''), {
+              style: { '--c': hex(rankColor(s.level)) },
+              onclick: onPick && click(() => {
+                if (!on && picked.size >= mission.squad) return this.toast(t('The drop ship takes at most {n}.', { n: mission.squad }));
+                onPick(s.id, !on);
+              }),
+            },
               h('div.row',
-                h('span.name', s.name, fresh.includes(s) && h('span.badge.new', t('NEW')), s.sp > 0 && h('span.badge', t('{n} SP', { n: s.sp }))),
+                h('span.name', s.name, fresh.includes(s) && h('span.badge.new', t('NEW')), s.sp > 0 && h('span.badge', t('{n} SP', { n: s.sp })), s.missed > 0 && h('span.badge.rest', t('RESTING'))),
                 h('span.num', `${rankOf(s)} · ${t('L{n}', { n: s.level })}`)),
               h('div.kit', `${WEAPONS[s.weapon].name} · ${ARMORS[s.armor].name}`),
-              h('div.kit', t('{hp} HP · {ap} AP', st) + (s.gear.filter(Boolean).length ? ' · ' + s.gear.filter(Boolean).map(g => GEAR[g].name).join(', ') : '')),
+              h('div.kit', t('HP {hp}/{max} · {ap} AP', { hp, max: st.hp, ap: st.ap }) + (s.gear.filter(Boolean).length ? ' · ' + s.gear.filter(Boolean).map(g => GEAR[g].name).join(', ') : '')),
+              h('div.bar' + (hp <= st.hp / 3 ? '.low' : ''), h('i', { style: { width: (100 * hp / st.hp) + '%' } })),
             );
           })),
           state.fallen.length > 0 && h('p', { style: { marginTop: '14px', fontSize: '12px' } }, t('In memoriam: {names}.', { names: state.fallen.map(f => f.name).join(', ') })),
@@ -165,7 +176,7 @@ export class UI {
         btn(t('Main menu'), onQuit),
         h('span.spacer'),
         btn(t(unspent ? 'Armoury · points to spend' : 'Armoury'), onArmory, unspent ? 'on' : ''),
-        btn(t('Deploy'), onDeploy, 'primary'),
+        btn(t('Deploy'), onDeploy, 'primary', { disabled: !picked.size }),
       ),
     ));
   }
@@ -341,6 +352,7 @@ export class UI {
             h('li', t('Hits from behind do 50% more damage, to them and to you.')),
             h('li', t('Standing on a brood hatch seals it.')),
             h('li', t('Troopers killed on a successful mission are gone for good; replacements are free but green.')),
+            h('li', t('Wounds carry over between missions: everyone heals a quarter of their maximum health per mission passed, plus another quarter for each mission spent on the bench.')),
           ),
         ),
       ),
