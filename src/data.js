@@ -100,6 +100,7 @@ export const SKILLS = {
   heavy: { name: 'Heavy Arms', max: 3, cost: l => l, desc: 'Qualifies for support weapons and plate armour.' },
   tech: { name: 'Technician', max: 3, cost: l => l, desc: 'Qualifies for jump packs, servos and prototypes.' },
   medic: { name: 'Field Medic', max: 3, cost: l => l, desc: 'Qualifies for medkits; each level heals +3.' },
+  knives: { name: 'Knives', max: 3, cost: l => l, desc: 'The bayonet bites deeper: +2 damage per level, and level 3 stabs cost 1 AP less.' },
   vitality: { name: 'Vitality', max: 6, cost: () => 1, desc: '+2 maximum health per level.' },
   reflexes: { name: 'Reflexes', max: 3, cost: () => 3, desc: '+1 action point per level.' },
 };

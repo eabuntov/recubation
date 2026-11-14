@@ -269,7 +269,15 @@ export class Battle {
     if (best) u.facing = this.dirToward(u, best.x, best.y);
   }
 
-  modes(u) { return [...u.weapon.def.modes, BAYONET]; }
+  // A personalised bayonet: the Knives skill sharpens it, and level 3 also
+  // quickens the stab. Everyone carries the stock one for free.
+  bayonet(u) {
+    const lv = (u.soldier && u.soldier.skills && u.soldier.skills.knives) || 0;
+    if (!lv) return BAYONET;
+    return { ...BAYONET, dmg: BAYONET.dmg + 2 * lv, ap: lv >= 3 ? BAYONET.ap - 1 : BAYONET.ap };
+  }
+
+  modes(u) { return [...u.weapon.def.modes, this.bayonet(u)]; }
 
   // Why this marine cannot use this fire mode right now, or null.
   fireProblem(u, mode) {

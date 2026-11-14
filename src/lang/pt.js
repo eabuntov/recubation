@@ -424,4 +424,6 @@ export default {
   "Slug": "Projétil",
   "Can strike: {names}": "Pode alcançar: {names}",
   "Nobody in reach": "Ninguém ao alcance",
+  "Knives": "Facas",
+  "The bayonet bites deeper: +2 damage per level, and level 3 stabs cost 1 AP less.": "A baioneta morde mais fundo: +2 de dano por nível, e no nível 3 a estocada custa 1 PA a menos.",
 };

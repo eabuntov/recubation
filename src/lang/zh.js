@@ -424,4 +424,6 @@ export default {
   "Slug": "钨弹",
   "Can strike: {names}": "可打击：{names}",
   "Nobody in reach": "无人可达",
+  "Knives": "刀具",
+  "The bayonet bites deeper: +2 damage per level, and level 3 stabs cost 1 AP less.": "刺刀咬得更深：每级 +2 伤害，3 级时突刺还减少 1 点行动消耗。",
 };

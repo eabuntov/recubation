@@ -424,4 +424,6 @@ export default {
   "Slug": "Pocisk",
   "Can strike: {names}": "Może dosięgnąć: {names}",
   "Nobody in reach": "Nikogo w zasięgu",
+  "Knives": "Noże",
+  "The bayonet bites deeper: +2 damage per level, and level 3 stabs cost 1 AP less.": "Bagnet kąsa głębiej: +2 obrażeń za poziom, a na 3. poziomie cios kosztuje też o 1 AP mniej.",
 };

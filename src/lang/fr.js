@@ -424,4 +424,6 @@ export default {
   "Slug": "Obus",
   "Can strike: {names}": "Peut frapper : {names}",
   "Nobody in reach": "Personne à portée",
+  "Knives": "Couteaux",
+  "The bayonet bites deeper: +2 damage per level, and level 3 stabs cost 1 AP less.": "La baïonnette mord plus profond : +2 dégâts par niveau, et au niveau 3 le coup coûte 1 PA de moins.",
 };

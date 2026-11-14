@@ -424,4 +424,6 @@ export default {
   "Slug": "タングステン弾",
   "Can strike: {names}": "攻撃可能：{names}",
   "Nobody in reach": "攻撃できる者がいない",
+  "Knives": "ナイフ",
+  "The bayonet bites deeper: +2 damage per level, and level 3 stabs cost 1 AP less.": "銃剣がより深く食い込む：レベルごとに +2 ダメージ、レベル 3 では突きの AP 消費も 1 減る。",
 };
