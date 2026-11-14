@@ -445,4 +445,10 @@ export default {
   "Cannot place it there": "Туди покласти не можна",
   "Proximity mines detonate the moment a hostile steps on them, hurting everything nearby — your own troopers included.": "Міни спрацьовують, щойно ворог ступає на них, ранячи всіх поруч — включно з вашими бійцями.",
   "Smoke blocks every line of sight through it, both ways, for two turns.": "Дим два ходи блокує будь-яку лінію погляду крізь нього — в обидва боки.",
+  "Auto-Turret": "Автоматична турель",
+  "Deploy a sentry gun on an adjacent tile: 6 rounds, range 5. It watches your back during the enemy phase; the brood will smash it.": "Розгортає сторожовий кулемет на сусідній клітинці: 6 патронів, дальність 5. Стереже вашу спину у фазі ворогів; виводок її розтрощить.",
+  "Turret": "Турель",
+  "TURRET": "ТУРЕЛЬ",
+  "TURRET UP": "ТУРЕЛЬ ГОТОВА",
+  "TURRET DOWN": "ТУРЕЛЬ ЗНИЩЕНА",
 };

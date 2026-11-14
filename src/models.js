@@ -180,6 +180,22 @@ function matriarch() {
   return { model, mats, height: 1.05, bob: t => { body.position.y = Math.sin(t * 1.8) * 0.02; sacs.forEach((s, i) => s.scale.setScalar(1 + Math.sin(t * 2.5 + i) * 0.15)); } };
 }
 
+export function buildTurret() {
+  const { mats, model, mat, box, add } = kit();
+  const frame = mat(0x4b5560, { metalness: 0.7, roughness: 0.35 });
+  const dark = mat(0x232a31, { metalness: 0.5, roughness: 0.6 });
+  const eye = mat(0x64e0ff, glow(0x64e0ff, 2));
+  box(0.5, 0.1, 0.5, dark, 0, 0.05, 0);                                        // base plate
+  add(new THREE.CylinderGeometry(0.06, 0.09, 0.34, 8), frame, 0, 0.26, 0);     // column
+  const head = new THREE.Group();
+  head.position.y = 0.46;
+  model.add(head);
+  box(0.3, 0.18, 0.34, frame, 0, 0, 0, head);                                  // housing
+  box(0.06, 0.06, 0.5, dark, 0.12, 0.02, -0.3, head);                          // barrel
+  box(0.02, 0.05, 0.02, eye, -0.1, 0.06, -0.18, head);                         // sensor
+  return { model, mats, height: 0.62, bob: null };
+}
+
 const BUILDERS = { skitter, spitter, carapace: shellback, bloater, stalker, behemoth: matriarch };
 const SCALE = { skitter: 0.85, spitter: 0.9, carapace: 1.1, bloater: 0.9, stalker: 1.0, behemoth: 1.45 };
 

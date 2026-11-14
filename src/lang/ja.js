@@ -445,4 +445,10 @@ export default {
   "Cannot place it there": "そこには置けない",
   "Proximity mines detonate the moment a hostile steps on them, hurting everything nearby — your own troopers included.": "地雷は敵が踏んだ瞬間に爆発し、周囲のすべてを傷つける——味方の兵士も含む。",
   "Smoke blocks every line of sight through it, both ways, for two turns.": "煙は 2 ターンの間、通り抜ける視線をどちら向きも遮る。",
+  "Auto-Turret": "自動タレット",
+  "Deploy a sentry gun on an adjacent tile: 6 rounds, range 5. It watches your back during the enemy phase; the brood will smash it.": "隣接マスに歩哨砲を展開する：6発、射程5。敵フェーズに背中を守る——巣の群れはこれを打ち砕くだろう。",
+  "Turret": "タレット",
+  "TURRET": "タレット",
+  "TURRET UP": "タレット展開",
+  "TURRET DOWN": "タレット破壊",
 };

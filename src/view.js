@@ -4,7 +4,7 @@
 import * as THREE from 'three';
 import { DIRS, rankColor } from './data.js';
 import { key } from './battle.js';
-import { buildMarine, buildAlien } from './models.js';
+import { buildMarine, buildAlien, buildTurret } from './models.js';
 import { sfx } from './audio.js';
 import { t as tr } from './i18n.js';
 
@@ -349,7 +349,8 @@ export class View {
 
   addUnit(u) {
     const group = new THREE.Group();
-    const built = u.side === 'marine' ? buildMarine(rankColor(u.soldier.level)) : buildAlien(u.kind);
+    const built = u.side === 'marine' ? buildMarine(rankColor(u.soldier.level))
+      : u.side === 'turret' ? buildTurret() : buildAlien(u.kind);
     // Elites get a hot tint so the player can read the threat off the board.
     if (u.elite) for (const m of new Set(built.mats)) {
       if (m.color) m.color.offsetHSL(-0.05, 0.25, 0.06);
@@ -714,6 +715,13 @@ export class View {
       this.floatText(this.above(u), tr('{name} is down', { name: u.name }), 'dmg-us');
       await this.tween(420, k => { o.model.rotation.x = -k * Math.PI / 2; o.model.position.y = k * 0.12; });
       for (const m of o.mats) { m.color.multiplyScalar(0.35); m.emissive.setScalar(0); }
+    } else if (u.side === 'turret') {
+      sfx.down();
+      this.floatText(this.above(u), tr('TURRET DOWN'), 'bad');
+      const y0 = o.group.position.y;
+      await this.tween(300, k => { o.group.rotation.x = k * Math.PI / 2; o.group.position.y = y0 - k * 0.08; });
+      this.root.remove(o.group);
+      this.objs.delete(u.id);
     } else {
       sfx.squelch();
       const gore = new THREE.Mesh(new THREE.CircleGeometry(0.34 * (u.def.scale || 1), 14), new THREE.MeshBasicMaterial({ color: 0x1d2b10, transparent: true, opacity: 0.85, depthWrite: false }));
@@ -810,6 +818,13 @@ export class View {
       const g = this.smokeMeshes.get(key(t.x, t.y));
       if (g) { this.root.remove(g); this.smokeMeshes.delete(key(t.x, t.y)); }
     }
+  }
+
+  async turretSet(tur, owner) {
+    const o = this.addUnit(tur);
+    sfx.good();
+    this.floatText(this.above(tur), tr('TURRET UP'), 'good');
+    await this.tween(300, k => o.group.scale.setScalar(0.05 + 0.95 * k));
   }
 
   async terminal(u, t, doors) {

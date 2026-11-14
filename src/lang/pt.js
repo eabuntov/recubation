@@ -445,4 +445,10 @@ export default {
   "Cannot place it there": "Não dá para colocar aí",
   "Proximity mines detonate the moment a hostile steps on them, hurting everything nearby — your own troopers included.": "As minas explodem assim que um hostil as pisa e ferem tudo por perto — suas próprias tropas incluídas.",
   "Smoke blocks every line of sight through it, both ways, for two turns.": "A fumaça bloqueia por dois turnos qualquer linha de visão através dela, nos dois sentidos.",
+  "Auto-Turret": "Torre automática",
+  "Deploy a sentry gun on an adjacent tile: 6 rounds, range 5. It watches your back during the enemy phase; the brood will smash it.": "Implanta uma metralhadora sentinela numa casa adjacente: 6 balas, alcance 5. Cobre suas costas na fase inimiga; a ninhada vai esmagá-la.",
+  "Turret": "Torre",
+  "TURRET": "TORRE",
+  "TURRET UP": "TORRE PRONTA",
+  "TURRET DOWN": "TORRE DESTRUÍDA",
 };

@@ -1,7 +1,7 @@
 // Tactical rules engine. No rendering in here: every visible consequence is
 // reported through the async `fx` hooks so the same code runs headless in tests.
 
-import { DIRS, WEAPONS, ARMORS, GEAR, ALIENS, BAYONET, BASE_HP, BASE_AP, RELOAD_AP, DIFFICULTIES } from './data.js';
+import { DIRS, WEAPONS, ARMORS, GEAR, ALIENS, BAYONET, BASE_HP, BASE_AP, RELOAD_AP, TURRET, DIFFICULTIES } from './data.js';
 import { t as tr } from './i18n.js';
 
 export const key = (x, y) => x + ',' + y;
@@ -154,10 +154,23 @@ export class Battle {
     return u;
   }
 
+  // A fielded sentry gun: its own side, so it neither counts as a trooper nor
+  // takes orders — it just watches its arc while the brood moves.
+  addTurret(x, y) {
+    const u = {
+      id: this.nextId++, side: 'turret', kind: 'turret', name: tr('Turret'), def: TURRET,
+      x, y, facing: 2, hp: TURRET.hp, maxHp: TURRET.hp, ap: 0, maxAp: 0, alive: true, reduce: 0,
+      rounds: TURRET.rounds, xpValue: 0,
+    };
+    this.units.push(u);
+    return u;
+  }
+
   // ---------------------------------------------------------------- queries
 
   marines() { return this.units.filter(u => u.alive && u.side === 'marine'); }
   aliens() { return this.units.filter(u => u.alive && u.side === 'alien'); }
+  turrets() { return this.units.filter(u => u.alive && u.side === 'turret'); }
   tile(x, y) { return (x >= 0 && y >= 0 && x < this.w && y < this.h) ? this.tiles[y][x] : null; }
   unitAt(x, y) { return this.units.find(u => u.alive && u.x === x && u.y === y) || null; }
   walkable(t) { return !!t && (t.type === 'floor' || t.type === 'ramp'); }
@@ -501,6 +514,12 @@ export class Battle {
       if (this.sightBlocked(u.x, u.y, tx, ty)) return tr('No clear arc');
       return null;
     }
+    if (kind === 'turret') {
+      const t = this.tile(tx, ty);
+      if (Math.abs(tx - u.x) + Math.abs(ty - u.y) !== 1) return tr('Must be adjacent');
+      if (!t || !this.walkable(t) || this.unitAt(tx, ty) || this.mines.has(key(tx, ty)) || t.hatch) return tr('Cannot place it there');
+      return null;
+    }
     return tr('Cannot be used');
   }
 
@@ -540,6 +559,10 @@ export class Battle {
           }
         }
         await this.fx.smokeSet(this.tile(tx, ty), tiles);
+      } else if (kind === 'turret') {
+        u.facing = this.dirToward(u, tx, ty);
+        const tur = this.addTurret(tx, ty);
+        await this.fx.turretSet(tur, u);
       }
     });
   }
@@ -700,16 +723,35 @@ export class Battle {
       await this.fx.note(m, tr('REACTION'), 'info');
       await this._attack(m, foe.x, foe.y, mode);
     }
+    if (foe.alive && !this.over) await this._turretFire(foe);
+  }
+
+  // Sentry guns shoot at each hostile once per that hostile's activation, the
+  // first moment it crosses a gun's line of sight. An empty gun powers down.
+  async _turretFire(foe) {
+    if (foe.turretShot) return;
+    for (const t of this.turrets()) {
+      if (Math.hypot(foe.x - t.x, foe.y - t.y) > TURRET.range + 0.5) continue;
+      if (this.sightBlocked(t.x, t.y, foe.x, foe.y)) continue;
+      foe.turretShot = true;
+      t.facing = this.dirToward(t, foe.x, foe.y);
+      this.fx.turn(t);
+      await this.fx.note(t, tr('TURRET'), 'info');
+      t.rounds--;
+      await this._attack(t, foe.x, foe.y, { name: tr('Burst'), ap: 0, dmg: TURRET.dmg, ammo: 1, heat: 0, pattern: 'single' });
+      if (t.rounds <= 0 && t.alive) await this._kill(t, null);
+      break;
+    }
   }
 
   async _act(a) {
     const def = a.def;
-    a.ap = a.maxAp; a.shots = 0; a.moved = false; a.provoked = false;
+    a.ap = a.maxAp; a.shots = 0; a.moved = false; a.provoked = false; a.turretShot = false;
     await this.fx.activate(a);
 
     if (def.explode) {
       await this._approach(a, true);
-      if (a.alive && this.marines().some(m => Math.max(Math.abs(m.x - a.x), Math.abs(m.y - a.y)) <= def.explode.radius)) {
+      if (a.alive && [...this.marines(), ...this.turrets()].some(m => Math.max(Math.abs(m.x - a.x), Math.abs(m.y - a.y)) <= def.explode.radius)) {
         await this._kill(a, null);
       }
     } else {
@@ -774,9 +816,10 @@ export class Battle {
   _shootTarget(a, fx, fy) {
     const mode = this._rangedMode(a);
     let best = null, bestScore = Infinity;
-    for (const m of this.marines()) {
+    // Troopers first; a sentry gun is worth spitting at when nobody softer shows.
+    for (const m of [...this.marines(), ...this.turrets()]) {
       if (this.shotProblem(fx, fy, m.x, m.y, mode, a)) continue;
-      const score = this._targetScore(m, mode.dmg);
+      const score = this._targetScore(m, mode.dmg) + (m.side === 'turret' ? 6 : 0);
       if (score < bestScore) { best = m; bestScore = score; }
     }
     return best;
@@ -817,14 +860,16 @@ export class Battle {
     for (let d = 0; d < 4; d++) {
       if (!this.stepOk(a.x, a.y, d)) continue;
       const m = this.unitAt(a.x + DIRS[d].x, a.y + DIRS[d].y);
-      if (!m || m.side !== 'marine') continue;
-      const score = this._targetScore(m, a.melee.dmg);
+      if (!m || (m.side !== 'marine' && m.side !== 'turret')) continue;
+      const score = this._targetScore(m, a.melee.dmg) + (m.side === 'turret' ? 6 : 0);
       if (score < bestScore) { best = m; bestScore = score; }
     }
     return best;
   }
 
   // Walk towards the closest tile next to a marine. Bloaters only need to get within blast range.
+  // Sentry guns are valid destinations too, at a discount: worth smashing once
+  // the soft targets are out of easy reach.
   async _approach(a, loose) {
     const goals = new Map();
     for (const m of this.marines()) {
@@ -836,6 +881,12 @@ export class Battle {
         if (this.walkable(this.tile(m.x + dx, m.y + dy))) goals.set(key(m.x + dx, m.y + dy), m);
       }
     }
+    for (const t of this.turrets()) {
+      for (let d = 0; d < 4; d++) {
+        const x = t.x - DIRS[d].x, y = t.y - DIRS[d].y;
+        if (this.stepOk(x, y, d)) goals.set(key(x, y), t);
+      }
+    }
     if (goals.has(key(a.x, a.y))) return;
     // Charging through a reaction arc is allowed but expensive, and costs more
     // the higher the difficulty; the brood is dumb, not suicidal.
@@ -845,7 +896,7 @@ export class Battle {
       for (const [k, m] of goals) {
         const n = reach.get(k);
         if (!n) continue;
-        const cost = n.cost + (threat.has(k) ? this.diff.aiPenalty : 0);
+        const cost = n.cost + (threat.has(k) ? this.diff.aiPenalty : 0) + (m.side === 'turret' ? 6 : 0);
         if (!best || cost < best.cost || (cost === best.cost && m.hp < best.hp)) best = { node: n, cost, hp: m.hp };
       }
       return best && best.node;

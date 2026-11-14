@@ -140,7 +140,9 @@ export class Tactical {
     const k = key(hv.x, hv.y), t = b.tile(hv.x, hv.y), u = b.unitAt(hv.x, hv.y);
     extra.set(k, 'hover');
 
-    if (u && u.side === 'alien') {
+    if (u && u.side === 'turret') {
+      lines.push(`<b>${esc(u.name)}</b> <span class="dim">${esc(tr('HP {hp}/{max}', { hp: u.hp, max: u.maxHp }))}</span>`, `<span class="dim">${esc(tr('{n} rds', { n: u.rounds }))}</span>`);
+    } else if (u && u.side === 'alien') {
       lines.push(`<b>${esc(u.name)}</b> <span class="dim">${esc(tr('HP {hp}/{max}', { hp: u.hp, max: u.maxHp }))}</span>`, `<span class="dim">${esc(u.def.desc)}</span>`);
       // The hovered hostile's next activation at a glance: how far it can walk
       // and which troopers it could reach when it gets there.

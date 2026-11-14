@@ -445,4 +445,10 @@ export default {
   "Cannot place it there": "Dort nicht platzierbar",
   "Proximity mines detonate the moment a hostile steps on them, hurting everything nearby — your own troopers included.": "Minen hoch in dem Moment, in dem ein Feind sie betritt, und verletzen alles in der Nähe — eigene Truppen eingeschlossen.",
   "Smoke blocks every line of sight through it, both ways, for two turns.": "Rauch blockiert zwei Runden lang jede Sichtlinie hindurch, in beide Richtungen.",
+  "Auto-Turret": "Automatikturm",
+  "Deploy a sentry gun on an adjacent tile: 6 rounds, range 5. It watches your back during the enemy phase; the brood will smash it.": "Errichtet auf einer benachbarten Kachel ein Wachgeschütz: 6 Schuss, Reichweite 5. Deckt Ihnen in der Feindphase den Rücken; der Brut wird es zerschmettern.",
+  "Turret": "Turm",
+  "TURRET": "TURM",
+  "TURRET UP": "TURM AKTIV",
+  "TURRET DOWN": "TURM ZERSTÖRT",
 };

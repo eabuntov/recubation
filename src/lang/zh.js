@@ -445,4 +445,10 @@ export default {
   "Cannot place it there": "无法放置在那里",
   "Proximity mines detonate the moment a hostile steps on them, hurting everything nearby — your own troopers included.": "地雷在敌人踩上的瞬间引爆，伤及周围一切——包括你自己的士兵。",
   "Smoke blocks every line of sight through it, both ways, for two turns.": "烟雾在两回合内阻断穿过它的一切视线，双向生效。",
+  "Auto-Turret": "自动炮塔",
+  "Deploy a sentry gun on an adjacent tile: 6 rounds, range 5. It watches your back during the enemy phase; the brood will smash it.": "在相邻格部署哨戒炮：6 发子弹，射程 5。在敌方阶段守护你的背后；虫群会砸烂它。",
+  "Turret": "炮塔",
+  "TURRET": "炮塔",
+  "TURRET UP": "炮塔就绪",
+  "TURRET DOWN": "炮塔被毁",
 };

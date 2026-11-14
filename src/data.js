@@ -91,6 +91,7 @@ export const GEAR = {
   mag: { name: 'Spare Magazine', cost: 15, req: {}, charges: 1, ap: 1, active: 'reload', desc: 'Fully reloads your weapon. Single use.' },
   mine: { name: 'Proximity Mine', cost: 35, req: { traps: 1 }, charges: 2, ap: 2, active: 'mine', range: 3, desc: 'Throw an armed mine up to 3 tiles. It goes off the moment a hostile steps on it — everything next to it bleeds, friendlies included. 2 uses.' },
   smoke: { name: 'Smoke Canister', cost: 25, req: { traps: 1 }, charges: 2, ap: 1, active: 'smoke', range: 4, desc: 'Pop a 3×3 smoke cloud on a tile for two turns. Nothing sees through it, in either direction. 2 uses.' },
+  turret: { name: 'Auto-Turret', cost: 90, req: { traps: 2 }, charges: 1, ap: 3, active: 'turret', desc: 'Deploy a sentry gun on an adjacent tile: 6 rounds, range 5. It watches your back during the enemy phase; the brood will smash it.' },
   servo: { name: 'Servo Harness', cost: 70, req: { tech: 2 }, apBonus: 1, desc: '+1 action point every turn.' },
   coolant: { name: 'Coolant Sleeve', cost: 35, req: { tech: 1 }, coolBonus: 2, desc: 'Weapon sheds 2 extra heat per turn.' },
   scope: { name: 'Rangefinder', cost: 30, req: { light: 1 }, rangeBonus: 2, desc: '+2 weapon range.' },
@@ -184,6 +185,9 @@ export const ALIENS = {
     desc: 'The heart of the nest. Frontal hits do half damage.',
   },
 };
+
+// Sentry gun fielded by the turret gear (built in Battle.addTurret).
+export const TURRET = { hp: 8, rounds: 6, range: 5, dmg: 4 };
 
 export const SOLDIER_NAMES = [
   'Vega', 'Okafor', 'Lindqvist', 'Marrow', 'Tanaka', 'Reyes', 'Kowal', 'Idris', 'Brandt', 'Solano',

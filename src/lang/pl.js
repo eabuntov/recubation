@@ -445,4 +445,10 @@ export default {
   "Cannot place it there": "Nie da się tego tam położyć",
   "Proximity mines detonate the moment a hostile steps on them, hurting everything nearby — your own troopers included.": "Miny wybuchają, gdy tylko wróg na nie wejdzie, raniąc wszystko obok — także twoich żołnierzy.",
   "Smoke blocks every line of sight through it, both ways, for two turns.": "Dym przez dwie tury blokuje każdą linię wzroku — w obie strony.",
+  "Auto-Turret": "Wieżyczka automatyczna",
+  "Deploy a sentry gun on an adjacent tile: 6 rounds, range 5. It watches your back during the enemy phase; the brood will smash it.": "Rozstawia karabin wartowniczy na sąsiedniej kratce: 6 naboi, zasięg 5. Pilnuje pleców w fazie wroga; wataha go roztrzaska.",
+  "Turret": "Wieżyczka",
+  "TURRET": "WIEŻYCZKA",
+  "TURRET UP": "WIEŻYCZKA GOTOWA",
+  "TURRET DOWN": "WIEŻYCZKA ZNISZCZONA",
 };

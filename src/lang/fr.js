@@ -445,4 +445,10 @@ export default {
   "Cannot place it there": "Impossible de la placer là",
   "Proximity mines detonate the moment a hostile steps on them, hurting everything nearby — your own troopers included.": "Les mines explosent dès qu’un hostile les foule et blessent tout ce qui est à proximité — vos propres troupes comprises.",
   "Smoke blocks every line of sight through it, both ways, for two turns.": "La fumée bloque deux tours durant toute ligne de vue à travers, dans les deux sens.",
+  "Auto-Turret": "Tourelle automatique",
+  "Deploy a sentry gun on an adjacent tile: 6 rounds, range 5. It watches your back during the enemy phase; the brood will smash it.": "Déploie une mitrailleuse sentinelle sur une case adjacente : 6 balles, portée 5. Elle couvre vos arrières pendant la phase ennemie ; la nichée la brisera.",
+  "Turret": "Tourelle",
+  "TURRET": "TOURELLE",
+  "TURRET UP": "TOURELLE EN PLACE",
+  "TURRET DOWN": "TOURELLE DÉTRUITE",
 };
