@@ -20,7 +20,8 @@ const tactical = new Tactical(view, ui, {
   help: () => showHelp(null),
   abort: () => {
     if (!(battle && tactical.ready)) return;
-    if (state.difficulty === 'ironman') { ui.toast(t('On Ironman the mission has to be seen through.')); return; }
+    // A battle with nobody left to fight is lost whatever the difficulty says.
+    if (state.difficulty === 'ironman' && battle.marines().length) { ui.toast(t('On Ironman the mission has to be seen through.')); return; }
     ui.confirm(t('Abandon this mission? Nothing is lost; you return to the briefing.'), t('Abort'), staging);
   },
 });
@@ -63,7 +64,7 @@ const fx = new Proxy({
     endBattle();
     const report = applyResult(state, done.summary());
     save(state);
-    ui.debrief(report, mission, { onContinue: staging, onRetry: deploy, onArmory: () => armory() });
+    ui.debrief(report, mission, { onContinue: staging, onRetry: staging, onArmory: () => armory() });
   },
 }, {
   // Anything not handled above is a visual effect owned by the view.
@@ -131,6 +132,9 @@ function armory() {
 
 async function deploy() {
   const mission = currentMission(state);
+  // A retry can arrive with an under-strength roster (an Ironman wipe empties
+  // it); replacements step in so the drop is never fielded empty.
+  reinforce(state);
   ui.hide();
   document.body.classList.remove('menu');
   view.attract = false;

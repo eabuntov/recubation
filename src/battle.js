@@ -362,6 +362,7 @@ export class Battle {
     this.busy = true;
     await this._startTurn();
     this.busy = false;
+    await this._announce();
     this.fx.refresh();
   }
 
@@ -491,6 +492,10 @@ export class Battle {
   // ---------------------------------------------------------------- internals
 
   async _startTurn() {
+    // A battle fielded with nobody alive is already lost; without this check no
+    // marine would ever move, kill or spawn, so _checkEnd would never fire and
+    // the mission would hang with no way out.
+    if (!this.marines().length) return this._finish(false, tr('The squad has been wiped out.'));
     this.turn++;
     const o = this.mission.objective;
     if (o.type === 'survive' && this.turn > o.turns) return this._finish(true, tr('The line held.'));
