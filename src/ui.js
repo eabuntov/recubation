@@ -393,7 +393,7 @@ export class UI {
       h('div.gun',
         h('div.label', h('b', w.def.name), h('span', t('rng {n}', { n: w.range }))),
         h('div.label', { style: { marginTop: '6px' } }, t('Ammo'), h('span', `${w.ammo}/${w.def.ammo}`)),
-        h('div.bar', h('i', { style: { width: (100 * w.ammo / w.def.ammo) + '%', background: 'var(--accent)' } })),
+        h('div.pips.ammo', Array.from({ length: w.def.ammo }, (_, i) => h('b' + (i < w.ammo ? '' : '.off')))),
         h('div.label', t('Heat'), h('span', t('{heat}/{max} · −{cool}/turn', { heat: w.heat, max: w.def.maxHeat, cool: w.cool }))),
         h('div.bar.heat', h('i', { style: { width: (100 * Math.min(1, w.heat / w.def.maxHeat)) + '%' } })),
       ),

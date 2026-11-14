@@ -93,6 +93,9 @@ h3 { font-size: 11px; color: var(--dim); letter-spacing: 0.18em; margin: 18px 0 
 .pips { display: flex; gap: 2px; flex-wrap: wrap; }
 .pips b { width: 9px; height: 5px; background: var(--accent); }
 .pips b.off { background: #1a2632; }
+/* Rounds in the magazine read as square cartridges, spent ones hollow. */
+.pips.ammo { margin: 5px 0 3px; }
+.pips.ammo b { width: 7px; height: 7px; }
 
 #panel {
   position: absolute; left: 50%; bottom: 12px; transform: translateX(-50%); min-width: 520px; max-width: calc(100vw - 420px);
