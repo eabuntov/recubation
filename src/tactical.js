@@ -158,7 +158,7 @@ export class Tactical {
             lines.push(`<span class="${cls}">${esc(mode.name)} → ${esc(hit.unit.name)}: ${esc(hit.dmg ? tr('{n} dmg', { n: hit.dmg }) : tr('no effect'))}${hit.note ? ' (' + esc(hit.note) + ')' : ''}${dead ? ' · ' + esc(tr('kills')) : ''}</span>`);
           }
           if (!p.hits.length) lines.push(`<span class="dim">${esc(tr('Nothing in the blast'))}</span>`);
-          lines.push(`<span class="dim">${esc(tr('{n} AP', { n: mode.ap }))}</span>`);
+          lines.push(`<span class="dim">${esc(tr('{n} AP', { n: mode.ap }))}${mode.ammo ? ' · ' + esc(tr('{n} rds', { n: mode.ammo })) : ''}</span>`);
         } else {
           lines.push(`<span class="bad">${esc(p.problem)}</span>`);
           extra.set(k, 'bad');

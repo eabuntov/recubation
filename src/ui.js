@@ -40,7 +40,8 @@ function soldierStats(s) {
 }
 
 function modeLine(w) {
-  return w.modes.map(m => t('{name} {dmg}dmg/{ap}AP', { name: m.name, dmg: m.dmg, ap: m.ap })).join(' · ');
+  return w.modes.map(m => t('{name} {dmg}dmg/{ap}AP', { name: m.name, dmg: m.dmg, ap: m.ap })
+    + (m.ammo ? ' · ' + t('{n} rds', { n: m.ammo }) : '')).join(' · ');
 }
 
 export class UI {
@@ -403,7 +404,9 @@ export class UI {
             onclick: click(() => handlers.mode(i)), title: problem || '', style: problem ? { opacity: 0.55 } : {},
           },
             h('kbd', String(i + 1)), mode.name,
-            h('small', t('{dmg} dmg · {ap} AP', { dmg: mode.dmg, ap: mode.ap }) + (mode.heat ? ` · +${mode.heat}°` : '')),
+            h('small', t('{dmg} dmg · {ap} AP', { dmg: mode.dmg, ap: mode.ap })
+              + (mode.ammo ? ' · ' + t('{n} rds', { n: mode.ammo }) : '')
+              + (mode.heat ? ` · +${mode.heat}°` : '')),
           );
         }),
         (() => {
