@@ -8,7 +8,7 @@ export const DIRS = [
   { x: -1, y: 0, name: 'W' },
 ];
 
-export const BAYONET = { id: 'bayonet', name: 'Bayonet', ap: 2, dmg: 4, ammo: 0, heat: 0, pattern: 'melee' };
+export const BAYONET = { id: 'bayonet', name: 'Bayonet', ap: 3, dmg: 4, ammo: 0, heat: 0, pattern: 'melee' };
 
 // pattern: single = one target, units block the shot
 //          line   = everything along the beam is hit
@@ -17,61 +17,61 @@ export const WEAPONS = {
   carbine: {
     name: 'SC-4 Carbine', cost: 0, req: {}, range: 6, ammo: 6, maxHeat: 8, cool: 4,
     desc: 'Standard issue. A small magazine, but it swaps fast.',
-    modes: [{ name: 'Single', ap: 2, dmg: 3, ammo: 1, heat: 2, pattern: 'single' }],
+    modes: [{ name: 'Single', ap: 3, dmg: 3, ammo: 1, heat: 2, pattern: 'single' }],
   },
   twin: {
     name: 'SC-4D Twin Carbine', cost: 30, req: { light: 1 }, range: 6, ammo: 12, maxHeat: 9, cool: 4, reloadAp: 4,
     desc: 'Two barrels on one frame. The double tap hits hard, runs hot, and takes twice as long to reload.',
     modes: [
-      { name: 'Single', ap: 2, dmg: 3, ammo: 1, heat: 2, pattern: 'single' },
-      { name: 'Double', ap: 3, dmg: 7, ammo: 2, heat: 4, pattern: 'single' },
+      { name: 'Single', ap: 3, dmg: 3, ammo: 1, heat: 2, pattern: 'single' },
+      { name: 'Double', ap: 4, dmg: 7, ammo: 2, heat: 4, pattern: 'single' },
     ],
   },
   scatter: {
     name: 'Breacher Scattergun', cost: 40, req: { light: 1 }, range: 4, ammo: 10, maxHeat: 8, cool: 4,
     desc: 'Devastating at arm\'s length, a rumour at four tiles.',
-    modes: [{ name: 'Blast', ap: 2, dmg: 9, falloff: [[1.5, 9], [3.2, 6], [99, 3]], ammo: 1, heat: 3, pattern: 'single' }],
+    modes: [{ name: 'Blast', ap: 3, dmg: 9, falloff: [[1.5, 9], [3.2, 6], [99, 3]], ammo: 1, heat: 3, pattern: 'single' }],
   },
   rifle: {
     name: 'AR-9 Assault Rifle', cost: 65, req: { light: 2 }, range: 7, ammo: 30, maxHeat: 10, cool: 4,
     desc: 'The workhorse of every boarding action since the Belt Wars.',
     modes: [
-      { name: 'Single', ap: 2, dmg: 5, ammo: 1, heat: 2, pattern: 'single' },
-      { name: 'Burst', ap: 3, dmg: 10, ammo: 3, heat: 5, pattern: 'single' },
+      { name: 'Single', ap: 3, dmg: 5, ammo: 1, heat: 2, pattern: 'single' },
+      { name: 'Burst', ap: 4, dmg: 10, ammo: 3, heat: 5, pattern: 'single' },
     ],
   },
   marksman: {
     name: 'LR-7 Marksman Rifle', cost: 70, req: { light: 3 }, range: 14, ammo: 8, maxHeat: 8, cool: 4,
     desc: 'One round, one problem solved. Slow to cycle.',
-    modes: [{ name: 'Aimed', ap: 3, dmg: 13, ammo: 1, heat: 4, pattern: 'single' }],
+    modes: [{ name: 'Aimed', ap: 4, dmg: 13, ammo: 1, heat: 4, pattern: 'single' }],
   },
   autocannon: {
     name: 'HMG-2 Autocannon', cost: 80, req: { heavy: 1 }, range: 8, ammo: 32, maxHeat: 12, cool: 5,
     desc: 'Belt-fed and bad-tempered. Sustained fire will cook the barrel.',
     modes: [
-      { name: 'Burst', ap: 3, dmg: 11, ammo: 4, heat: 5, pattern: 'single' },
-      { name: 'Sustained', ap: 5, dmg: 21, ammo: 8, heat: 9, pattern: 'single' },
+      { name: 'Burst', ap: 4, dmg: 11, ammo: 4, heat: 5, pattern: 'single' },
+      { name: 'Sustained', ap: 6, dmg: 21, ammo: 8, heat: 9, pattern: 'single' },
     ],
   },
   incinerator: {
     name: 'Furnace Incinerator', cost: 70, req: { heavy: 1 }, range: 3, ammo: 12, maxHeat: 10, cool: 4,
     desc: 'A tongue of burning gel. Scorches everything in a line and ignores armour.',
-    modes: [{ name: 'Jet', ap: 3, dmg: 8, ammo: 2, heat: 5, pattern: 'line', pierce: true, fx: 'flame' }],
+    modes: [{ name: 'Jet', ap: 4, dmg: 8, ammo: 2, heat: 5, pattern: 'line', pierce: true, fx: 'flame' }],
   },
   launcher: {
     name: 'GL-3 Launcher', cost: 90, req: { heavy: 2 }, range: 7, minRange: 2, ammo: 6, maxHeat: 8, cool: 4,
     desc: 'Lobs a fragmentation shell over heads. Mind the blast radius.',
-    modes: [{ name: 'Shell', ap: 4, dmg: 10, ammo: 1, heat: 4, pattern: 'blast', pierce: true, arc: true, fx: 'shell' }],
+    modes: [{ name: 'Shell', ap: 5, dmg: 10, ammo: 1, heat: 4, pattern: 'blast', pierce: true, arc: true, fx: 'shell' }],
   },
   lance: {
     name: 'PL-1 Plasma Lance', cost: 140, req: { heavy: 2, tech: 2 }, range: 9, ammo: 6, maxHeat: 10, cool: 4,
     desc: 'Prototype. Burns a hole through everything between you and the far wall.',
-    modes: [{ name: 'Beam', ap: 4, dmg: 18, ammo: 1, heat: 8, pattern: 'line', pierce: true, fx: 'plasma' }],
+    modes: [{ name: 'Beam', ap: 5, dmg: 18, ammo: 1, heat: 8, pattern: 'line', pierce: true, fx: 'plasma' }],
   },
   rail: {
     name: 'M-90 Railgun', cost: 160, req: { light: 3, tech: 2 }, range: 16, ammo: 6, maxHeat: 9, cool: 4,
     desc: 'A tungsten slug at rail speed. Nothing in this colony walks it off.',
-    modes: [{ name: 'Slug', ap: 3, dmg: 15, ammo: 1, heat: 5, pattern: 'single' }],
+    modes: [{ name: 'Slug', ap: 4, dmg: 15, ammo: 1, heat: 5, pattern: 'single' }],
   },
 };
 
@@ -114,7 +114,11 @@ export const rankColor = level => RANK_COLORS[Math.min(RANK_COLORS.length, Math.
 export const xpForLevel = level => 14 * level * (level + 1); // total xp needed to reach level+1
 
 export const BASE_HP = 14;
-export const BASE_AP = 6;
+
+// Every fire mode costs 1 AP more than moving a tile, and troopers get a 7th
+// point to spend: a turn spent repositioning now buys real ground, and
+// waiting in one room for the brood is what the turn limit punishes.
+export const BASE_AP = 7;
 
 // What swapping a fresh magazine costs, for any weapon (see Battle.reload).
 // A weapon def may override this with its own `reloadAp`.
@@ -130,11 +134,11 @@ export const DIFFICULTIES = {
     desc: 'The campaign as intended. A failed mission is a simulation run; the squad lives to try again.',
   },
   hard: {
-    name: 'Hard', hpMul: 1.25, apBonus: 1, countMul: 2, spawnExtra: 8, rpMul: 0.85, aiPenalty: 2, aiFocus: 2,
+    name: 'Hard', hpMul: 1.15, apBonus: 1, countMul: 2, spawnExtra: 4, rpMul: 0.85, aiPenalty: 2, aiFocus: 2,
     desc: 'Tougher broods: more health, more action points, relentless hatches, thinner rewards.',
   },
   ironman: {
-    name: 'Ironman', hpMul: 1.25, apBonus: 1, countMul: 2, spawnExtra: 8, rpMul: 0.85, aiPenalty: 2, aiFocus: 2, ironman: true,
+    name: 'Ironman', hpMul: 1.15, apBonus: 1, countMul: 2, spawnExtra: 4, rpMul: 0.85, aiPenalty: 2, aiFocus: 2, ironman: true,
     desc: 'As Hard, and a failed mission costs every trooper deployed on it. There are no simulations down here.',
   },
 };

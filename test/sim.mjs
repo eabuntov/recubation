@@ -66,6 +66,7 @@ async function botTurn(b) {
       }
       if (used) continue;
       if (m.ap < 3) break; // keep something for reaction fire
+      // A single shot now costs 3, so leave 3 behind instead of 2.
       const reach = b.flood(m.x, m.y, 999);
       const goals = [];
       for (const row of b.tiles) for (const t of row) {
@@ -80,7 +81,7 @@ async function botTurn(b) {
         if (n && n.cost > 0 && (!best || n.cost < best.cost)) best = n;
       }
       if (!best) break;
-      const path = b.pathFrom(best).slice(0, m.ap - 2);
+      const path = b.pathFrom(best).slice(0, m.ap - 3);
       if (!path.length || !(await b.move(m, path))) break;
     }
     if (m.alive) b.faceNearest(m);
