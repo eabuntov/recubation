@@ -426,4 +426,6 @@ export default {
   "Nobody in reach": "Nikogo w zasięgu",
   "Knives": "Noże",
   "The bayonet bites deeper: +2 damage per level, and level 3 stabs cost 1 AP less.": "Bagnet kąsa głębiej: +2 obrażeń za poziom, a na 3. poziomie cios kosztuje też o 1 AP mniej.",
+  "A crate or a body beside the target soaks part of the hit: shots skimming cover deal 2 less damage.": "Skrzynia lub ciało obok celu amortyzują część ciosu: strzały ślizgiem po osłonie zadają o 2 mniej obrażeń.",
+  "cover": "osłona",
 };

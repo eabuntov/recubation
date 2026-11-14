@@ -302,8 +302,26 @@ export class Battle {
       if (plate === 'immune') return { dmg: 0, note: tr('deflected') };
       dmg = Math.floor(dmg / 2); note = tr('armour');
     }
+    if (mode.pattern !== 'melee' && this._inCover(target, attacker)) {
+      dmg = Math.max(1, dmg - 2); note = tr('cover');
+    }
     if (target.reduce) dmg = Math.max(1, dmg - target.reduce);
     return { dmg, note };
+  }
+
+  // Does the shot at `target` from `attacker` skim a crate or a body huddled
+  // next to the target? Such cover soaks part of the blow. Melee ignores it,
+  // and so do blast footprints (they never route through calcDamage).
+  _inCover(target, attacker) {
+    for (const e of trace(attacker.x, attacker.y, target.x, target.y)) {
+      if (e.corner) continue;
+      if (Math.max(Math.abs(e.x - target.x), Math.abs(e.y - target.y)) !== 1) continue;
+      const t = this.tile(e.x, e.y);
+      if (t && t.type === 'crate') return true;
+      const u = this.unitAt(e.x, e.y);
+      if (u && u !== attacker && u !== target) return true;
+    }
+    return false;
   }
 
   // Tiles touched by an attack, for previews and effects.

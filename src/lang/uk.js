@@ -426,4 +426,6 @@ export default {
   "Nobody in reach": "Нікого в межах досяжності",
   "Knives": "Ножі",
   "The bayonet bites deeper: +2 damage per level, and level 3 stabs cost 1 AP less.": "Штик ріже глибше: +2 до шкоди за рівень, а на 3-му рівні удар ще й на 1 ОД дешевший.",
+  "A crate or a body beside the target soaks part of the hit: shots skimming cover deal 2 less damage.": "Ящик або тіло поруч із ціллю гасять частину удару: постріли навскіс через укриття завдають на 2 менше.",
+  "cover": "укриття",
 };

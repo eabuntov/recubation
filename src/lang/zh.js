@@ -426,4 +426,6 @@ export default {
   "Nobody in reach": "无人可达",
   "Knives": "刀具",
   "The bayonet bites deeper: +2 damage per level, and level 3 stabs cost 1 AP less.": "刺刀咬得更深：每级 +2 伤害，3 级时突刺还减少 1 点行动消耗。",
+  "A crate or a body beside the target soaks part of the hit: shots skimming cover deal 2 less damage.": "目标旁边的箱子或躯体会吸收部分伤害：擦过掩体的射击伤害降低 2 点。",
+  "cover": "掩体",
 };

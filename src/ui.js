@@ -337,6 +337,7 @@ export class UI {
             h('li', t('Weapons heat up as they fire and cool between turns. A gun at its limit will not fire, even on reaction.')),
             h('li', t('Ammunition is finite. Reload (2 AP) swaps in a full magazine; a yellow crate refills it too, and a green cross patches a trooper up.')),
             h('li', t('Bodies block bullets. Nobody shoots through a friend. Height lets you fire over heads and adds +1 damage.')),
+            h('li', t('A crate or a body beside the target soaks part of the hit: shots skimming cover deal 2 less damage.')),
             h('li', t('Hits from behind do 50% more damage, to them and to you.')),
             h('li', t('Standing on a brood hatch seals it.')),
             h('li', t('Troopers killed on a successful mission are gone for good; replacements are free but green.')),

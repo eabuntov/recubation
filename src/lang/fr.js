@@ -426,4 +426,6 @@ export default {
   "Nobody in reach": "Personne à portée",
   "Knives": "Couteaux",
   "The bayonet bites deeper: +2 damage per level, and level 3 stabs cost 1 AP less.": "La baïonnette mord plus profond : +2 dégâts par niveau, et au niveau 3 le coup coûte 1 PA de moins.",
+  "A crate or a body beside the target soaks part of the hit: shots skimming cover deal 2 less damage.": "Une caisse ou un corps à côté de la cible absorbe une partie du coup : les tirs qui frôlent un couvert infligent 2 dégâts de moins.",
+  "cover": "couvert",
 };

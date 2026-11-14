@@ -426,4 +426,6 @@ export default {
   "Nobody in reach": "Niemand in Reichweite",
   "Knives": "Messer",
   "The bayonet bites deeper: +2 damage per level, and level 3 stabs cost 1 AP less.": "Das Bajonett schneidet tiefer: +2 Schaden pro Stufe, und auf Stufe 3 kostet der Stich zusätzlich 1 AP weniger.",
+  "A crate or a body beside the target soaks part of the hit: shots skimming cover deal 2 less damage.": "Eine Kiste oder ein Körper neben dem Ziel schluckt einen Teil des Treffers: Schüsse, die Deckung streifen, richten 2 Schaden weniger an.",
+  "cover": "Deckung",
 };

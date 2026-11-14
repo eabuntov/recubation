@@ -426,4 +426,6 @@ export default {
   "Nobody in reach": "攻撃できる者がいない",
   "Knives": "ナイフ",
   "The bayonet bites deeper: +2 damage per level, and level 3 stabs cost 1 AP less.": "銃剣がより深く食い込む：レベルごとに +2 ダメージ、レベル 3 では突きの AP 消費も 1 減る。",
+  "A crate or a body beside the target soaks part of the hit: shots skimming cover deal 2 less damage.": "目標のそばにある箱や身体が衝撃の一部を吸収する：遮蔽をかすめる射撃はダメージが 2 減る。",
+  "cover": "遮蔽",
 };
