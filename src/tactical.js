@@ -63,6 +63,7 @@ export class Tactical {
   refresh() {
     const b = this.battle;
     if (!b) return;
+    if (b.limited) { b.updateVision(); this.view.syncVision(b); }
     if (this.sel && !this.sel.alive) this.sel = null;
     if (!this.sel) { this.sel = b.marines().find(m => m.ap > 0) || b.marines()[0] || null; this.modeIdx = 0; this.armed = null; }
     if (this.sel && this.modeIdx >= b.modes(this.sel).length) this.modeIdx = 0;
@@ -99,7 +100,7 @@ export class Tactical {
         // Walkable tiles keep the reaction arc where the two overlap: the arc
         // is the tactically meaningful layer there.
         for (const [k, n] of this.reach) if (n.cost > 0 && !this.base.has(k)) this.base.set(k, 'move');
-        for (const a of b.aliens()) if (b.preview(s, a.x, a.y, this.mode).ok) this.base.set(key(a.x, a.y), 'target');
+        for (const a of b.aliens()) if (b.isVisible(a) && b.preview(s, a.x, a.y, this.mode).ok) this.base.set(key(a.x, a.y), 'target');
         for (const d of DIRS) if (!b.terminalProblem(s, s.x + d.x, s.y + d.y)) this.base.set(key(s.x + d.x, s.y + d.y), 'use');
         // A corner pip on every reachable tile the current fire mode could
         // actually shoot from: where to stand, not just where to walk.
@@ -108,7 +109,7 @@ export class Tactical {
           for (const [k, n] of this.reach) {
             if (!n.cost) continue;
             const opts = { range: s.weapon.range, minRange: s.weapon.def.minRange, pattern: mode.pattern, arc: mode.arc };
-            if (b.aliens().some(a => !b.shotProblem(n.x, n.y, a.x, a.y, opts, s))) this.dots.add(k);
+            if (b.aliens().some(a => b.isVisible(a) && !b.shotProblem(n.x, n.y, a.x, a.y, opts, s))) this.dots.add(k);
           }
         }
       }

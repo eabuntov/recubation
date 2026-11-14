@@ -74,10 +74,11 @@ export function trace(x0, y0, x1, y1) {
 }
 
 export class Battle {
-  constructor(mission, squad, fx = NOFX, difficulty = 'normal') {
+  constructor(mission, squad, fx = NOFX, difficulty = 'normal', limitedVision = false) {
     this.mission = mission;
     this.fx = fx;
     this.diff = DIFFICULTIES[difficulty] || DIFFICULTIES.normal;
+    this.limited = !!limitedVision; // fog of war: only what the squad can see
     const map = parseMap(mission);
     this.w = map.w; this.h = map.h; this.tiles = map.tiles; this.hatches = map.hatches;
     this.units = [];
@@ -97,6 +98,8 @@ export class Battle {
     this.engaged = {};        // marine id -> alien attacks against them this phase
     this.mines = new Map();   // tile key -> {x, y}: armed, hostile-triggered
     this.smoke = new Map();   // tile key -> turns of cloud left
+    this.seen = new Set();    // alien ids currently in some trooper's sight
+    this.ghosts = new Map();  // alien id -> tile last seen on (limited vision)
     this._threatCache = null;
 
     squad.slice(0, map.starts.length).forEach((s, i) => this.addMarine(s, map.starts[i], i));
@@ -171,6 +174,24 @@ export class Battle {
   marines() { return this.units.filter(u => u.alive && u.side === 'marine'); }
   aliens() { return this.units.filter(u => u.alive && u.side === 'alien'); }
   turrets() { return this.units.filter(u => u.alive && u.side === 'turret'); }
+
+  // Under limited vision a hostile shows only while some trooper holds it in
+  // weapon range along a clear line; where one was last seen is remembered.
+  updateVision() {
+    if (!this.limited) return;
+    const visible = new Set();
+    for (const a of this.aliens()) {
+      const spotted = this.marines().some(m =>
+        Math.hypot(a.x - m.x, a.y - m.y) <= m.weapon.range + 0.5 && !this.sightBlocked(m.x, m.y, a.x, a.y));
+      if (spotted) { visible.add(a.id); this.ghosts.set(a.id, { x: a.x, y: a.y }); }
+    }
+    this.seen = visible;
+  }
+
+  isVisible(u) { return !this.limited || u.side !== 'alien' || this.seen.has(u.id); }
+
+  // What the HUD counts: everything, or only what the squad can see.
+  knownAliens() { return this.limited ? this.aliens().filter(a => this.seen.has(a.id)) : this.aliens(); }
   tile(x, y) { return (x >= 0 && y >= 0 && x < this.w && y < this.h) ? this.tiles[y][x] : null; }
   unitAt(x, y) { return this.units.find(u => u.alive && u.x === x && u.y === y) || null; }
   walkable(t) { return !!t && (t.type === 'floor' || t.type === 'ramp'); }
@@ -689,6 +710,7 @@ export class Battle {
 
   async _kill(target, source) {
     target.alive = false;
+    this.ghosts.delete(target.id);
     if (source && source.side === 'marine' && target.side === 'alien') { source.kills++; source.xp += target.xpValue ?? target.def.xp; }
     await this.fx.death(target);
     const ex = target.def && target.def.explode;

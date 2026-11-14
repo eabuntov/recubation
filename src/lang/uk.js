@@ -451,4 +451,6 @@ export default {
   "TURRET": "ТУРЕЛЬ",
   "TURRET UP": "ТУРЕЛЬ ГОТОВА",
   "TURRET DOWN": "ТУРЕЛЬ ЗНИЩЕНА",
+  "Limited vision": "Обмежена видимість",
+  "Hostiles are only visible along your troopers' lines of sight. Last-known positions show as ghosts.": "Ворогів видно лише вздовж ліній погляду ваших бійців. Останні відомі позиції позначаються примарами.",
 };

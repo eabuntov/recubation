@@ -7,13 +7,13 @@ import { t } from './i18n.js';
 const SAVE_KEY = 'recubation.save.v1';
 export const GEAR_SLOTS = 2;
 
-export function newCampaign(difficulty = 'normal') {
+export function newCampaign(difficulty = 'normal', limitedVision = false) {
   const names = [...SOLDIER_NAMES];
   for (let i = names.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [names[i], names[j]] = [names[j], names[i]];
   }
-  return { mission: 0, difficulty: DIFFICULTIES[difficulty] ? difficulty : 'normal', rp: 0, squad: [], fallen: [], names, nextId: 1, complete: false };
+  return { mission: 0, difficulty: DIFFICULTIES[difficulty] ? difficulty : 'normal', limitedVision: !!limitedVision, rp: 0, squad: [], fallen: [], names, nextId: 1, complete: false };
 }
 
 export function currentMission(state) { return MISSIONS[state.mission] || null; }
@@ -167,6 +167,7 @@ function sanitize(s) {
   const int = (v, d, lo = 0) => (Number.isInteger(v) && v >= lo ? v : d);
   s.mission = Math.min(int(s.mission, 0), MISSIONS.length);
   s.difficulty = DIFFICULTIES[s.difficulty] ? s.difficulty : 'normal';
+  s.limitedVision = !!s.limitedVision;
   s.rp = int(s.rp, 0);
   s.nextId = int(s.nextId, s.squad.length + 1, 1);
   s.fallen = Array.isArray(s.fallen)

@@ -118,13 +118,18 @@ export class UI {
 
   // Shown before a new campaign: pick once, it rides along in the save.
   difficultyPick({ onPick, onCancel }) {
+    const limited = h('input', { type: 'checkbox' });
     this.show(h('div.sheet', { style: { width: 'min(560px, 100%)' } },
       h('header', h('h2', t('Choose the campaign difficulty'))),
       h('div.body',
-        Object.entries(DIFFICULTIES).map(([id, d]) => h('div.item.diff', { onclick: click(() => onPick(id)) },
+        Object.entries(DIFFICULTIES).map(([id, d]) => h('div.item.diff', { onclick: click(() => onPick(id, limited.checked)) },
           h('div', h('span.name', d.name)),
           h('div.desc', d.desc),
-        ))),
+        )),
+        h('label.diff-opt', limited,
+          h('span', t('Limited vision'),
+            h('div.desc', t('Hostiles are only visible along your troopers\' lines of sight. Last-known positions show as ghosts.')))),
+      ),
       h('footer', btn(t('Back'), onCancel)),
     ));
   }
@@ -378,7 +383,7 @@ export class UI {
       const left = m.turnLimit - battle.turn;
       parts.push(h('span' + (left <= 2 ? '.bad' : left <= 4 ? '.warn' : ''), t('TURN {n} / {max}', { n: battle.turn, max: m.turnLimit })));
     } else parts.push(h('span', t('TURN {n}', { n: battle.turn })));
-    const hostile = battle.aliens().length;
+    const hostile = battle.knownAliens().length;
     const next = battle.nextSpawnIn();
     parts.push(h('small', t('{n} hostiles', { n: hostile }) + (next == null ? '' : ' · ' + (next === 0 ? t('hatches open this turn') : t('hatches open in {n}', { n: next })))));
     clock.replaceChildren(...parts);

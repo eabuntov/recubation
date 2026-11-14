@@ -451,4 +451,6 @@ export default {
   "TURRET": "TURM",
   "TURRET UP": "TURM AKTIV",
   "TURRET DOWN": "TURM ZERSTÖRT",
+  "Limited vision": "Eingeschränkte Sicht",
+  "Hostiles are only visible along your troopers' lines of sight. Last-known positions show as ghosts.": "Feinde sind nur entlang der Sichtlinien Ihrer Truppen sichtbar. Zuletzt bekannte Positionen erscheinen als Geister.",
 };

@@ -451,4 +451,6 @@ export default {
   "TURRET": "炮塔",
   "TURRET UP": "炮塔就绪",
   "TURRET DOWN": "炮塔被毁",
+  "Limited vision": "受限视野",
+  "Hostiles are only visible along your troopers' lines of sight. Last-known positions show as ghosts.": "敌人只有在你士兵的视线内可见。最后已知位置会显示为虚影。",
 };

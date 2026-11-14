@@ -63,6 +63,7 @@ export class View {
     this.terminals = new Map();
     this.mineMeshes = new Map(); // tile key -> group (blinking light inside)
     this.smokeMeshes = new Map(); // tile key -> group of puffs
+    this.ghostMeshes = new Map(); // alien id -> last-seen marker (fog of war)
     this.selected = null;
 
     this.overlayMats = {};
@@ -111,7 +112,7 @@ export class View {
     this.labels.replaceChildren();
     this.root = null; this.battle = null; this.selected = null;
     this.objs.clear(); this.overlays.clear(); this.dots.clear(); this.pickups.clear(); this.doors.clear(); this.terminals.clear();
-    this.mineMeshes.clear(); this.smokeMeshes.clear();
+    this.mineMeshes.clear(); this.smokeMeshes.clear(); this.ghostMeshes.clear();
     this.pickables = []; this.tweens = []; this.hatchRings = []; this.exitMats = [];
   }
 
@@ -420,6 +421,34 @@ export class View {
     for (const [k, mesh] of this.dots) mesh.visible = keys.has(k);
   }
 
+  // Fog of war: hide whatever the squad cannot see and mark where hostiles
+  // were last spotted. Called from Tactical.refresh after updateVision.
+  syncVision(b) {
+    for (const o of this.objs.values()) {
+      if (o.u.side !== 'alien') continue;
+      const vis = b.seen.has(o.u.id);
+      o.group.visible = vis;
+      if (vis) b.ghosts.delete(o.u.id);
+    }
+    const live = new Set();
+    for (const [id, spot] of b.ghosts) {
+      const u = b.units.find(q => q.id === id);
+      if (!u || !u.alive) { b.ghosts.delete(id); continue; }
+      live.add(id);
+      if (!this.ghostMeshes.has(id)) {
+        const g = new THREE.Mesh(new THREE.CircleGeometry(0.3, 18), new THREE.MeshBasicMaterial({ color: 0x8a4444, transparent: true, opacity: 0.45, depthWrite: false }));
+        g.rotation.x = -Math.PI / 2;
+        this.root.add(g);
+        this.ghostMeshes.set(id, g);
+      }
+      const g = this.ghostMeshes.get(id);
+      g.position.set(spot.x, this.battle.heightAt(spot.x, spot.y) * HU + 0.02, spot.y);
+    }
+    for (const [id, g] of this.ghostMeshes) {
+      if (!live.has(id)) { this.root.remove(g); g.geometry.dispose(); g.material.dispose(); this.ghostMeshes.delete(id); }
+    }
+  }
+
   pick(clientX, clientY) {
     if (!this.battle) return null;
     const r = this.canvas.getBoundingClientRect();
@@ -427,7 +456,7 @@ export class View {
     this.raycaster.setFromCamera(ndc, this.camera);
     for (const h of this.raycaster.intersectObjects(this.pickables, false)) {
       const d = h.object.userData;
-      if (d.unit) { if (d.unit.alive) return { x: d.unit.x, y: d.unit.y }; continue; }
+      if (d.unit) { if (d.unit.alive && this.battle.isVisible(d.unit)) return { x: d.unit.x, y: d.unit.y }; continue; }
       return { x: d.tile.x, y: d.tile.y };
     }
     return null;
@@ -551,7 +580,7 @@ export class View {
     if (this.battle) {
       const w = this.canvas.clientWidth, h = this.canvas.clientHeight, v = new THREE.Vector3();
       for (const o of this.objs.values()) {
-        if (!o.u.alive) continue;
+        if (!o.u.alive || !o.group.visible) { o.label.style.display = 'none'; continue; }
         v.copy(o.group.position); v.y += o.height + 0.22;
         v.project(this.camera);
         const show = v.z < 1;
@@ -581,7 +610,8 @@ export class View {
 
   // Always pull the active hostile to the centre: the no-yank margin in focus()
   // reads as the camera failing to follow when several aliens act in a row.
-  async activate(u) { this.focus(u.x, u.y, true); }
+  // What the squad cannot see still moves, but the camera keeps its secret.
+  async activate(u) { if (this.battle.limited && !this.battle.seen.has(u.id)) return; this.focus(u.x, u.y, true); }
 
   async step(u, from, to) {
     const o = this.objs.get(u.id);
@@ -749,6 +779,13 @@ export class View {
 
   async spawn(u) {
     const o = this.addUnit(u);
+    this.battle.updateVision();
+    if (this.battle.limited && !this.battle.seen.has(u.id)) {
+      // Something came up out of sight: heard, not seen.
+      o.group.visible = false;
+      sfx.spawn();
+      return;
+    }
     sfx.spawn();
     this.focus(u.x, u.y);
     this.floatText(this.pos(u.x, u.y, 1.2), tr('HATCH'), 'bad');

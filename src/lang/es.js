@@ -451,4 +451,6 @@ export default {
   "TURRET": "TORRETA",
   "TURRET UP": "TORRETA LISTA",
   "TURRET DOWN": "TORRETA DESTRUIDA",
+  "Limited vision": "Visión limitada",
+  "Hostiles are only visible along your troopers' lines of sight. Last-known positions show as ghosts.": "Los hostiles solo son visibles junto a las líneas de visión de tus tropas. Las últimas posiciones conocidas se muestran como fantasmas.",
 };
