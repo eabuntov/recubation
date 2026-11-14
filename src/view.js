@@ -555,7 +555,9 @@ export class View {
 
   turn(u) { /* rotation eases toward u.facing in update() */ }
 
-  async activate(u) { this.focus(u.x, u.y); }
+  // Always pull the active hostile to the centre: the no-yank margin in focus()
+  // reads as the camera failing to follow when several aliens act in a row.
+  async activate(u) { this.focus(u.x, u.y, true); }
 
   async step(u, from, to) {
     const o = this.objs.get(u.id);
