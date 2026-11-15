@@ -1,7 +1,7 @@
 // Tactical rules engine. No rendering in here: every visible consequence is
 // reported through the async `fx` hooks so the same code runs headless in tests.
 
-import { DIRS, WEAPONS, ARMORS, GEAR, ALIENS, BAYONET, BASE_HP, BASE_AP, RELOAD_AP, TURRET, DIFFICULTIES, SIGHT, ALERT } from './data.js';
+import { DIRS, WEAPONS, ARMORS, GEAR, ALIENS, BAYONET, BASE_HP, BASE_AP, RELOAD_AP, TURRET, DIFFICULTIES, SIGHT, ALERT, CALL_RADII } from './data.js';
 import { t as tr } from './i18n.js';
 
 export const key = (x, y) => x + ',' + y;
@@ -78,11 +78,13 @@ export function trace(x0, y0, x1, y1) {
 }
 
 export class Battle {
-  constructor(mission, squad, fx = NOFX, difficulty = 'normal', limitedVision = false) {
+  constructor(mission, squad, fx = NOFX, difficulty = 'normal', limitedVision = false, callRadius = ALERT.spread) {
     this.mission = mission;
     this.fx = fx;
     this.diff = DIFFICULTIES[difficulty] || DIFFICULTIES.normal;
     this.limited = !!limitedVision; // fog of war: only what the squad can see
+    // How far a sighting travels mouth to mouth through the brood.
+    this.spread = CALL_RADII.includes(callRadius) ? callRadius : ALERT.spread;
     const map = parseMap(mission);
     this.w = map.w; this.h = map.h; this.tiles = map.tiles; this.hatches = map.hatches;
     this.units = [];
@@ -850,13 +852,14 @@ export class Battle {
   }
 
   // One alien learns where the squad is, and shrieks the find to the brood
-  // around it — one hop only, so the far end of the map stays undisturbed.
+  // around it — one hop only, as far as the campaign's call radius allows.
   _raise(a, x, y) {
     if (!a.alive) return;
     this.alert.set(a.id, { x, y });
+    if (!this.spread) return;
     for (const b of this.aliens()) {
       if (b === a) continue;
-      if (Math.hypot(b.x - a.x, b.y - a.y) <= ALERT.spread + 0.5) this.alert.set(b.id, { x, y });
+      if (Math.hypot(b.x - a.x, b.y - a.y) <= this.spread + 0.5) this.alert.set(b.id, { x, y });
     }
   }
 

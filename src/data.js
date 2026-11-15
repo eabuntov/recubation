@@ -142,6 +142,10 @@ export const SIGHT = 9;
 // must stay calm for the fog of war to mean anything.
 export const ALERT = { sense: 8, hearing: 5, spread: 4 };
 
+// How far a hostile that spots the squad passes the position on to the brood
+// around it — a campaign-start option. 0 means they never call to each other.
+export const CALL_RADII = [0, 2, 4, 6, 8];
+
 // Campaign difficulty. Aliens are built from these numbers in Battle.addAlien;
 // the requisition multiplier is applied in applyResult.
 // countMul multiplies how many hostiles every mission fields: placed map

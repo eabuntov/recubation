@@ -324,6 +324,8 @@ export default {
   "Troopers killed on a successful mission are gone for good. Replacements are free at the briefing, but arrive a level behind the squad.": "Los soldados caídos en una misión con éxito se pierden para siempre. Los reemplazos son gratuitos en el briefing, pero llegan un nivel por detrás del escuadrón.",
   "Recruit trooper": "Reclutar soldado",
   "Roster is full": "La plantilla está completa",
+  "Brood call radius": "Radio de aviso de la cría",
+  "How far a hostile that spots you passes your position to the brood around it. 0 means they never call.": "Hasta dónde pasa un hostil que te divisa tu posición a la cría que lo rodea. 0 significa que nunca avisarán.",
   "The brood hunts by sight and sound. Hostiles that have not seen or heard you do not know where you are, but gunfire carries through walls, and one that spots you calls the ones nearby.": "La cría caza por vista y oído. Los hostiles que no te han visto ni oído no saben dónde estás, pero los disparos traspasan los muros, y el que te divisa avisa a los cercanos.",
   "Cancel": "Cancelar",
 

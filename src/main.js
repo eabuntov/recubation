@@ -106,11 +106,11 @@ function title() {
     hasSave: !!load(),
     onContinue: () => { state = load(); staging(); },
     onNew: () => {
-      const start = (difficulty, limitedVision) => {
-        if (!load()) { clearSave(); state = newCampaign(difficulty, limitedVision); staging(); return; }
+      const start = (difficulty, limitedVision, callRadius) => {
+        if (!load()) { clearSave(); state = newCampaign(difficulty, limitedVision, callRadius); staging(); return; }
         ui.confirm(t('Start over? The current campaign will be erased.'), t('New campaign'), () => {
           clearSave();
-          state = newCampaign(difficulty, limitedVision);
+          state = newCampaign(difficulty, limitedVision, callRadius);
           staging();
         }, title);
       };
@@ -163,7 +163,7 @@ async function deploy(soldiers) {
   ui.hide();
   document.body.classList.remove('menu');
   view.attract = false;
-  battle = new Battle(mission, squad, fx, state.difficulty, state.limitedVision);
+  battle = new Battle(mission, squad, fx, state.difficulty, state.limitedVision, state.callRadius);
   view.load(battle);
   tactical.start(battle);
   ui.hudShow(true);

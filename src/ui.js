@@ -1,6 +1,6 @@
 // DOM interface: menus, armoury, debrief and the tactical HUD.
 
-import { WEAPONS, ARMORS, GEAR, SKILLS, RANKS, BASE_HP, BASE_AP, rankColor, xpForLevel, meetsReq, reqText, DIFFICULTIES } from './data.js';
+import { WEAPONS, ARMORS, GEAR, SKILLS, RANKS, BASE_HP, BASE_AP, rankColor, xpForLevel, meetsReq, reqText, DIFFICULTIES, ALERT, CALL_RADII } from './data.js';
 import { objectiveText, MISSIONS } from './missions.js';
 import { GEAR_SLOTS, maxHpOf, canRaise, raiseSkill, skillCost, equip, equipProblem, byLevel } from './campaign.js';
 import { byUnit } from './battle.js';
@@ -128,16 +128,23 @@ export class UI {
   // Shown before a new campaign: pick once, it rides along in the save.
   difficultyPick({ onPick, onCancel }) {
     const limited = h('input', { type: 'checkbox' });
+    const call = h('select', { onchange: () => sfx.click() },
+      CALL_RADII.map(r => h('option', { value: r, selected: r === ALERT.spread }, String(r))),
+    );
     this.show(h('div.sheet', { style: { width: 'min(560px, 100%)' } },
       h('header', h('h2', t('Choose the campaign difficulty'))),
       h('div.body',
-        Object.entries(DIFFICULTIES).map(([id, d]) => h('div.item.diff', { onclick: click(() => onPick(id, limited.checked)) },
+        Object.entries(DIFFICULTIES).map(([id, d]) => h('div.item.diff', { onclick: click(() => onPick(id, limited.checked, +call.value)) },
           h('div', h('span.name', d.name)),
           h('div.desc', d.desc),
         )),
         h('label.diff-opt', limited,
           h('span', t('Limited vision'),
             h('div.desc', t('Hostiles are only visible along your troopers\' lines of sight. Last-known positions show as ghosts.')))),
+        h('label.diff-opt',
+          h('span', t('Brood call radius'),
+            h('div.desc', t('How far a hostile that spots you passes your position to the brood around it. 0 means they never call.'))),
+          call),
       ),
       h('footer', btn(t('Back'), onCancel)),
     ));

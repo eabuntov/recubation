@@ -324,6 +324,8 @@ export default {
   "Troopers killed on a successful mission are gone for good. Replacements are free at the briefing, but arrive a level behind the squad.": "成功した任務で戦死した隊員は二度と戻らない。ブリーフィングでの補充は無料だが、到着時の階級は部隊平均より一つ下だ。",
   "Recruit trooper": "兵士を募集",
   "Roster is full": "部隊は満員です",
+  "Brood call radius": "仲間への報告範囲",
+  "How far a hostile that spots you passes your position to the brood around it. 0 means they never call.": "こちらを見つけた敵が、周囲の仲間にあなたの位置を伝える距離。0なら報告しない。",
   "The brood hunts by sight and sound. Hostiles that have not seen or heard you do not know where you are, but gunfire carries through walls, and one that spots you calls the ones nearby.": "敵は視覚と音で狩る。お前たちを見てもいないし聞いてもいない敵は、お前たちの居場所を知らない。だが銃声は壁越しに届き、こちらを見つけた個体は近くの仲間を呼ぶ。",
   "Cancel": "キャンセル",
 

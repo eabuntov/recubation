@@ -324,6 +324,8 @@ export default {
   "Troopers killed on a successful mission are gone for good. Replacements are free at the briefing, but arrive a level behind the squad.": "Бойцы, погибшие в успешной миссии, потеряны навсегда. Замена на брифинге бесплатна, но новички приходят уровнем ниже среднего по отряду.",
   "Recruit trooper": "Нанять бойца",
   "Roster is full": "Отряд укомплектован",
+  "Brood call radius": "Радиус сигнала выводка",
+  "How far a hostile that spots you passes your position to the brood around it. 0 means they never call.": "Как далеко заметивший вас враг передаёт вашу позицию окружающему выводку. 0 — они никогда не подают сигнал.",
   "The brood hunts by sight and sound. Hostiles that have not seen or heard you do not know where you are, but gunfire carries through walls, and one that spots you calls the ones nearby.": "Выводок охотится по зрению и слуху. Враги, которые не видели и не слышали вас, не знают, где вы, но выстрелы слышны сквозь стены, а заметивший вас зовёт ближних.",
   "Cancel": "Отмена",
 

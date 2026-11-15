@@ -1,19 +1,19 @@
 // Campaign state: roster, progression, requisition, persistence.
 
-import { WEAPONS, ARMORS, GEAR, SKILLS, SOLDIER_NAMES, SQUAD_COLORS, BASE_HP, xpForLevel, meetsReq, DIFFICULTIES } from './data.js';
+import { WEAPONS, ARMORS, GEAR, SKILLS, SOLDIER_NAMES, SQUAD_COLORS, BASE_HP, xpForLevel, meetsReq, DIFFICULTIES, CALL_RADII, ALERT } from './data.js';
 import { MISSIONS } from './missions.js';
 import { t } from './i18n.js';
 
 const SAVE_KEY = 'recubation.save.v1';
 export const GEAR_SLOTS = 2;
 
-export function newCampaign(difficulty = 'normal', limitedVision = false) {
+export function newCampaign(difficulty = 'normal', limitedVision = false, callRadius = ALERT.spread) {
   const names = [...SOLDIER_NAMES];
   for (let i = names.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [names[i], names[j]] = [names[j], names[i]];
   }
-  const state = { mission: 0, difficulty: DIFFICULTIES[difficulty] ? difficulty : 'normal', limitedVision: !!limitedVision, rp: 0, squad: [], fallen: [], names, nextId: 1, complete: false };
+  const state = { mission: 0, difficulty: DIFFICULTIES[difficulty] ? difficulty : 'normal', limitedVision: !!limitedVision, callRadius: CALL_RADII.includes(callRadius) ? callRadius : ALERT.spread, rp: 0, squad: [], fallen: [], names, nextId: 1, complete: false };
   // The starting drop team, plus a warm bench for the first wounded.
   const size = (MISSIONS[0] ? MISSIONS[0].squad : 2) + 2;
   for (let i = 0; i < size; i++) recruit(state);
@@ -184,6 +184,7 @@ function sanitize(s) {
   s.mission = Math.min(int(s.mission, 0), MISSIONS.length);
   s.difficulty = DIFFICULTIES[s.difficulty] ? s.difficulty : 'normal';
   s.limitedVision = !!s.limitedVision;
+  s.callRadius = CALL_RADII.includes(s.callRadius) ? s.callRadius : ALERT.spread;
   s.rp = int(s.rp, 0);
   s.nextId = int(s.nextId, s.squad.length + 1, 1);
   s.fallen = Array.isArray(s.fallen)
