@@ -177,6 +177,7 @@ h3 { font-size: 11px; color: var(--dim); letter-spacing: 0.18em; margin: 18px 0 
 .sheet li { margin-bottom: 5px; }
 .objective { border-left: 3px solid var(--warn); padding: 6px 12px; background: rgba(255, 178, 46, 0.08); color: #ffe2ad; }
 
+.item.diff { cursor: pointer; }
 .diff-opt { display: flex; gap: 10px; align-items: flex-start; margin-top: 4px; cursor: pointer; }
 .diff-opt input { margin-top: 3px; }
 .diff-opt .desc { font-size: 12px; color: var(--dim); }
