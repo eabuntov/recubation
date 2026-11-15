@@ -137,8 +137,10 @@ export const SIGHT = 9;
 // The brood's own fog of war: it hunts by sight and sound, not omniscience.
 // sense is how far an alien sees along a clear line, hearing how far gunfire
 // carries through walls, spread how far a sighting is shouted to the brood
-// around the spotter — one hop only, so the far end of the map stays calm.
-export const ALERT = { sense: 8, hearing: 9, spread: 6 };
+// around the spotter — one hop only. Keep these SHORT: on a 20-tile map a
+// hearing of 9 means the first shot wakes the whole level, and the far rooms
+// must stay calm for the fog of war to mean anything.
+export const ALERT = { sense: 8, hearing: 5, spread: 4 };
 
 // Campaign difficulty. Aliens are built from these numbers in Battle.addAlien;
 // the requisition multiplier is applied in applyResult.
