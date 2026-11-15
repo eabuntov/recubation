@@ -321,7 +321,7 @@ export default {
   "Bodies block bullets. Nobody shoots through a friend. Height lets you fire over heads and adds +1 damage.": "体は弾を遮る。味方越しに撃つことはできない。高所からは頭越しに撃て、ダメージも +1 される。",
   "Hits from behind do 50% more damage, to them and to you.": "背後からの攻撃は 50% 増しのダメージ。敵にも味方にも適用される。",
   "Standing on a brood hatch seals it.": "孵化ハッチの上に立つと封鎖できる。",
-  "Troopers killed on a successful mission are gone for good. Hire replacements at the briefing for requisition; they arrive a level behind the squad.": "成功した任務で戦死した隊員は二度と戻らない。ブリーフィングで補給ポイントと引き換えに補充兵を雇える。到着時の階級は部隊平均より一つ下だ。",
+  "Troopers killed on a successful mission are gone for good. Replacements are free at the briefing, but arrive a level behind the squad.": "成功した任務で戦死した隊員は二度と戻らない。ブリーフィングでの補充は無料だが、到着時の階級は部隊平均より一つ下だ。",
   "Recruit trooper": "兵士を募集",
   "Roster is full": "部隊は満員です",
   "The brood hunts by sight and sound. Hostiles that have not seen or heard you do not know where you are, but gunfire carries through walls, and one that spots you calls the ones nearby.": "敵は視覚と音で狩る。お前たちを見てもいないし聞いてもいない敵は、お前たちの居場所を知らない。だが銃声は壁越しに届き、こちらを見つけた個体は近くの仲間を呼ぶ。",

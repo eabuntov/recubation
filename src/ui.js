@@ -2,7 +2,7 @@
 
 import { WEAPONS, ARMORS, GEAR, SKILLS, RANKS, BASE_HP, BASE_AP, rankColor, xpForLevel, meetsReq, reqText, DIFFICULTIES } from './data.js';
 import { objectiveText, MISSIONS } from './missions.js';
-import { GEAR_SLOTS, maxHpOf, canRaise, raiseSkill, skillCost, equip, equipProblem, byLevel, recruitCost, hire } from './campaign.js';
+import { GEAR_SLOTS, maxHpOf, canRaise, raiseSkill, skillCost, equip, equipProblem, byLevel } from './campaign.js';
 import { byUnit } from './battle.js';
 import { sfx } from './audio.js';
 import { t, LANGS, savedLang, browserLang } from './i18n.js';
@@ -184,11 +184,9 @@ export class UI {
             );
           })),
           h('div', { style: { marginTop: '10px' } }, (() => {
-            const cost = recruitCost(state);
             const full = state.squad.length >= mission.squad + 2;
-            const short = !full && state.rp < cost;
-            return btn(t('Recruit trooper') + (cost ? ' · ' + t('{n} RP', { n: cost }) : ''), () => onRecruit && onRecruit(),
-              '', { disabled: full || short, title: full ? t('Roster is full') : short ? t('Not enough requisition') : '' });
+            return btn(t('Recruit trooper'), () => onRecruit && onRecruit(),
+              '', { disabled: full, title: full ? t('Roster is full') : '' });
           })()),
           state.fallen.length > 0 && h('p', { style: { marginTop: '14px', fontSize: '12px' } }, t('In memoriam: {names}.', { names: state.fallen.map(f => f.name).join(', ') })),
         ),
@@ -372,7 +370,7 @@ export class UI {
             h('li', t('A crate or a body beside the target soaks part of the hit: shots skimming cover deal 2 less damage.')),
             h('li', t('Hits from behind do 50% more damage, to them and to you.')),
             h('li', t('Standing on a brood hatch seals it.')),
-            h('li', t('Troopers killed on a successful mission are gone for good. Hire replacements at the briefing for requisition; they arrive a level behind the squad.')),
+            h('li', t('Troopers killed on a successful mission are gone for good. Replacements are free at the briefing, but arrive a level behind the squad.')),
             h('li', t('Wounds carry over between missions: everyone heals a quarter of their maximum health per mission passed, plus another quarter for each mission spent on the bench.')),
             h('li', t('Proximity mines detonate the moment a hostile steps on them, hurting everything nearby — your own troopers included.')),
             h('li', t('Smoke blocks every line of sight through it, both ways, for two turns.')),

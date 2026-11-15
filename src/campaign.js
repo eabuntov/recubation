@@ -47,22 +47,12 @@ export function maxHpOf(s) {
   return BASE_HP + (s.skills.vitality || 0) * 2 + ARMORS[s.armor].hp;
 }
 
-// What a replacement costs: greener troops come cheaper, and the first one
-// after a wipe is free — command will not leave the roster empty-handed.
-export function recruitCost(state) {
-  if (!state.squad.length) return 0;
-  const avg = state.squad.reduce((n, s) => n + s.level, 0) / state.squad.length;
-  return 20 + 15 * Math.max(1, Math.floor(avg) - 1);
-}
-
-// Hire a replacement at the briefing. Returns the new soldier, or a string
-// saying why nobody stepped off the drop ship.
+// Hire a replacement at the briefing. Replacements are free but green — the
+// price of a lost trooper is their inexperience, not requisition. Returns the
+// new soldier, or a string saying why nobody stepped off the drop ship.
 export function hire(state) {
   const m = currentMission(state);
   if (state.squad.length >= (m ? m.squad : 4) + 2) return t('Roster is full');
-  const cost = recruitCost(state);
-  if (cost > state.rp) return t('Not enough requisition');
-  state.rp -= cost;
   return recruit(state);
 }
 

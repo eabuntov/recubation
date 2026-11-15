@@ -321,7 +321,7 @@ export default {
   "Bodies block bullets. Nobody shoots through a friend. Height lets you fire over heads and adds +1 damage.": "Les corps bloquent les balles. Personne ne tire à travers un allié. La hauteur permet de tirer par-dessus les têtes et ajoute +1 dégât.",
   "Hits from behind do 50% more damage, to them and to you.": "Les coups dans le dos infligent 50 % de dégâts en plus, à eux comme à vous.",
   "Standing on a brood hatch seals it.": "Se tenir sur une trappe de couvée la scelle.",
-  "Troopers killed on a successful mission are gone for good. Hire replacements at the briefing for requisition; they arrive a level behind the squad.": "Les soldats tués lors d'une mission réussie sont perdus pour de bon. Recrutez des remplaçants au briefing contre de la réquisition ; ils arrivent avec un niveau de retard sur l'escouade.",
+  "Troopers killed on a successful mission are gone for good. Replacements are free at the briefing, but arrive a level behind the squad.": "Les soldats tués lors d'une mission réussie sont perdus pour de bon. Les remplaçants sont gratuits au briefing, mais ils arrivent avec un niveau de retard sur l'escouade.",
   "Recruit trooper": "Recruter un soldat",
   "Roster is full": "L'effectif est au complet",
   "The brood hunts by sight and sound. Hostiles that have not seen or heard you do not know where you are, but gunfire carries through walls, and one that spots you calls the ones nearby.": "La couvée chasse à la vue et au bruit. Les hostiles qui ne vous ont ni vu ni entendu ignorent où vous êtes, mais les tirs traversent les cloisons, et celui qui vous repère appelle ceux qui sont proches.",

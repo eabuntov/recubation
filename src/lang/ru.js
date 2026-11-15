@@ -321,7 +321,7 @@ export default {
   "Bodies block bullets. Nobody shoots through a friend. Height lets you fire over heads and adds +1 damage.": "Тела блокируют пули. Никто не стреляет сквозь своих. Высота позволяет стрелять поверх голов и даёт +1 к урону.",
   "Hits from behind do 50% more damage, to them and to you.": "Попадания в спину наносят на 50% больше урона — и им, и вам.",
   "Standing on a brood hatch seals it.": "Боец, стоящий на люке выводка, запечатывает его.",
-  "Troopers killed on a successful mission are gone for good. Hire replacements at the briefing for requisition; they arrive a level behind the squad.": "Бойцы, погибшие в успешной миссии, потеряны навсегда. Нанимайте замену на брифинге за снабжение; новички приходят уровнем ниже среднего по отряду.",
+  "Troopers killed on a successful mission are gone for good. Replacements are free at the briefing, but arrive a level behind the squad.": "Бойцы, погибшие в успешной миссии, потеряны навсегда. Замена на брифинге бесплатна, но новички приходят уровнем ниже среднего по отряду.",
   "Recruit trooper": "Нанять бойца",
   "Roster is full": "Отряд укомплектован",
   "The brood hunts by sight and sound. Hostiles that have not seen or heard you do not know where you are, but gunfire carries through walls, and one that spots you calls the ones nearby.": "Выводок охотится по зрению и слуху. Враги, которые не видели и не слышали вас, не знают, где вы, но выстрелы слышны сквозь стены, а заметивший вас зовёт ближних.",

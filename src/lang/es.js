@@ -321,7 +321,7 @@ export default {
   "Bodies block bullets. Nobody shoots through a friend. Height lets you fire over heads and adds +1 damage.": "Los cuerpos bloquean las balas. Nadie dispara a través de un compañero. La altura permite disparar por encima de las cabezas y añade +1 de daño.",
   "Hits from behind do 50% more damage, to them and to you.": "Los impactos por la espalda hacen un 50 % más de daño, a ellos y a ti.",
   "Standing on a brood hatch seals it.": "Situarse sobre una escotilla de cría la sella.",
-  "Troopers killed on a successful mission are gone for good. Hire replacements at the briefing for requisition; they arrive a level behind the squad.": "Los soldados caídos en una misión con éxito se pierden para siempre. Contrata reemplazos en el briefing por requisición; llegan un nivel por detrás del escuadrón.",
+  "Troopers killed on a successful mission are gone for good. Replacements are free at the briefing, but arrive a level behind the squad.": "Los soldados caídos en una misión con éxito se pierden para siempre. Los reemplazos son gratuitos en el briefing, pero llegan un nivel por detrás del escuadrón.",
   "Recruit trooper": "Reclutar soldado",
   "Roster is full": "La plantilla está completa",
   "The brood hunts by sight and sound. Hostiles that have not seen or heard you do not know where you are, but gunfire carries through walls, and one that spots you calls the ones nearby.": "La cría caza por vista y oído. Los hostiles que no te han visto ni oído no saben dónde estás, pero los disparos traspasan los muros, y el que te divisa avisa a los cercanos.",
