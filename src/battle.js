@@ -1,10 +1,14 @@
 // Tactical rules engine. No rendering in here: every visible consequence is
 // reported through the async `fx` hooks so the same code runs headless in tests.
 
-import { DIRS, WEAPONS, ARMORS, GEAR, ALIENS, BAYONET, BASE_HP, BASE_AP, RELOAD_AP, TURRET, DIFFICULTIES } from './data.js';
+import { DIRS, WEAPONS, ARMORS, GEAR, ALIENS, BAYONET, BASE_HP, BASE_AP, RELOAD_AP, TURRET, DIFFICULTIES, SIGHT, ALERT } from './data.js';
 import { t as tr } from './i18n.js';
 
 export const key = (x, y) => x + ',' + y;
+
+// How every interface lists troopers: highest level first, experience breaking
+// ties. Display only — spawn slots and turn order stay as deployed.
+export const byUnit = (a, b) => b.soldier.level - a.soldier.level || b.soldier.xp - a.soldier.xp;
 
 const NOFX = new Proxy({}, { get: () => async () => {} });
 
@@ -100,6 +104,7 @@ export class Battle {
     this.smoke = new Map();   // tile key -> turns of cloud left
     this.seen = new Set();    // alien ids currently in some trooper's sight
     this.ghosts = new Map();  // alien id -> tile last seen on (limited vision)
+    this.alert = new Map();   // alien id -> tile the brood last saw or heard the squad on
     this._threatCache = null;
 
     squad.slice(0, map.starts.length).forEach((s, i) => this.addMarine(s, map.starts[i], i));
@@ -113,7 +118,8 @@ export class Battle {
         this.addAlien(a.kind, spot.x, spot.y, a.elite);
       }
     }
-    for (const a of this.aliens()) this.faceNearest(a);
+    // The brood starts unaware; facings point wherever, not at the squad.
+    for (const a of this.aliens()) a.facing = Math.floor(Math.random() * 4);
   }
 
   // ---------------------------------------------------------------- setup
@@ -131,7 +137,8 @@ export class Battle {
       id: this.nextId++, side: 'marine', kind: 'marine', name: s.name, soldier: s, slot,
       x: pos.x, y: pos.y, facing: this.mission.facing ?? 1,
       hp, maxHp, ap: maxAp, maxAp, alive: true, reduce: armor.reduce, guard: false,
-      weapon: { id: s.weapon, def: wdef, ammo: wdef.ammo, heat: 0, range: wdef.range + bonus('rangeBonus'), cool: wdef.cool + bonus('coolBonus') },
+      sight: Math.max(SIGHT, wdef.range) + bonus('rangeBonus'),
+      weapon: { id: s.weapon, def: wdef, ammo: wdef.ammo, heat: 0, streak: 0, range: wdef.range + bonus('rangeBonus'), cool: wdef.cool + bonus('coolBonus') },
       gear, medic: s.skills.medic || 0, kills: 0, xp: 0,
     };
     this.units.push(u);
@@ -176,13 +183,15 @@ export class Battle {
   turrets() { return this.units.filter(u => u.alive && u.side === 'turret'); }
 
   // Under limited vision a hostile shows only while some trooper holds it in
-  // weapon range along a clear line; where one was last seen is remembered.
+  // sight range along a clear line; where one was last seen is remembered.
+  // Sight is its own sense — longer than a carbine's reach, shorter than a
+  // railgun's — so nobody is blind at six tiles and optics see far.
   updateVision() {
     if (!this.limited) return;
     const visible = new Set();
     for (const a of this.aliens()) {
       const spotted = this.marines().some(m =>
-        Math.hypot(a.x - m.x, a.y - m.y) <= m.weapon.range + 0.5 && !this.sightBlocked(m.x, m.y, a.x, a.y));
+        Math.hypot(a.x - m.x, a.y - m.y) <= m.sight + 0.5 && !this.sightBlocked(m.x, m.y, a.x, a.y));
       if (spotted) { visible.add(a.id); this.ghosts.set(a.id, { x: a.x, y: a.y }); }
     }
     this.seen = visible;
@@ -321,12 +330,17 @@ export class Battle {
 
   modes(u) { return [...u.weapon.def.modes, this.bayonet(u)]; }
 
+  // Heat the next shot actually adds. Shots fired without a pause run the
+  // barrel hotter: the second costs double, the third triple, so sustained
+  // fire now ends in a lockup instead of a steady state.
+  shotHeat(u, mode) { return mode.heat * (1 + (u.weapon.streak || 0)); }
+
   // Why this marine cannot use this fire mode right now, or null.
   fireProblem(u, mode) {
     if (u.ap < mode.ap) return tr('Not enough AP');
     if (mode.pattern === 'melee') return null;
     if (u.weapon.ammo < mode.ammo) return tr('Out of ammo');
-    if (u.weapon.heat + mode.heat > u.weapon.def.maxHeat) return tr('Weapon too hot');
+    if (u.weapon.heat + this.shotHeat(u, mode) > u.weapon.def.maxHeat) return tr('Weapon too hot');
     return null;
   }
 
@@ -590,7 +604,8 @@ export class Battle {
 
   endTurn() {
     return this._run(async () => {
-      for (const m of this.marines()) m.guard = true;
+      // Guard arcs open; a new phase is a fresh barrel as far as the streak goes.
+      for (const m of this.marines()) { m.guard = true; m.weapon.streak = 0; }
       this.phase = 'alien';
       this.engaged = {};        // focus-fire bookkeeping for the alien phase
       this._threatCache = null; // guard arcs may have changed; recompute lazily
@@ -620,6 +635,7 @@ export class Battle {
       m.ap = m.maxAp;
       m.guard = false;
       m.weapon.heat = Math.max(0, m.weapon.heat - m.weapon.cool);
+      m.weapon.streak = 0;
     }
     // Clouds thin and drift apart at the top of each turn.
     const clear = [];
@@ -672,6 +688,7 @@ export class Battle {
   // A mine goes off: everything beside it bleeds, friendlies included.
   async _detonate(x, y) {
     this.mines.delete(key(x, y));
+    this._noise(x, y);
     await this.fx.mineBoom(x, y);
     const victims = this.units.filter(v => v.alive && Math.max(Math.abs(v.x - x), Math.abs(v.y - y)) <= 1);
     for (const v of victims) if (v.alive) await this._damage(v, Math.max(1, 7 - v.reduce), null, 'blast');
@@ -695,7 +712,12 @@ export class Battle {
     if (u.side === 'alien') for (const h of hits)
       if (h.unit.side === 'marine') this.engaged[h.unit.id] = (this.engaged[h.unit.id] || 0) + 1;
     u.ap -= mode.ap;
-    if (u.side === 'marine' && mode.pattern !== 'melee') { u.weapon.ammo -= mode.ammo; u.weapon.heat += mode.heat; }
+    if (u.side === 'marine' && mode.pattern !== 'melee') {
+      u.weapon.ammo -= mode.ammo;
+      u.weapon.heat += this.shotHeat(u, mode);
+      u.weapon.streak = (u.weapon.streak || 0) + 1;
+      this._noise(u.x, u.y); // gunfire carries, walls or no walls
+    }
     u.facing = this.dirToward(u, tx, ty);
     await this.fx.attack(u, { x: tx, y: ty }, mode, tiles);
     for (const h of hits) if (h.unit.alive) await this._damage(h.unit, h.dmg, u, h.note);
@@ -703,6 +725,9 @@ export class Battle {
 
   async _damage(target, dmg, source, note) {
     if (dmg <= 0) { await this.fx.note(target, tr('DEFLECTED'), 'bad'); return; }
+    // A hit focuses the brood's attention on whoever dealt it — and the
+    // shriek carries to the creatures nearby.
+    if (target.side === 'alien' && source && source.side !== 'alien') this._raise(target, source.x, source.y);
     target.hp = Math.max(0, target.hp - dmg);
     await this.fx.damage(target, dmg, note);
     if (target.hp <= 0) await this._kill(target, source);
@@ -715,6 +740,7 @@ export class Battle {
     await this.fx.death(target);
     const ex = target.def && target.def.explode;
     if (ex) {
+      this._noise(target.x, target.y);
       await this.fx.explosion(target.x, target.y, ex.radius);
       const victims = this.units.filter(v => v.alive && Math.max(Math.abs(v.x - target.x), Math.abs(v.y - target.y)) <= ex.radius);
       for (const v of victims) if (v.alive) await this._damage(v, Math.max(1, ex.dmg - v.reduce), source, 'blast');
@@ -757,6 +783,7 @@ export class Battle {
       if (this.sightBlocked(t.x, t.y, foe.x, foe.y)) continue;
       foe.turretShot = true;
       t.facing = this.dirToward(t, foe.x, foe.y);
+      this._noise(t.x, t.y); // a sentry gun announcing itself to the whole deck
       this.fx.turn(t);
       await this.fx.note(t, tr('TURRET'), 'info');
       t.rounds--;
@@ -770,6 +797,21 @@ export class Battle {
     const def = a.def;
     a.ap = a.maxAp; a.shots = 0; a.moved = false; a.provoked = false; a.turretShot = false;
     await this.fx.activate(a);
+
+    // The brood hunts by sight and sound. Whatever it has not seen or heard
+    // about does not exist for it: unaware creatures mill in place instead of
+    // homing on the squad through the walls.
+    const sensed = this._sensedFoes(a);
+    const seen = sensed.filter(m => m.side === 'marine');
+    if (seen.length) {
+      const near = seen.reduce((b, c) => Math.hypot(c.x - a.x, c.y - a.y) < Math.hypot(b.x - a.x, b.y - a.y) ? c : b);
+      this._raise(a, near.x, near.y);
+    }
+    if (!sensed.length && !this.alert.has(a.id)) {
+      await this._mill(a);
+      if (a.alive) { this._faceThreat(a); this.fx.turn(a); }
+      return;
+    }
 
     if (def.explode) {
       await this._approach(a, true);
@@ -796,7 +838,64 @@ export class Battle {
         }
       }
     }
-    if (a.alive) { this.faceNearest(a); this.fx.turn(a); }
+    if (a.alive) { this._faceThreat(a); this.fx.turn(a); }
+  }
+
+  // What this alien can actually perceive right now: foes inside its sense
+  // radius along a clear line. Smoke blinds the brood as readily as it blinds
+  // the squad.
+  _sensedFoes(a) {
+    return [...this.marines(), ...this.turrets()].filter(m =>
+      Math.hypot(m.x - a.x, m.y - a.y) <= ALERT.sense + 0.5 && !this.sightBlocked(a.x, a.y, m.x, m.y));
+  }
+
+  // One alien learns where the squad is, and shrieks the find to the brood
+  // around it — one hop only, so the far end of the map stays undisturbed.
+  _raise(a, x, y) {
+    if (!a.alive) return;
+    this.alert.set(a.id, { x, y });
+    for (const b of this.aliens()) {
+      if (b === a) continue;
+      if (Math.hypot(b.x - a.x, b.y - a.y) <= ALERT.spread + 0.5) this.alert.set(b.id, { x, y });
+    }
+  }
+
+  // Gunfire, sentry guns and blasts carry through walls to everything nearby.
+  _noise(x, y) {
+    for (const a of this.aliens()) {
+      if (Math.hypot(a.x - x, a.y - y) <= ALERT.hearing + 0.5) this.alert.set(a.id, { x, y });
+    }
+  }
+
+  // Face what this alien knows about: a foe in view, else the last place the
+  // brood caught wind of the squad, else wherever it was looking.
+  _faceThreat(a) {
+    const sensed = this._sensedFoes(a);
+    let tx, ty;
+    if (sensed.length) {
+      let bd = Infinity;
+      for (const m of sensed) { const d = Math.hypot(m.x - a.x, m.y - a.y); if (d < bd) { bd = d; tx = m.x; ty = m.y; } }
+    } else {
+      const p = this.alert.get(a.id);
+      if (p) { tx = p.x; ty = p.y; }
+    }
+    if (tx != null) a.facing = this.dirToward(a, tx, ty);
+  }
+
+  // Nothing sensed, nothing heard: the creature shuffles about and re-tastes
+  // the air. It never wanders onto the brood's own hatches.
+  async _mill(a) {
+    const steps = Math.floor(Math.random() * 3);
+    for (let i = 0; i < steps && a.alive && !this.over && a.ap >= 1; i++) {
+      const dirs = [0, 1, 2, 3].sort(() => Math.random() - 0.5);
+      for (const d of dirs) {
+        const x = a.x + DIRS[d].x, y = a.y + DIRS[d].y;
+        if (this.stepOk(a.x, a.y, d) && !this.unitAt(x, y) && !this.tiles[y][x].hatch) {
+          await this._move(a, [{ x, y, d }]);
+          break;
+        }
+      }
+    }
   }
 
   // An alien that attacks without having moved still gives guards one chance to fire.
@@ -889,12 +988,14 @@ export class Battle {
     return best;
   }
 
-  // Walk towards the closest tile next to a marine. Bloaters only need to get within blast range.
-  // Sentry guns are valid destinations too, at a discount: worth smashing once
-  // the soft targets are out of easy reach.
+  // Walk towards the closest tile next to a foe it can see — or, blind but
+  // alerted, towards where the brood last caught wind of the squad. Bloaters
+  // only need to get within blast range. Sentry guns are valid destinations
+  // too, at a discount: worth smashing once the soft targets are out of easy
+  // reach.
   async _approach(a, loose) {
     const goals = new Map();
-    for (const m of this.marines()) {
+    const addFoe = m => {
       for (let d = 0; d < 4; d++) {
         const x = m.x - DIRS[d].x, y = m.y - DIRS[d].y;
         if (this.stepOk(x, y, d)) goals.set(key(x, y), m);
@@ -902,12 +1003,16 @@ export class Battle {
       if (loose) for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) {
         if (this.walkable(this.tile(m.x + dx, m.y + dy))) goals.set(key(m.x + dx, m.y + dy), m);
       }
-    }
-    for (const t of this.turrets()) {
-      for (let d = 0; d < 4; d++) {
-        const x = t.x - DIRS[d].x, y = t.y - DIRS[d].y;
-        if (this.stepOk(x, y, d)) goals.set(key(x, y), t);
-      }
+    };
+    const sensed = this._sensedFoes(a);
+    if (sensed.length) {
+      for (const m of sensed) addFoe(m);
+    } else {
+      const p = this.alert.get(a.id);
+      if (!p) return;
+      addFoe({ x: p.x, y: p.y });
+      // Arrived with nothing to show for it: forget what the brood heard.
+      if (goals.has(key(a.x, a.y))) { this.alert.delete(a.id); return; }
     }
     if (goals.has(key(a.x, a.y))) return;
     // Charging through a reaction arc is allowed but expensive, and costs more
@@ -967,7 +1072,14 @@ export class Battle {
         const kind = sp.pool[this.spawnCount++ % sp.pool.length];
         this.spawnLeft--;
         const u = this.addAlien(kind, spot.x, spot.y);
-        this.faceNearest(u);
+        // Fresh from the hatch, it comes up hunting: the brood below felt the
+        // squad's footsteps, so it knows roughly where to look.
+        let near = null, nd = Infinity;
+        for (const m of this.marines()) {
+          const d = Math.hypot(m.x - spot.x, m.y - spot.y);
+          if (d < nd) { nd = d; near = m; }
+        }
+        if (near) { this.alert.set(u.id, { x: near.x, y: near.y }); u.facing = this.dirToward(u, near.x, near.y); }
         await this.fx.spawn(u);
         // A mine laid on the hatch takes the wave's firstborn with it.
         if (this.mines.has(key(spot.x, spot.y))) await this._detonate(spot.x, spot.y);

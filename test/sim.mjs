@@ -4,7 +4,7 @@
 
 import { MISSIONS } from '../src/missions.js';
 import { Battle, parseMap, key } from '../src/battle.js';
-import { newCampaign, reinforce, applyResult, raiseSkill, equip, maxHpOf } from '../src/campaign.js';
+import { newCampaign, hire, recruitCost, applyResult, raiseSkill, equip, maxHpOf } from '../src/campaign.js';
 import { DIRS } from '../src/data.js';
 
 let failures = 0;
@@ -107,8 +107,9 @@ async function runCampaign(difficulty) {
   if (difficulty !== 'normal') console.log(`  --- ${difficulty} ---`);
   const state = newCampaign(difficulty);
   for (let guard = 0; guard < 40 && !state.complete; guard++) {
-  reinforce(state);
   const m = MISSIONS[state.mission];
+  // Hire like a cautious player: keep the bench full before buying kit.
+  while (state.squad.length < m.squad + 2 && recruitCost(state) <= state.rp) hire(state);
   // Spend points the way a cautious player might.
   for (const s of state.squad) {
     for (const id of ['light', 'vitality', 'light', 'heavy', 'vitality', 'reflexes']) raiseSkill(s, id);

@@ -129,6 +129,17 @@ export const BASE_AP = 7;
 // A weapon def may override this with its own `reloadAp`.
 export const RELOAD_AP = 2;
 
+// How far a trooper spots hostiles, whatever their gun's reach: a carbine
+// cannot outsee its own nose, but nobody is blind past six tiles either.
+// Long optics (marksman, rail) still see further than this.
+export const SIGHT = 9;
+
+// The brood's own fog of war: it hunts by sight and sound, not omniscience.
+// sense is how far an alien sees along a clear line, hearing how far gunfire
+// carries through walls, spread how far a sighting is shouted to the brood
+// around the spotter — one hop only, so the far end of the map stays calm.
+export const ALERT = { sense: 8, hearing: 9, spread: 6 };
+
 // Campaign difficulty. Aliens are built from these numbers in Battle.addAlien;
 // the requisition multiplier is applied in applyResult.
 // countMul multiplies how many hostiles every mission fields: placed map

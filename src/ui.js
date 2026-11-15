@@ -2,7 +2,8 @@
 
 import { WEAPONS, ARMORS, GEAR, SKILLS, RANKS, BASE_HP, BASE_AP, rankColor, xpForLevel, meetsReq, reqText, DIFFICULTIES } from './data.js';
 import { objectiveText, MISSIONS } from './missions.js';
-import { GEAR_SLOTS, maxHpOf, canRaise, raiseSkill, skillCost, equip, equipProblem } from './campaign.js';
+import { GEAR_SLOTS, maxHpOf, canRaise, raiseSkill, skillCost, equip, equipProblem, byLevel, recruitCost, hire } from './campaign.js';
+import { byUnit } from './battle.js';
 import { sfx } from './audio.js';
 import { t, LANGS, savedLang, browserLang } from './i18n.js';
 
@@ -42,6 +43,14 @@ function soldierStats(s) {
 function modeLine(w) {
   return w.modes.map(m => t('{name} {dmg}dmg/{ap}AP', { name: m.name, dmg: m.dmg, ap: m.ap })
     + (m.ammo ? ' · ' + t('{n} rds', { n: m.ammo }) : '')).join(' · ');
+}
+
+// Discrete health squares: green flesh, steel plate, red holes. One square
+// per point of health; the armour-granted ones shade steel so the kit's
+// contribution reads at a glance, and wounds leave red gaps behind.
+function hpPips(hp, max, armorHp = 0) {
+  return h('div.pips.hp', { title: `${hp}/${max}` },
+    Array.from({ length: max }, (_, i) => h('b' + (i >= hp ? '.lost' : i >= max - armorHp ? '.armor' : ''))));
 }
 
 export class UI {
@@ -136,7 +145,7 @@ export class UI {
 
   // `picked` is the set of soldier ids marching on this drop; clicking a card
   // toggles them through onPick (up to what the mission fields).
-  staging(state, mission, fresh, { onDeploy, onArmory, onQuit }, picked = new Set(), onPick = null) {
+  staging(state, mission, fresh, { onDeploy, onArmory, onQuit, onRecruit }, picked = new Set(), onPick = null) {
     const unspent = state.squad.some(s => s.sp > 0);
     const diff = DIFFICULTIES[state.difficulty] || DIFFICULTIES.normal;
     this.show(h('div.sheet',
@@ -155,7 +164,7 @@ export class UI {
         ),
         h('div',
           h('h3', { style: { marginTop: 0 } }, t('Squad · {n} deploy', { n: mission.squad })),
-          h('div.roster', state.squad.map(s => {
+          h('div.roster', [...state.squad].sort(byLevel).map(s => {
             const st = soldierStats(s);
             const hp = s.hp == null ? st.hp : Math.max(1, Math.min(st.hp, s.hp));
             const on = picked.has(s.id);
@@ -171,9 +180,16 @@ export class UI {
                 h('span.num', `${rankOf(s)} · ${t('L{n}', { n: s.level })}`)),
               h('div.kit', `${WEAPONS[s.weapon].name} · ${ARMORS[s.armor].name}`),
               h('div.kit', t('HP {hp}/{max} · {ap} AP', { hp, max: st.hp, ap: st.ap }) + (s.gear.filter(Boolean).length ? ' · ' + s.gear.filter(Boolean).map(g => GEAR[g].name).join(', ') : '')),
-              h('div.bar' + (hp <= st.hp / 3 ? '.low' : ''), h('i', { style: { width: (100 * hp / st.hp) + '%' } })),
+              hpPips(hp, st.hp, ARMORS[s.armor].hp),
             );
           })),
+          h('div', { style: { marginTop: '10px' } }, (() => {
+            const cost = recruitCost(state);
+            const full = state.squad.length >= mission.squad + 2;
+            const short = !full && state.rp < cost;
+            return btn(t('Recruit trooper') + (cost ? ' · ' + t('{n} RP', { n: cost }) : ''), () => onRecruit && onRecruit(),
+              '', { disabled: full || short, title: full ? t('Roster is full') : short ? t('Not enough requisition') : '' });
+          })()),
           state.fallen.length > 0 && h('p', { style: { marginTop: '14px', fontSize: '12px' } }, t('In memoriam: {names}.', { names: state.fallen.map(f => f.name).join(', ') })),
         ),
       ),
@@ -228,7 +244,7 @@ export class UI {
     this.show(h('div.sheet',
       h('header', h('h2', t('Armoury')), h('span.tag', t('Kit can be swapped freely; old items are refunded in full.')), h('span.rp', t('{n} RP', { n: state.rp }))),
       h('div.body.armory',
-        h('div.roster', state.squad.map(q => h('div.card' + (q === s ? '.sel' : ''), { style: { '--c': hex(rankColor(q.level)) }, onclick: click(() => this.armory(state, { onBack, onChange }, q.id)) },
+        h('div.roster', [...state.squad].sort(byLevel).map(q => h('div.card' + (q === s ? '.sel' : ''), { style: { '--c': hex(rankColor(q.level)) }, onclick: click(() => this.armory(state, { onBack, onChange }, q.id)) },
           h('div.row', h('span.name', q.name), q.sp > 0 && h('span.badge', t('{n} SP', { n: q.sp }))),
           h('div.num', `${rankOf(q)} · ${t('L{n}', { n: q.level })}`),
         ))),
@@ -272,7 +288,7 @@ export class UI {
         h('p', `${report.text} ${t('Completed in {n} turns.', { n: report.turns })} ${t('Requisition awarded: {n} RP.', { n: report.reward })}`),
         h('table.report',
           h('tr', h('th', t('Trooper')), h('th', t('Kills')), h('th', t('Experience')), h('th', t('Status'))),
-          report.rows.map(r => h('tr',
+          [...report.rows].sort((a, b) => byLevel(a.soldier, b.soldier)).map(r => h('tr',
             h('td', r.soldier.name),
             h('td.num', r.kills),
             h('td.num', r.alive ? `+${r.xp}` : '—'),
@@ -288,7 +304,7 @@ export class UI {
           : t('Command is treating that as a simulation run. The squad is intact and the mission can be attempted again; consider a different loadout.')),
         report.ironmanLoss && h('table.report',
           h('tr', h('th', t('Trooper')), h('th', t('Kills')), h('th', t('Status'))),
-          report.rows.map(r => h('tr',
+          [...report.rows].sort((a, b) => byLevel(a.soldier, b.soldier)).map(r => h('tr',
             h('td', r.soldier.name),
             h('td.num', r.kills),
             h('td', h('span.kia', t('Killed in action'))),
@@ -315,7 +331,7 @@ export class UI {
           : t('{n} troopers came home, every one of them.', { n: state.squad.length }))),
         h('table.report',
           h('tr', h('th', t('Trooper')), h('th', t('Rank')), h('th', t('Missions')), h('th', t('Kills'))),
-          state.squad.map(s => h('tr', h('td', s.name), h('td', rankOf(s)), h('td.num', s.missions), h('td.num', s.kills))),
+          [...state.squad].sort(byLevel).map(s => h('tr', h('td', s.name), h('td', rankOf(s)), h('td.num', s.missions), h('td.num', s.kills))),
         ),
       )),
       h('footer', btn(t('Main menu'), onDone, 'primary')),
@@ -350,16 +366,17 @@ export class UI {
             h('li', t('There are no dice. If you have a line and the range, the shot lands for exactly the damage shown.')),
             h('li', t('Moving costs 1 AP per tile. Each fire mode lists its AP cost.')),
             h('li', t('Unspent AP turn into reaction fire in the enemy phase, but only into the trooper\'s front arc (shown in yellow). Choose where everyone is looking before you end the turn.')),
-            h('li', t('Weapons heat up as they fire and cool between turns. A gun at its limit will not fire, even on reaction.')),
+            h('li', t('Weapons heat up as they fire and cool between turns; shots fired in quick succession run hotter still. A gun at its limit will not fire, even on reaction.')),
             h('li', t('Ammunition is finite. Reload (2 AP) swaps in a full magazine; a yellow crate refills it too, and a green cross patches a trooper up.')),
             h('li', t('Bodies block bullets. Nobody shoots through a friend. Height lets you fire over heads and adds +1 damage.')),
             h('li', t('A crate or a body beside the target soaks part of the hit: shots skimming cover deal 2 less damage.')),
             h('li', t('Hits from behind do 50% more damage, to them and to you.')),
             h('li', t('Standing on a brood hatch seals it.')),
-            h('li', t('Troopers killed on a successful mission are gone for good; replacements are free but green.')),
+            h('li', t('Troopers killed on a successful mission are gone for good. Hire replacements at the briefing for requisition; they arrive a level behind the squad.')),
             h('li', t('Wounds carry over between missions: everyone heals a quarter of their maximum health per mission passed, plus another quarter for each mission spent on the bench.')),
             h('li', t('Proximity mines detonate the moment a hostile steps on them, hurting everything nearby — your own troopers included.')),
             h('li', t('Smoke blocks every line of sight through it, both ways, for two turns.')),
+            h('li', t('The brood hunts by sight and sound. Hostiles that have not seen or heard you do not know where you are, but gunfire carries through walls, and one that spots you calls the ones nearby.')),
           ),
         ),
       ),
@@ -388,13 +405,13 @@ export class UI {
     parts.push(h('small', t('{n} hostiles', { n: hostile }) + (next == null ? '' : ' · ' + (next === 0 ? t('hatches open this turn') : t('hatches open in {n}', { n: next })))));
     clock.replaceChildren(...parts);
 
-    const mine = battle.units.filter(u => u.side === 'marine');
+    const mine = battle.units.filter(u => u.side === 'marine').sort(byUnit);
     $('squad').replaceChildren(...mine.map(u => h('div.card' + (u === sel ? '.sel' : '') + (u.alive ? '' : '.dead'), {
       style: { '--c': hex(rankColor(u.soldier.level)) },
       onclick: () => u.alive && handlers.select && handlers.select(u),
     },
       h('div.row', h('span.name', u.name), h('span.num', u.alive ? `${u.hp}/${u.maxHp}` : t('KIA'))),
-      h('div.bar' + (u.hp <= u.maxHp / 3 ? '.low' : ''), h('i', { style: { width: (100 * u.hp / u.maxHp) + '%' } })),
+      hpPips(u.hp, u.maxHp, ARMORS[u.soldier.armor].hp),
       u.alive && h('div.pips', Array.from({ length: Math.max(u.maxAp, u.ap) }, (_, i) => h('b' + (i < u.ap ? '' : '.off')))),
     )));
 
@@ -407,12 +424,13 @@ export class UI {
       h('div.who',
         h('b', sel.name),
         h('small', `${rankOf(sel.soldier)} · ${t('HP {hp}/{max}', { hp: sel.hp, max: sel.maxHp })}`),
+        hpPips(sel.hp, sel.maxHp, ARMORS[sel.soldier.armor].hp),
         h('small', t('AP {ap}/{max}', { ap: sel.ap, max: sel.maxAp })),
         h('div.pips', { style: { marginTop: '5px' } }, Array.from({ length: Math.max(sel.maxAp, sel.ap) }, (_, i) => h('b' + (i < sel.ap ? '' : '.off')))),
       ),
       h('div.gun',
         h('div.label', h('b', w.def.name), h('span', t('rng {n}', { n: w.range }))),
-        h('div.label', { style: { marginTop: '6px' } }, t('Ammo'), h('span', `${w.ammo}/${w.def.ammo}`)),
+        h('div.label', { style: { marginTop: '6px' } }, t('Ammo'), h('span', `${w.ammo}`)),
         h('div.pips.ammo', Array.from({ length: w.def.ammo }, (_, i) => h('b' + (i < w.ammo ? '' : '.off')))),
         h('div.label', t('Heat'), h('span', t('{heat}/{max} · −{cool}/turn', { heat: w.heat, max: w.def.maxHeat, cool: w.cool }))),
         h('div.bar.heat', h('i', { style: { width: (100 * Math.min(1, w.heat / w.def.maxHeat)) + '%' } })),
@@ -426,7 +444,7 @@ export class UI {
             h('kbd', String(i + 1)), mode.name,
             h('small', t('{dmg} dmg · {ap} AP', { dmg: mode.dmg, ap: mode.ap })
               + (mode.ammo ? ' · ' + t('{n} rds', { n: mode.ammo }) : '')
-              + (mode.heat ? ` · +${mode.heat}°` : '')),
+              + (mode.heat ? ` · +${battle.shotHeat(sel, mode)}°` : '')),
           );
         }),
         (() => {

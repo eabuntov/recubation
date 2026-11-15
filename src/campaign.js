@@ -13,10 +13,18 @@ export function newCampaign(difficulty = 'normal', limitedVision = false) {
     const j = Math.floor(Math.random() * (i + 1));
     [names[i], names[j]] = [names[j], names[i]];
   }
-  return { mission: 0, difficulty: DIFFICULTIES[difficulty] ? difficulty : 'normal', limitedVision: !!limitedVision, rp: 0, squad: [], fallen: [], names, nextId: 1, complete: false };
+  const state = { mission: 0, difficulty: DIFFICULTIES[difficulty] ? difficulty : 'normal', limitedVision: !!limitedVision, rp: 0, squad: [], fallen: [], names, nextId: 1, complete: false };
+  // The starting drop team, plus a warm bench for the first wounded.
+  const size = (MISSIONS[0] ? MISSIONS[0].squad : 2) + 2;
+  for (let i = 0; i < size; i++) recruit(state);
+  return state;
 }
 
 export function currentMission(state) { return MISSIONS[state.mission] || null; }
+
+// How every interface lists the roster: highest level first, experience
+// breaking ties. Display only — the squad array keeps its own order.
+export const byLevel = (a, b) => b.level - a.level || b.xp - a.xp;
 
 function recruit(state) {
   // Replacements arrive one level behind the squad average so they are not dead weight.
@@ -39,13 +47,32 @@ export function maxHpOf(s) {
   return BASE_HP + (s.skills.vitality || 0) * 2 + ARMORS[s.armor].hp;
 }
 
-// Top the roster up to two above what the next mission fields, so the wounded
-// can sit a battle out. Returns the new arrivals.
-export function reinforce(state) {
+// What a replacement costs: greener troops come cheaper, and the first one
+// after a wipe is free — command will not leave the roster empty-handed.
+export function recruitCost(state) {
+  if (!state.squad.length) return 0;
+  const avg = state.squad.reduce((n, s) => n + s.level, 0) / state.squad.length;
+  return 20 + 15 * Math.max(1, Math.floor(avg) - 1);
+}
+
+// Hire a replacement at the briefing. Returns the new soldier, or a string
+// saying why nobody stepped off the drop ship.
+export function hire(state) {
   const m = currentMission(state);
-  const fresh = [];
-  while (m && state.squad.length < m.squad + 2) fresh.push(recruit(state));
-  return fresh;
+  if (state.squad.length >= (m ? m.squad : 4) + 2) return t('Roster is full');
+  const cost = recruitCost(state);
+  if (cost > state.rp) return t('Not enough requisition');
+  state.rp -= cost;
+  return recruit(state);
+}
+
+// XP cash-in shared by mission debriefs (and, quietly, by the debug cheats):
+// levels resolve immediately, each one paying two skill points.
+export function grantXp(state, s, n) {
+  s.xp += n;
+  let levels = 0;
+  while (s.xp >= xpForLevel(s.level)) { s.level++; s.sp += 2; levels++; }
+  return levels;
 }
 
 export function applyResult(state, summary) {
@@ -74,8 +101,7 @@ export function applyResult(state, summary) {
     s.missions++;
     if (r.alive) {
       row.xp = r.xp + bonus;
-      s.xp += row.xp;
-      while (s.xp >= xpForLevel(s.level)) { s.level++; s.sp += 2; row.levels++; }
+      row.levels = grantXp(state, s, row.xp);
     }
     report.rows.push(row);
   }

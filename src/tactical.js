@@ -1,7 +1,7 @@
 // Player input for the tactical view: selection, hover previews, clicks and keys.
 
 import { DIRS } from './data.js';
-import { key } from './battle.js';
+import { key, byUnit } from './battle.js';
 import { sfx, toggleMute } from './audio.js';
 import { t as tr } from './i18n.js';
 
@@ -138,7 +138,11 @@ export class Tactical {
     if (!b) return;
     const hv = this.hover, s = this.sel, extra = new Map(), lines = [];
     if (!hv) { this.paint(); this.ui.tip(null); return; }
-    const k = key(hv.x, hv.y), t = b.tile(hv.x, hv.y), u = b.unitAt(hv.x, hv.y);
+    // A hostile the squad has not spotted is not there as far as the player
+    // is concerned: no tooltip, no threat overlay, no fire preview.
+    let u = b.unitAt(hv.x, hv.y);
+    if (u && u.side === 'alien' && !b.isVisible(u)) u = null;
+    const k = key(hv.x, hv.y), t = b.tile(hv.x, hv.y);
     extra.set(k, 'hover');
 
     if (u && u.side === 'turret') {
@@ -259,7 +263,11 @@ export class Tactical {
   click(x, y, shift) {
     const b = this.battle, s = this.sel;
     if (!this.ready) return;
-    const u = b.unitAt(x, y), t = b.tile(x, y);
+    // Never take a shot at a hostile the squad cannot see; to the player the
+    // tile is empty, and it shall behave as empty.
+    let u = b.unitAt(x, y);
+    if (u && u.side === 'alien' && !b.isVisible(u)) u = null;
+    const t = b.tile(x, y);
 
     if (this.armed && s) {
       const problem = b.gearProblem(s, this.armed, x, y);
@@ -352,7 +360,7 @@ export class Tactical {
       case 'KeyR': if (this.ready && this.sel) b.setFacing(this.sel, (this.sel.facing + 1) % 4); break;
       case 'Tab': {
         e.preventDefault();
-        const ms = b.marines();
+        const ms = b.marines().sort(byUnit);
         if (!ms.length) break;
         const i = ms.indexOf(this.sel);
         const order = [...ms.slice(i + 1), ...ms.slice(0, i + 1)];

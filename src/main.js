@@ -5,7 +5,8 @@ import { UI } from './ui.js';
 import { Tactical } from './tactical.js';
 import { Battle } from './battle.js';
 import { MISSIONS } from './missions.js';
-import { newCampaign, currentMission, reinforce, applyResult, save, load, clearSave } from './campaign.js';
+import { newCampaign, currentMission, hire, applyResult, save, load, clearSave, byLevel } from './campaign.js';
+import { initCheats } from './cheats.js';
 import { sfx, unlock, ambience } from './audio.js';
 import { t, initLang, setLang } from './i18n.js';
 import { localize } from './locale.js';
@@ -72,6 +73,9 @@ const fx = new Proxy({
     if (name in own) return own[name];
     return async (...args) => {
       if (typeof view[name] === 'function') await view[name](...args);
+      // During the enemy phase, hostiles stepping in or out of sight must
+      // show or vanish right away — not after the next damage number.
+      if (name === 'step' && battle && battle.limited) { battle.updateVision(); view.syncVision(battle); }
       if (LIVE.has(name)) tactical.refresh();
     };
   },
@@ -117,24 +121,32 @@ function title() {
   });
 }
 
-let deployIds = null; // soldier ids picked for the next drop; null = front of the roster
+let deployIds = null; // soldier ids picked for the next drop; null = best of the roster
+let freshIds = new Set(); // recently hired, for the NEW badge
 
 function staging() {
   if (battle) endBattle();
   if (!view.attract) backdrop();
   if (state.complete) { ui.ending(state, { onDone: () => { clearSave(); title(); } }); return; }
   const mission = currentMission(state);
-  const fresh = reinforce(state);
   save(state);
   // Keep what the player last picked; bury whoever has since been lost, and
-  // fall back to the front of the roster when nobody picked survives.
+  // fall back to the top of the roster when nobody picked survives.
+  const top = () => [...state.squad].sort(byLevel).slice(0, mission.squad).map(s => s.id);
   const alive = new Set(state.squad.map(s => s.id));
-  deployIds = new Set([...(deployIds || state.squad.slice(0, mission.squad).map(s => s.id))].filter(id => alive.has(id)));
-  if (!deployIds.size) deployIds = new Set(state.squad.slice(0, mission.squad).map(s => s.id));
-  ui.staging(state, mission, fresh, {
+  deployIds = new Set([...(deployIds || top())].filter(id => alive.has(id)));
+  if (!deployIds.size) deployIds = new Set(top());
+  ui.staging(state, mission, state.squad.filter(s => freshIds.has(s.id)), {
     onDeploy: () => deploy(state.squad.filter(s => deployIds.has(s.id))),
     onArmory: () => armory(),
     onQuit: () => { deployIds = null; title(); },
+    onRecruit: () => {
+      const r = hire(state);
+      if (typeof r === 'string') return ui.toast(r);
+      freshIds.add(r.id);
+      save(state);
+      staging();
+    },
   }, deployIds, (id, add) => { add ? deployIds.add(id) : deployIds.delete(id); staging(); });
 }
 
@@ -144,10 +156,10 @@ function armory() {
 
 async function deploy(soldiers) {
   const mission = currentMission(state);
-  // A retry can arrive with an under-strength roster (an Ironman wipe empties
-  // it); replacements step in so the drop is never fielded empty.
-  reinforce(state);
-  const squad = soldiers && soldiers.length ? soldiers : state.squad.slice(0, mission.squad);
+  freshIds.clear();
+  const squad = soldiers && soldiers.length
+    ? soldiers
+    : [...state.squad].sort(byLevel).slice(0, mission.squad);
   ui.hide();
   document.body.classList.remove('menu');
   view.attract = false;
@@ -189,6 +201,15 @@ function fatal(msg) {
 
 // Small hook for automated checks and the curious.
 window.recubation = { view, tactical, get battle() { return battle; }, get state() { return state; } };
+
+// Testing cheats: typed codes (see src/cheats.js). They touch the campaign
+// only, so mid-battle they take effect at the next screen.
+initCheats({
+  getState: () => state,
+  save,
+  toast: msg => ui.toast(msg),
+  redraw: () => { if (!battle) staging(); },
+});
 
 await initLang();
 localize();

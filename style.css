@@ -96,6 +96,11 @@ h3 { font-size: 11px; color: var(--dim); letter-spacing: 0.18em; margin: 18px 0 
 /* Rounds in the magazine read as square cartridges, spent ones hollow. */
 .pips.ammo { margin: 5px 0 3px; }
 .pips.ammo b { width: 7px; height: 7px; }
+/* Health reads as discrete squares: green flesh, steel plate, red holes. */
+.pips.hp { margin: 4px 0 3px; }
+.pips.hp b { width: 5px; height: 7px; background: var(--good); }
+.pips.hp b.armor { background: #6fb3d9; }
+.pips.hp b.lost { background: #47242e; }
 
 #panel {
   position: absolute; left: 50%; bottom: 12px; transform: translateX(-50%); min-width: 520px; max-width: calc(100vw - 420px);
