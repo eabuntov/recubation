@@ -5,7 +5,7 @@ import { UI } from './ui.js';
 import { Tactical } from './tactical.js';
 import { Battle } from './battle.js';
 import { MISSIONS } from './missions.js';
-import { newCampaign, currentMission, hire, applyResult, save, load, clearSave, byLevel } from './campaign.js';
+import { newCampaign, currentMission, topUp, applyResult, save, load, clearSave, byLevel } from './campaign.js';
 import { initCheats } from './cheats.js';
 import { sfx, unlock, ambience } from './audio.js';
 import { t, initLang, setLang } from './i18n.js';
@@ -135,6 +135,8 @@ function staging() {
   if (!view.attract) backdrop();
   if (state.complete) { ui.ending(state, { onDone: () => { clearSave(); title(); } }); return; }
   const mission = currentMission(state);
+  // Replacements walk off the drop ship on their own now; badge them NEW.
+  for (const s of topUp(state)) freshIds.add(s.id);
   save(state);
   // Keep what the player last picked; bury whoever has since been lost, and
   // fall back to the top of the roster when nobody picked survives.
@@ -146,13 +148,6 @@ function staging() {
     onDeploy: () => deploy(state.squad.filter(s => deployIds.has(s.id))),
     onArmory: () => armory(),
     onQuit: () => { deployIds = null; title(); },
-    onRecruit: () => {
-      const r = hire(state);
-      if (typeof r === 'string') return ui.toast(r);
-      freshIds.add(r.id);
-      save(state);
-      staging();
-    },
   }, deployIds, (id, add) => { add ? deployIds.add(id) : deployIds.delete(id); staging(); });
 }
 

@@ -311,8 +311,6 @@ export default {
   "Hits from behind do 50% more damage, to them and to you.": "Trafienia od tyłu zadają o 50% więcej obrażeń — im i tobie.",
   "Standing on a brood hatch seals it.": "Stanięcie na włazie wylęgu zamyka go.",
   "Troopers killed on a successful mission are gone for good. Replacements are free at the briefing, but arrive a level behind the squad.": "Żołnierze polegli w udanej misji odchodzą na zawsze. Zastępcy są w odprawie darmowi, ale przybywają o poziom za składem.",
-  "Recruit trooper": "Zrekrutuj żołnierza",
-  "Roster is full": "Stan osobowy jest pełny",
   "Brood call radius": "Zasięg okrzyku lęgu",
   "The brood hunts by sight and sound. Hostiles that have not seen or heard you do not know where you are, but gunfire carries through walls, and one that spots you calls the ones nearby.": "Lęg poluje wzrokiem i słuchem. Wrogowie, którzy cię nie widzieli ani nie usłyszeli, nie wiedzą, gdzie jesteś, ale strzały niosą się przez ściany, a ten, kto cię wypatrzy, wzywa pobliskich.",
   "Cancel": "Anuluj",

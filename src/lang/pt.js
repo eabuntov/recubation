@@ -311,8 +311,6 @@ export default {
   "Hits from behind do 50% more damage, to them and to you.": "Acertos pelas costas causam 50% a mais de dano, neles e em você.",
   "Standing on a brood hatch seals it.": "Ficar em cima de uma escotilha da ninhada a sela.",
   "Troopers killed on a successful mission are gone for good. Replacements are free at the briefing, but arrive a level behind the squad.": "Soldados mortos numa missão bem-sucedida se vão para sempre; os substitutos são gratuitos no briefing, mas chegam um nível atrás do esquadrão.",
-  "Recruit trooper": "Recrutar soldado",
-  "Roster is full": "O efetivo está completo",
   "Brood call radius": "Alcance do chamado da ninhada",
   "The brood hunts by sight and sound. Hostiles that have not seen or heard you do not know where you are, but gunfire carries through walls, and one that spots you calls the ones nearby.": "A ninhada caça pela vista e pelo som. Hostis que não os viram nem ouviram não sabem onde vocês estão, mas os tiros atravessam as paredes, e quem os avista chama os que estão perto.",
   "Cancel": "Cancelar",

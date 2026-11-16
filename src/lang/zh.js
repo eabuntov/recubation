@@ -311,8 +311,6 @@ export default {
   "Hits from behind do 50% more damage, to them and to you.": "背后命中多造成 50% 伤害，对它们和对你都一样。",
   "Standing on a brood hatch seals it.": "站在孵化口上就能封住它。",
   "Troopers killed on a successful mission are gone for good. Replacements are free at the briefing, but arrive a level behind the squad.": "在成功的任务中阵亡的队员将永远离开；在简报界面可以免费补充新兵，但比队伍平均等级低一级。",
-  "Recruit trooper": "招募士兵",
-  "Roster is full": "编制已满",
   "Brood call radius": "虫群呼叫半径",
   "The brood hunts by sight and sound. Hostiles that have not seen or heard you do not know where you are, but gunfire carries through walls, and one that spots you calls the ones nearby.": "虫群靠视觉和听觉狩猎。没有看见或听到你的敌人不知道你的位置，但枪声能穿透墙壁，发现你的那只会呼叫附近的同伴。",
   "Cancel": "取消",

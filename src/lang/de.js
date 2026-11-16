@@ -311,8 +311,6 @@ export default {
   "Hits from behind do 50% more damage, to them and to you.": "Treffer von hinten verursachen 50 % mehr Schaden – bei ihnen wie bei dir.",
   "Standing on a brood hatch seals it.": "Wer auf einer Brutluke steht, versiegelt sie.",
   "Troopers killed on a successful mission are gone for good. Replacements are free at the briefing, but arrive a level behind the squad.": "In einer erfolgreichen Mission gefallene Soldaten sind für immer verloren. Ersatz ist im Briefing kostenlos, kommt aber eine Stufe hinter dem Trupp her.",
-  "Recruit trooper": "Soldaten anwerben",
-  "Roster is full": "Der Kader ist voll",
   "Brood call radius": "Rufweite der Brut",
   "The brood hunts by sight and sound. Hostiles that have not seen or heard you do not know where you are, but gunfire carries through walls, and one that spots you calls the ones nearby.": "Die Brut jagt nach Sicht und Geräusch. Feinde, die euch weder gesehen noch gehört haben, wissen nicht, wo ihr seid — aber Schüsse tragen durch Wände, und wer euch erspäht, ruft die Nahen herbei.",
   "Cancel": "Abbrechen",

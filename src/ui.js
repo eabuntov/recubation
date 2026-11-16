@@ -200,7 +200,7 @@ export class UI {
 
   // `picked` is the set of soldier ids marching on this drop; clicking a card
   // toggles them through onPick (up to what the mission fields).
-  staging(state, mission, fresh, { onDeploy, onArmory, onQuit, onRecruit }, picked = new Set(), onPick = null) {
+  staging(state, mission, fresh, { onDeploy, onArmory, onQuit }, picked = new Set(), onPick = null) {
     const unspent = state.squad.some(s => s.sp > 0);
     const diff = DIFFICULTIES[state.difficulty] || DIFFICULTIES.normal;
     this.show(h('div.sheet',
@@ -238,11 +238,6 @@ export class UI {
               hpPips(hp, st.hp, ARMORS[s.armor].hp),
             );
           })),
-          h('div', { style: { marginTop: '10px' } }, (() => {
-            const full = state.squad.length >= mission.squad + 2;
-            return btn(t('Recruit trooper'), () => onRecruit && onRecruit(),
-              '', { disabled: full, title: full ? t('Roster is full') : '' });
-          })()),
           state.fallen.length > 0 && h('p', { style: { marginTop: '14px', fontSize: '12px' } }, t('In memoriam: {names}.', { names: state.fallen.map(f => f.name).join(', ') })),
         ),
       ),

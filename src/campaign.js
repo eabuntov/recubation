@@ -14,8 +14,9 @@ export function newCampaign(difficulty = 'normal', limitedVision = false, callRa
     [names[i], names[j]] = [names[j], names[i]];
   }
   const state = { mission: 0, difficulty: DIFFICULTIES[difficulty] ? difficulty : 'normal', limitedVision: !!limitedVision, callRadius: CALL_RADII.includes(callRadius) ? callRadius : ALERT.spread, rp: 0, squad: [], fallen: [], names, nextId: 1, complete: false };
-  // The starting drop team, plus a warm bench for the first wounded.
-  const size = (MISSIONS[0] ? MISSIONS[0].squad : 2) + 2;
+  // The standing strength: five slots, or whatever a mission fields if it
+  // fields more. The bench is not asked for — it fills on its own.
+  const size = Math.max(5, MISSIONS[0] ? MISSIONS[0].squad : 4);
   for (let i = 0; i < size; i++) recruit(state);
   return state;
 }
@@ -47,13 +48,15 @@ export function maxHpOf(s) {
   return BASE_HP + (s.skills.vitality || 0) * 2 + ARMORS[s.armor].hp;
 }
 
-// Hire a replacement at the briefing. Replacements are free but green — the
-// price of a lost trooper is their inexperience, not requisition. Returns the
-// new soldier, or a string saying why nobody stepped off the drop ship.
-export function hire(state) {
+// Replacements no longer wait to be asked for: whenever the roster runs short
+// of the standing strength, the drop ship sends another body — green, a level
+// behind the squad average. Returns the fresh faces, for the NEW badges.
+export function topUp(state) {
   const m = currentMission(state);
-  if (state.squad.length >= (m ? m.squad : 4) + 2) return t('Roster is full');
-  return recruit(state);
+  const size = Math.max(5, m ? m.squad : 4);
+  const fresh = [];
+  while (state.squad.length < size) fresh.push(recruit(state));
+  return fresh;
 }
 
 // XP cash-in shared by mission debriefs (and, quietly, by the debug cheats):

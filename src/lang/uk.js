@@ -311,8 +311,6 @@ export default {
   "Hits from behind do 50% more damage, to them and to you.": "Влучання в спину завдають на 50% більше шкоди — і їм, і вам.",
   "Standing on a brood hatch seals it.": "Боєць, що стоїть на люку виводка, запечатує його.",
   "Troopers killed on a successful mission are gone for good. Replacements are free at the briefing, but arrive a level behind the squad.": "Бійці, що загинули в успішній місії, втрачені назавжди. Заміна на брифінгу безкоштовна, але новачки приходять рівнем нижче середнього по загону.",
-  "Recruit trooper": "Найми бійця",
-  "Roster is full": "Загін укомплектований",
   "Brood call radius": "Радіус сигналу виводка",
   "The brood hunts by sight and sound. Hostiles that have not seen or heard you do not know where you are, but gunfire carries through walls, and one that spots you calls the ones nearby.": "Виводок полює на зір і слух. Вороги, які не бачили й не чули вас, не знають, де ви, але постріли чутно крізь стіни, а той, хто вас помітив, кличе ближніх.",
   "Cancel": "Скасувати",

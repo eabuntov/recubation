@@ -311,8 +311,6 @@ export default {
   "Hits from behind do 50% more damage, to them and to you.": "Les coups dans le dos infligent 50 % de dégâts en plus, à eux comme à vous.",
   "Standing on a brood hatch seals it.": "Se tenir sur une trappe de couvée la scelle.",
   "Troopers killed on a successful mission are gone for good. Replacements are free at the briefing, but arrive a level behind the squad.": "Les soldats tués lors d'une mission réussie sont perdus pour de bon. Les remplaçants sont gratuits au briefing, mais ils arrivent avec un niveau de retard sur l'escouade.",
-  "Recruit trooper": "Recruter un soldat",
-  "Roster is full": "L'effectif est au complet",
   "Brood call radius": "Portée d'appel de la couvée",
   "The brood hunts by sight and sound. Hostiles that have not seen or heard you do not know where you are, but gunfire carries through walls, and one that spots you calls the ones nearby.": "La couvée chasse à la vue et au bruit. Les hostiles qui ne vous ont ni vu ni entendu ignorent où vous êtes, mais les tirs traversent les cloisons, et celui qui vous repère appelle ceux qui sont proches.",
   "Cancel": "Annuler",

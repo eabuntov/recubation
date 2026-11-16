@@ -4,7 +4,7 @@
 
 import { MISSIONS } from '../src/missions.js';
 import { Battle, parseMap, key } from '../src/battle.js';
-import { newCampaign, hire, applyResult, raiseSkill, equip, maxHpOf } from '../src/campaign.js';
+import { newCampaign, topUp, applyResult, raiseSkill, equip, maxHpOf } from '../src/campaign.js';
 import { DIRS } from '../src/data.js';
 
 let failures = 0;
@@ -108,8 +108,8 @@ async function runCampaign(difficulty) {
   const state = newCampaign(difficulty);
   for (let guard = 0; guard < 40 && !state.complete; guard++) {
   const m = MISSIONS[state.mission];
-  // Keep the bench full the way the old auto-reinforce did.
-  while (state.squad.length < m.squad + 2) hire(state);
+  // Keep the bench at standing strength, the way the briefing does now.
+  topUp(state);
   // Spend points the way a cautious player might.
   for (const s of state.squad) {
     for (const id of ['light', 'vitality', 'light', 'heavy', 'vitality', 'reflexes']) raiseSkill(s, id);
