@@ -488,4 +488,11 @@ export default {
   "Pack up ({n} AP)": "Remballer ({n} PA)",
   "Defuse ({n} AP)": "Désamorcer ({n} PA)",
   "Armed. It goes off the moment anyone steps on it.": "Armée. Elle explose dès que n'importe qui pose le pied dessus.",
+  "Contract unpaid": "Contrat impayé",
+  "UNPAID": "IMPAYÉ",
+  "Contract: {n} missions": {"one":"Contrat : {n} mission","many":"Contrat : {n} missions","other":"Contrat : {n} missions"},
+  "Pay {n}": "Payer {n}",
+  "Demobilize": "Démobiliser",
+  "Demobilized": "Démobilisé",
+  "Past the fifth level troopers serve on contracts: a renewal buys three missions ahead, a rested bench burns none, and an unpaid trooper waits on the bench until command pays up or demobilizes them with a full kit refund.": "Après le cinquième niveau, les soldats servent sous contrat : un renouvellement achète trois missions d'avance, un banc de repos n'en consomme aucune, et un soldat impayé attend sur le banc jusqu'à ce que le commandement paie ou le démobilise avec remboursement intégral de l'équipement.",
 };

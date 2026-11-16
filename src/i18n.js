@@ -30,6 +30,7 @@ const EN = {
   'Final tally: {n} hostiles destroyed.': { one: 'Final tally: {n} hostile destroyed.', other: 'Final tally: {n} hostiles destroyed.' },
   '{n} troopers came home; {names} did not.': { one: '{n} trooper came home; {names} did not.', other: '{n} troopers came home; {names} did not.' },
   '{n} troopers came home, every one of them.': { one: '{n} trooper came home, every one of them.', other: '{n} troopers came home, every one of them.' },
+  'Contract: {n} missions': { one: 'Contract: {n} mission', other: 'Contract: {n} missions' },
 };
 
 let lang = 'en';

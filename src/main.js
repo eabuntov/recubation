@@ -5,7 +5,7 @@ import { UI } from './ui.js';
 import { Tactical } from './tactical.js';
 import { Battle } from './battle.js';
 import { MISSIONS } from './missions.js';
-import { newCampaign, currentMission, topUp, applyResult, save, load, clearSave, byLevel } from './campaign.js';
+import { newCampaign, currentMission, topUp, applyResult, save, load, clearSave, byLevel, contractDue, payContract, demobilize } from './campaign.js';
 import { initCheats } from './cheats.js';
 import { sfx, unlock, ambience } from './audio.js';
 import { t, initLang, setLang } from './i18n.js';
@@ -138,16 +138,19 @@ function staging() {
   // Replacements walk off the drop ship on their own now; badge them NEW.
   for (const s of topUp(state)) freshIds.add(s.id);
   save(state);
-  // Keep what the player last picked; bury whoever has since been lost, and
-  // fall back to the top of the roster when nobody picked survives.
-  const top = () => [...state.squad].sort(byLevel).slice(0, mission.squad).map(s => s.id);
-  const alive = new Set(state.squad.map(s => s.id));
+  // Keep what the player last picked; bury whoever has since been lost, drop
+  // whoever is off-contract, and fall back to the top of the roster.
+  const deployable = s => !contractDue(s);
+  const top = () => [...state.squad].filter(deployable).sort(byLevel).slice(0, mission.squad).map(s => s.id);
+  const alive = new Set(state.squad.filter(deployable).map(s => s.id));
   deployIds = new Set([...(deployIds || top())].filter(id => alive.has(id)));
   if (!deployIds.size) deployIds = new Set(top());
   ui.staging(state, mission, state.squad.filter(s => freshIds.has(s.id)), {
     onDeploy: () => deploy(state.squad.filter(s => deployIds.has(s.id))),
     onArmory: () => armory(),
     onQuit: () => { deployIds = null; title(); },
+    onPay: s => { const err = payContract(state, s); if (err) ui.toast(err); save(state); staging(); },
+    onDemobilize: s => { demobilize(state, s); save(state); staging(); },
   }, deployIds, (id, add) => { add ? deployIds.add(id) : deployIds.delete(id); staging(); });
 }
 

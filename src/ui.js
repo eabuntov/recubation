@@ -2,7 +2,7 @@
 
 import { WEAPONS, ARMORS, GEAR, SKILLS, RANKS, BASE_HP, BASE_AP, rankColor, xpForLevel, meetsReq, reqText, DIFFICULTIES, ALERT, CALL_RADII } from './data.js';
 import { objectiveText, MISSIONS } from './missions.js';
-import { GEAR_SLOTS, maxHpOf, canRaise, raiseSkill, skillCost, equip, equipProblem, byLevel } from './campaign.js';
+import { GEAR_SLOTS, maxHpOf, canRaise, raiseSkill, skillCost, equip, equipProblem, byLevel, contractDue, contractPrice } from './campaign.js';
 import { byUnit } from './battle.js';
 import { sfx } from './audio.js';
 import { t, LANGS, savedLang, browserLang } from './i18n.js';
@@ -200,7 +200,7 @@ export class UI {
 
   // `picked` is the set of soldier ids marching on this drop; clicking a card
   // toggles them through onPick (up to what the mission fields).
-  staging(state, mission, fresh, { onDeploy, onArmory, onQuit }, picked = new Set(), onPick = null) {
+  staging(state, mission, fresh, { onDeploy, onArmory, onQuit, onPay, onDemobilize }, picked = new Set(), onPick = null) {
     const unspent = state.squad.some(s => s.sp > 0);
     const diff = DIFFICULTIES[state.difficulty] || DIFFICULTIES.normal;
     this.show(h('div.sheet',
@@ -223,19 +223,27 @@ export class UI {
             const st = soldierStats(s);
             const hp = s.hp == null ? st.hp : Math.max(1, Math.min(st.hp, s.hp));
             const on = picked.has(s.id);
+            const unpaid = contractDue(s);
             return h('div.card.pick' + (on ? '.sel' : ''), {
               style: { '--c': hex(rankColor(s.level)) },
               onclick: onPick && click(() => {
+                if (unpaid) return this.toast(t('Contract unpaid'));
                 if (!on && picked.size >= mission.squad) return this.toast(t('The drop ship takes at most {n}.', { n: mission.squad }));
                 onPick(s.id, !on);
               }),
             },
               h('div.row',
-                h('span.name', s.name, fresh.includes(s) && h('span.badge.new', t('NEW')), s.sp > 0 && h('span.badge', t('{n} SP', { n: s.sp })), s.missed > 0 && h('span.badge.rest', t('RESTING'))),
+                h('span.name', s.name, fresh.includes(s) && h('span.badge.new', t('NEW')), s.sp > 0 && h('span.badge', t('{n} SP', { n: s.sp })), s.missed > 0 && h('span.badge.rest', t('RESTING')), unpaid && h('span.badge.unpaid', t('UNPAID'))),
                 h('span.num', `${rankOf(s)} · ${t('L{n}', { n: s.level })}`)),
               h('div.kit', `${WEAPONS[s.weapon].name} · ${ARMORS[s.armor].name}`),
               h('div.kit', t('HP {hp}/{max} · {ap} AP', { hp, max: st.hp, ap: st.ap }) + (s.gear.filter(Boolean).length ? ' · ' + s.gear.filter(Boolean).map(g => GEAR[g].name).join(', ') : '')),
               hpPips(hp, st.hp, ARMORS[s.armor].hp),
+              s.level > 5 && h('div.contract',
+                h('span.num', t('Contract: {n} missions', { n: s.contract || 0 })),
+                h('span.grow'),
+                unpaid && onPay && btn(t('Pay {n}', { n: contractPrice(s) }), () => onPay(s), ''),
+                onDemobilize && btn(t('Demobilize'), () => onDemobilize(s), 'danger'),
+              ),
             );
           })),
           state.fallen.length > 0 && h('p', { style: { marginTop: '14px', fontSize: '12px' } }, t('In memoriam: {names}.', { names: state.fallen.map(f => f.name).join(', ') })),
@@ -422,6 +430,7 @@ export class UI {
             h('li', t('Standing on a brood hatch seals it.')),
             h('li', t('Troopers killed on a successful mission are gone for good. Replacements are free at the briefing, but arrive a level behind the squad.')),
             h('li', t('Wounds carry over between missions: everyone heals a quarter of their maximum health per mission passed, plus another quarter for each mission spent on the bench.')),
+            h('li', t('Past the fifth level troopers serve on contracts: a renewal buys three missions ahead, a rested bench burns none, and an unpaid trooper waits on the bench until command pays up or demobilizes them with a full kit refund.')),
             h('li', t('Proximity mines detonate the moment anyone steps on them, hurting everything nearby — your own troopers included. A Traps-trained trooper defuses an adjacent mine for 3 AP.')),
             h('li', t('Smoke blocks every line of sight through it, both ways, for two turns.')),
             h('li', t('A sentry gun beside a trooper can be reloaded for 5 AP, or packed back into its kit with Shift+click by a Traps-3 trooper.')),

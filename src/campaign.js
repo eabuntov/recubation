@@ -37,7 +37,7 @@ function recruit(state) {
     level, xp: level > 1 ? xpForLevel(level - 1) : 0, sp: (level - 1) * 2,
     skills: Object.fromEntries(Object.keys(SKILLS).map(k => [k, 0])),
     weapon: 'carbine', armor: 'none', gear: new Array(GEAR_SLOTS).fill(null),
-    kills: 0, missions: 0, hp: null, missed: 0,
+    kills: 0, missions: 0, hp: null, missed: 0, contract: 0,
   };
   state.squad.push(s);
   return s;
@@ -57,6 +57,36 @@ export function topUp(state) {
   const fresh = [];
   while (state.squad.length < size) fresh.push(recruit(state));
   return fresh;
+}
+
+// Contract economy. Past the fifth level a trooper fights only as long as
+// their contract holds: renewing buys three missions ahead, a mission fought
+// burns one, and a rested bench burns nothing. An unpaid trooper warms the
+// bench until command pays up or lets them go.
+export const CONTRACT_FREE_LEVEL = 5;
+export const CONTRACT_RUN = 3;
+
+export function contractDue(s) { return s.level > CONTRACT_FREE_LEVEL && (s.contract || 0) <= 0; }
+
+export function contractPrice(s) {
+  return Math.max(0, s.level * 5 - 5 * (s.skills.economy || 0));
+}
+
+export function payContract(state, s) {
+  const price = contractPrice(s);
+  if (state.rp < price) return t('Not enough requisition');
+  state.rp -= price;
+  s.contract = (s.contract || 0) + CONTRACT_RUN;
+  return null;
+}
+
+// A demobilized trooper hands in their kit at full price and walks; the drop
+// ship already has their replacement strapped in.
+export function demobilize(state, s) {
+  state.rp += loadoutValue(s);
+  state.squad = state.squad.filter(q => q !== s);
+  state.fallen.push({ name: s.name, level: s.level, kills: s.kills, mission: t('Demobilized') });
+  topUp(state);
 }
 
 // XP cash-in shared by mission debriefs (and, quietly, by the debug cheats):
@@ -95,6 +125,8 @@ export function applyResult(state, summary) {
     if (r.alive) {
       row.xp = r.xp + bonus;
       row.levels = grantXp(state, s, row.xp);
+      // One mission fought, one mission off the contract.
+      if (s.contract > 0) s.contract--;
     }
     report.rows.push(row);
   }
@@ -222,6 +254,7 @@ function sanitize(s) {
       missions: int(q.missions, 0),
       hp: Number.isInteger(q.hp) && q.hp > 0 ? q.hp : null,
       missed: int(q.missed, 0),
+      contract: int(q.contract, CONTRACT_RUN),
     };
   });
   s.rp += refunds;

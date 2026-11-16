@@ -488,4 +488,11 @@ export default {
   "Pack up ({n} AP)": "收回（{n} AP）",
   "Defuse ({n} AP)": "拆除（{n} AP）",
   "Armed. It goes off the moment anyone steps on it.": "已布防。任何人踩上即引爆。",
+  "Contract unpaid": "合同未支付",
+  "UNPAID": "欠饷",
+  "Contract: {n} missions": {"other":"合同：{n} 场任务"},
+  "Pay {n}": "支付 {n}",
+  "Demobilize": "退役",
+  "Demobilized": "已退役",
+  "Past the fifth level troopers serve on contracts: a renewal buys three missions ahead, a rested bench burns none, and an unpaid trooper waits on the bench until command pays up or demobilizes them with a full kit refund.": "五级之后士兵按合同服役：续约一次预付三场任务，坐冷板凳不消耗场次，欠饷的士兵会一直坐板凳，直到指挥部付款或让其退役并全额退还装备。",
 };

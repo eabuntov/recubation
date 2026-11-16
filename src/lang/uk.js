@@ -488,4 +488,11 @@ export default {
   "Pack up ({n} AP)": "Забрати ({n} ОД)",
   "Defuse ({n} AP)": "Розмінувати ({n} ОД)",
   "Armed. It goes off the moment anyone steps on it.": "Звідена. Спрацьовує, коли на неї ступає хто завгодно.",
+  "Contract unpaid": "Контракт не оплачений",
+  "UNPAID": "НЕ ОПЛАЧЕНИЙ",
+  "Contract: {n} missions": {"one":"Контракт: {n} місія","few":"Контракт: {n} місії","many":"Контракт: {n} місій","other":"Контракт: {n} місії"},
+  "Pay {n}": "Оплатити {n}",
+  "Demobilize": "Демобілізувати",
+  "Demobilized": "Демобілізований",
+  "Past the fifth level troopers serve on contracts: a renewal buys three missions ahead, a rested bench burns none, and an unpaid trooper waits on the bench until command pays up or demobilizes them with a full kit refund.": "Після п'ятого рівня бійці служать за контрактом: продовження купує три місії наперед, на лавці запасу контракт не тікає, а неоплачений боєць чекає, поки командування не заплатить або не демобілізує його з повним поверненням за обладнання.",
 };

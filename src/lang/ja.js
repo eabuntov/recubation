@@ -488,4 +488,11 @@ export default {
   "Pack up ({n} AP)": "収容（{n} AP）",
   "Defuse ({n} AP)": "解除（{n} AP）",
   "Armed. It goes off the moment anyone steps on it.": "起動済み。誰でも踏めば爆発する。",
+  "Contract unpaid": "契約未払い",
+  "UNPAID": "未払い",
+  "Contract: {n} missions": {"other":"契約：残り {n} 任務"},
+  "Pay {n}": "{n} 支払う",
+  "Demobilize": "除隊させる",
+  "Demobilized": "除隊",
+  "Past the fifth level troopers serve on contracts: a renewal buys three missions ahead, a rested bench burns none, and an unpaid trooper waits on the bench until command pays up or demobilizes them with a full kit refund.": "レベル5を超えた兵士は契約で戦う。更新は3任務前倒しで購入し、ベンチでは消費されない。未払いの兵士は、支払いか全額返金での除隊があるまでベンチで待つ。",
 };
