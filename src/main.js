@@ -7,6 +7,7 @@ import { Battle } from './battle.js';
 import { MISSIONS } from './missions.js';
 import { newCampaign, currentMission, topUp, applyResult, save, load, clearSave, byLevel, contractDue, payContract, demobilize, buyClone, payClone, cloneDrop, cloneView } from './campaign.js';
 import { initCheats } from './cheats.js';
+import { generateMap } from './genmap.js';
 import { sfx, unlock, ambience } from './audio.js';
 import { t, initLang, setLang } from './i18n.js';
 import { localize } from './locale.js';
@@ -131,11 +132,23 @@ let deployIds = null; // soldier ids picked for the next drop; null = best of th
 let deployClone = false; // whether the leased clone takes a slot on the next drop
 let freshIds = new Set(); // recently hired, for the NEW badge
 
+// The mission as it will actually be fought: the authored definition with a
+// rolled floor plan — same size, same brood, same schedule, new geography.
+// The seed is drawn once per mission per campaign and kept in the save, so a
+// retried mission replays the same map while a new campaign rolls fresh ones.
+// A roll the checks reject falls back to the authored map.
+function stagedMission() {
+  const mission = currentMission(state);
+  if (!(state.mission in state.maps)) state.maps[state.mission] = (Math.random() * 0x7fffffff) | 0;
+  const gen = generateMap(mission, state.mission, state.maps[state.mission]);
+  return gen ? { ...mission, map: gen.map, raised: gen.raised } : mission;
+}
+
 function staging() {
   if (battle) endBattle();
   if (!view.attract) backdrop();
   if (state.complete) { ui.ending(state, { onDone: () => { clearSave(); title(); } }); return; }
-  const mission = currentMission(state);
+  const mission = stagedMission();
   // Replacements walk off the drop ship on their own now; badge them NEW.
   for (const s of topUp(state)) freshIds.add(s.id);
   // An unpaid clone cannot take a slot; a missing one ends the lease talk.
@@ -172,7 +185,7 @@ function armory() {
 }
 
 async function deploy(soldiers) {
-  const mission = currentMission(state);
+  const mission = stagedMission();
   freshIds.clear();
   const squad = soldiers && soldiers.length
     ? soldiers

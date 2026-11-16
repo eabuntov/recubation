@@ -81,7 +81,7 @@ export const MISSIONS = [
     turnLimit: 15,
     objective: { type: 'eliminate' },
     brief: [
-      'The ore-sorting hall. A maintenance gantry runs the length of the north wall and the things have learned to use it.',
+      'The ore-sorting hall. A maintenance gantry hangs over one corner of the floor and the things have learned to use it.',
       'Whoever holds the high ground shoots over heads and hits harder. Take the ramps, or make them come down.',
     ],
     tips: [
@@ -296,7 +296,7 @@ export const MISSIONS = [
     raised: [[1, 1, 22, 2]],
     brief: [
       'The ore-sorting gallery again, but the nest has moved in proper: shellbacks on the high deck and an elite spitter holding the middle.',
-      'Take the ramps at both ends, or push through the pillar field below. Whoever holds the deck holds the room.',
+      'Take the ramp up, or push through the floor below. Whoever holds the deck holds the room.',
     ],
     tips: [
       'Firing from the high deck adds damage and lets you shoot over heads.',
@@ -391,7 +391,7 @@ export const MISSIONS = [
       'The charge has to go on the upper gallery, past the control room. The hatches here never stop. Keep moving.',
     ],
     tips: [
-      'The terminal in the pump annex opens the control-room door. The ramp beyond leads up to the gallery.',
+      'Find the terminal to open the lift door; a ramp leads up to the demolition gallery.',
       'Stalkers cover eight tiles a turn. Keep someone watching the flanks.',
     ],
     raised: [[16, 1, 26, 4]],

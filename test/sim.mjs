@@ -1,45 +1,20 @@
-// Headless checks: validates every map and auto-plays each mission with a
-// crude bot so rule or AI exceptions show up without opening a browser.
+// Headless checks: validates every map (authored and generated) and
+// auto-plays the campaign with a crude bot so rule or AI exceptions show up
+// without opening a browser.
 //   node test/sim.mjs
 
 import { MISSIONS } from '../src/missions.js';
-import { Battle, parseMap, key } from '../src/battle.js';
+import { Battle, key } from '../src/battle.js';
 import { newCampaign, topUp, applyResult, raiseSkill, equip, maxHpOf } from '../src/campaign.js';
 import { DIRS } from '../src/data.js';
+import { mapProblems } from '../src/mapcheck.js';
+import { generateMap } from '../src/genmap.js';
 
 let failures = 0;
 const fail = msg => { failures++; console.error('  FAIL ' + msg); };
 
 function validate(m) {
-  const widths = new Set(m.map.map(r => r.length));
-  if (widths.size !== 1) fail(`${m.id}: ragged rows ${[...widths]}`);
-  const map = parseMap(m);
-  if (map.starts.length < m.squad) fail(`${m.id}: ${map.starts.length} starts for squad of ${m.squad}`);
-  const squad = Array.from({ length: m.squad }, (_, i) => ({
-    id: i + 1, name: 'T' + i, skills: {}, weapon: 'carbine', armor: 'none', gear: [],
-  }));
-  const b = new Battle(m, squad);
-  for (const row of b.tiles) for (const t of row) {
-    if (t.ramp == null) continue;
-    const d = DIRS[t.ramp];
-    const up = b.tile(t.x + d.x, t.y + d.y), down = b.tile(t.x - d.x, t.y - d.y);
-    if (!up || up.h !== 1 || !b.walkable(up)) fail(`${m.id}: ramp ${t.x},${t.y} has no upper landing`);
-    if (!down || down.h !== 0 || !b.walkable(down)) fail(`${m.id}: ramp ${t.x},${t.y} has no lower landing`);
-  }
-  // Everything that matters must be reachable on foot once the doors are open.
-  for (const row of b.tiles) for (const t of row) if (t.door) t.type = 'floor';
-  const s = map.starts[0];
-  const reach = b.flood(s.x, s.y, 999, { ignoreUnits: true });
-  for (const u of b.units) if (!reach.has(key(u.x, u.y))) fail(`${m.id}: ${u.name} at ${u.x},${u.y} unreachable`);
-  let exits = 0;
-  for (const row of b.tiles) for (const t of row) {
-    if (t.exit) { exits++; if (!reach.has(key(t.x, t.y))) fail(`${m.id}: exit ${t.x},${t.y} unreachable`); }
-    if (t.hatch && !reach.has(key(t.x, t.y))) fail(`${m.id}: hatch ${t.x},${t.y} unreachable`);
-    if (t.pickup && !reach.has(key(t.x, t.y))) fail(`${m.id}: pickup ${t.x},${t.y} unreachable`);
-    if (t.terminal && !DIRS.some(d => reach.has(key(t.x + d.x, t.y + d.y)))) fail(`${m.id}: terminal ${t.x},${t.y} unreachable`);
-  }
-  if (m.objective.type === 'exit' && exits < m.squad) fail(`${m.id}: ${exits} exit tiles for squad of ${m.squad}`);
-  if (m.spawn && !map.hatches.length) fail(`${m.id}: spawn schedule without hatches`);
+  for (const p of mapProblems(m)) fail(`${m.id}: ${p}`);
 }
 
 // A deliberately simple bot: shoot what it can, otherwise walk toward the goal.
@@ -102,12 +77,30 @@ async function play(m, squad, difficulty = 'normal') {
 console.log('Validating maps');
 for (const m of MISSIONS) validate(m);
 
+console.log('Validating generated maps');
+// Every mission rolls a batch of seeds; a roll that cannot be made valid
+// inside its attempt budget falls back to the authored map, which is fine —
+// but a batch of outright failures is a generator regression.
+const GENERATED = MISSIONS.map((m, i) => {
+  let ok = 0;
+  for (let seed = 1; seed <= 10; seed++) {
+    const g = generateMap(m, i, seed * 7919);
+    if (!g) continue;
+    for (const p of mapProblems({ ...m, map: g.map, raised: g.raised })) fail(`${m.id} (roll ${seed}): ${p}`);
+    ok++;
+  }
+  console.log(`  ${m.id.padEnd(16)} ${ok}/10 rolls valid`);
+  // One fixed roll becomes the generated campaign the bot plays below.
+  const pick = generateMap(m, i, 20261116 + i);
+  return pick ? { ...m, map: pick.map, raised: pick.raised } : m;
+});
+
 console.log('Auto-playing campaign');
-async function runCampaign(difficulty) {
-  if (difficulty !== 'normal') console.log(`  --- ${difficulty} ---`);
+async function runCampaign(difficulty, missions = MISSIONS) {
+  if (difficulty !== 'normal' || missions !== MISSIONS) console.log(`  --- ${difficulty}${missions === MISSIONS ? '' : ' · generated'} ---`);
   const state = newCampaign(difficulty);
   for (let guard = 0; guard < 40 && !state.complete; guard++) {
-  const m = MISSIONS[state.mission];
+  const m = missions[state.mission];
   // Keep the bench at standing strength, the way the briefing does now.
   topUp(state);
   // Spend points the way a cautious player might.
@@ -130,6 +123,7 @@ async function runCampaign(difficulty) {
 }
 await runCampaign('normal');
 await runCampaign('hard');
+await runCampaign('normal', GENERATED);
 
 console.log(failures ? `\n${failures} failure(s)` : '\nAll checks passed');
 process.exit(failures ? 1 : 0);

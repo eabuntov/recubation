@@ -153,6 +153,55 @@ function tryMap(mission, index, rng) {
 
   const items = stock(mission);
 
+  // A raised deck for the missions that teach height: seal a room off the
+  // ring entirely, then punch one ramp into it. The ring loses that room and
+  // stays a path, so the level remains connected; the ramp is the only way
+  // up. When no clean ramp site exists, the roll simply stays flat.
+  let raised = null;
+  if (mission.raised) {
+    const candidates = rooms.filter(r => r !== startRoom && r !== exitRoom
+      && inner(r).x1 - inner(r).x0 >= 2 && inner(r).y1 - inner(r).y0 >= 2);
+    if (candidates.length) {
+      const room = pick(rng, candidates);
+      // Seal every opening on the room's walls.
+      for (let x = room.x0; x <= room.x1; x++) for (const y of [room.y0, room.y1]) if (at(x, y) === '.') set(x, y, '#');
+      for (let y = room.y0; y <= room.y1; y++) for (const x of [room.x0, room.x1]) if (at(x, y) === '.') set(x, y, '#');
+      // Punch a ramp: room wall tile plus a short carved approach outward.
+      const sides = [
+        { wall: x => [x, room.y0, 'v', room.y0 - 2], range: [room.x0 + 1, room.x1 - 1] }, // north wall: the room lies south, so the ramp points south
+        { wall: x => [x, room.y1, '^', room.y1 + 2], range: [room.x0 + 1, room.x1 - 1] }, // south wall: the room lies north
+        { wall: y => [room.x0, y, '>', room.x0 - 2], range: [room.y0 + 1, room.y1 - 1] }, // west wall: the room lies east
+        { wall: y => [room.x1, y, '<', room.x1 + 2], range: [room.y0 + 1, room.y1 - 1] }, // east wall: the room lies west
+      ].sort(() => rng() - 0.5);
+      outer: for (const side of sides) {
+        const spots = [];
+        for (let p = side.range[0]; p <= side.range[1]; p++) spots.push(p);
+        spots.sort(() => rng() - 0.5);
+        for (const p of spots) {
+          const [wx, wy, ch, outward] = side.wall(p);
+          // Carve straight out until floor is met; the ramp's lower landing
+          // is that first floor tile. Never touch the map border.
+          const step = (ch === '^' || ch === 'v') ? [0, Math.sign(outward - wy)] : [Math.sign(outward - wx), 0];
+          let cx = wx + step[0], cy = wy + step[1], hit = null;
+          for (let n = 0; n < 4 && cx > 0 && cy > 0 && cx < W - 1 && cy < H - 1; n++) {
+            if (at(cx, cy) !== '#') { hit = { x: cx, y: cy }; break; }
+            cx += step[0]; cy += step[1];
+          }
+          if (cx <= 0 || cy <= 0 || cx >= W - 1 || cy >= H - 1) continue;
+          if (!hit) hit = { x: cx, y: cy };
+          if (at(hit.x, hit.y) === '#') continue; // ran out of level before floor
+          // Carve the approach up to the hit.
+          let ax = wx + step[0], ay = wy + step[1];
+          while (ax !== hit.x || ay !== hit.y) { set(ax, ay, '.'); ax += step[0]; ay += step[1]; }
+          set(wx, wy, ch);
+          const i = inner(room);
+          raised = [i.x0, i.y0, i.x1, i.y1];
+          break outer;
+        }
+      }
+    }
+  }
+
   // Extraction zone in the far room; the blast doors seal every opening into
   // it, and a terminal elsewhere buys them open.
   if (mission.objective.type === 'exit') {
@@ -194,5 +243,5 @@ function tryMap(mission, index, rng) {
   take(rooms, items.ammo, t => set(t.x, t.y, 'A'));
   take(rooms, items.med, t => set(t.x, t.y, '+'));
 
-  return { map: grid.map(r => r.join('')), raised: [] };
+  return { map: grid.map(r => r.join('')), raised: raised ? [raised] : [] };
 }
