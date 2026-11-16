@@ -47,9 +47,6 @@ export default {
   "Qualifies for carbines, rifles and optics.": "カービン、ライフル、照準器が使用可能になる。",
   "Heavy Arms": "重火器",
   "Qualifies for support weapons and plate armour.": "支援火器とプレートアーマーが使用可能になる。",
-  "Technician": "技術兵",
-  "Qualifies for jump packs, servos and prototypes.": "ジャンプパック、サーボ、試作品が使用可能になる。",
-  "Field Medic": "衛生兵",
   "Qualifies for medkits; each level heals +3.": "メディキットが使用可能になる。レベルごとに回復量 +3。",
   "Vitality": "体力強化",
   "+2 maximum health per level.": "レベルごとに最大体力 +2。",
@@ -461,4 +458,7 @@ export default {
   "A shell or a flame ignores the plate entirely — under-barrel launchers and flamethrowers are the answer.": "砲弾と炎は装甲を完全に無視する——アンダーバレル・グレネードと火炎放射器が答えだ。",
   "This is the last door. Whatever you have been saving — the shells, the fire, the stims — spend it here.": "これが最後の扉だ。温存してきたもの——砲弾も炎も興奮剤も——ここで使い切れ。",
   "Cannot target there": "そこは狙えない",
+  "Medicine": "医療",
+  "Equipment": "装備",
+  "Qualifies for jump packs, coolant sleeves and servo harnesses.": "ジャンプパック、冷却スリーブ、サーボハーネスの使用資格。",
 };

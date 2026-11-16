@@ -47,9 +47,6 @@ export default {
   "Qualifies for carbines, rifles and optics.": "Допуск к карабинам, винтовкам и оптике.",
   "Heavy Arms": "Тяжёлое оружие",
   "Qualifies for support weapons and plate armour.": "Допуск к оружию поддержки и латам.",
-  "Technician": "Техник",
-  "Qualifies for jump packs, servos and prototypes.": "Допуск к прыжковым ранцам, сервоприводам и прототипам.",
-  "Field Medic": "Полевой медик",
   "Qualifies for medkits; each level heals +3.": "Допуск к аптечкам; каждый уровень даёт +3 к лечению.",
   "Vitality": "Живучесть",
   "+2 maximum health per level.": "+2 к максимальному здоровью за уровень.",
@@ -461,4 +458,7 @@ export default {
   "A shell or a flame ignores the plate entirely — under-barrel launchers and flamethrowers are the answer.": "Снаряд и огонь полностью игнорируют панцирь — подствольный гранатомёт или огнемёт и есть ответ.",
   "This is the last door. Whatever you have been saving — the shells, the fire, the stims — spend it here.": "Это последняя дверь. Что бы вы ни берегли — снаряды, огонь, стимуляторы — тратьте это здесь.",
   "Cannot target there": "Туда не целиться",
+  "Medicine": "Медицина",
+  "Equipment": "Оборудование",
+  "Qualifies for jump packs, coolant sleeves and servo harnesses.": "Открывает прыжковые ранцы, охлаждающие рукава и серво-жгуты.",
 };

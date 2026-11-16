@@ -47,9 +47,6 @@ export default {
   "Qualifies for carbines, rifles and optics.": "可使用卡宾枪、步枪和瞄具。",
   "Heavy Arms": "重武器",
   "Qualifies for support weapons and plate armour.": "可使用支援武器和板甲。",
-  "Technician": "技师",
-  "Qualifies for jump packs, servos and prototypes.": "可使用跳跃背包、伺服装置和原型武器。",
-  "Field Medic": "战地医疗",
   "Qualifies for medkits; each level heals +3.": "可使用医疗包；每级治疗量 +3。",
   "Vitality": "体魄",
   "+2 maximum health per level.": "每级最大生命 +2。",
@@ -461,4 +458,7 @@ export default {
   "A shell or a flame ignores the plate entirely — under-barrel launchers and flamethrowers are the answer.": "榴弹和火焰完全无视甲壳——下挂式榴弹发射器和喷火器就是答案。",
   "This is the last door. Whatever you have been saving — the shells, the fire, the stims — spend it here.": "这是最后一道门。无论你一直留着什么——榴弹、火焰、兴奋剂——都在这里用掉吧。",
   "Cannot target there": "无法瞄准那里",
+  "Medicine": "医学",
+  "Equipment": "装备",
+  "Qualifies for jump packs, coolant sleeves and servo harnesses.": "解锁跳跃背包、冷却套管和伺服护具。",
 };

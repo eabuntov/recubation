@@ -195,6 +195,9 @@ function sanitize(s) {
   s.squad = s.squad.filter(q => q && typeof q === 'object').map((q, i) => {
     const skills = {};
     for (const k in SKILLS) skills[k] = Math.min(int(q.skills && q.skills[k], 0), SKILLS[k].max);
+    // Levels bought above a newly lowered cap (Vitality went 6 → 3) come back
+    // as the skill points they cost, at their old price of one point each.
+    const capped = (q.skills && q.skills.vitality || 0) - skills.vitality;
     // A weapon the arsenal no longer issues goes back to stores at full price.
     if (RETIRED_WEAPONS[q.weapon]) { refunds += RETIRED_WEAPONS[q.weapon]; q = { ...q, weapon: 'carbine' }; }
     return {
@@ -203,7 +206,7 @@ function sanitize(s) {
       color: int(q.color, SQUAD_COLORS[i % SQUAD_COLORS.length]),
       level: Math.max(1, int(q.level, 1, 1)),
       xp: int(q.xp, 0),
-      sp: int(q.sp, 0),
+      sp: int(q.sp, 0) + Math.max(0, capped),
       skills,
       weapon: WEAPONS[q.weapon] ? q.weapon : 'carbine',
       armor: ARMORS[q.armor] ? q.armor : 'none',

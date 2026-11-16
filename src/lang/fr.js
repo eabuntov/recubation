@@ -47,9 +47,6 @@ export default {
   "Qualifies for carbines, rifles and optics.": "Donne accès aux carabines, fusils et optiques.",
   "Heavy Arms": "Armes lourdes",
   "Qualifies for support weapons and plate armour.": "Donne accès aux armes d'appui et aux armures lourdes.",
-  "Technician": "Technicien",
-  "Qualifies for jump packs, servos and prototypes.": "Donne accès aux réacteurs dorsaux, servomoteurs et prototypes.",
-  "Field Medic": "Infirmier de terrain",
   "Qualifies for medkits; each level heals +3.": "Donne accès aux trousses de soins ; chaque niveau soigne +3.",
   "Vitality": "Vitalité",
   "+2 maximum health per level.": "+2 de santé maximale par niveau.",
@@ -461,4 +458,7 @@ export default {
   "A shell or a flame ignores the plate entirely — under-barrel launchers and flamethrowers are the answer.": "Un obus ou une flamme ignore complètement la plaque — la réponse, ce sont les lance-grenades et lance-flammes sous-canons.",
   "This is the last door. Whatever you have been saving — the shells, the fire, the stims — spend it here.": "C'est la dernière porte. Tout ce que vous avez gardé — les obus, le feu, les stims — dépensez-le ici.",
   "Cannot target there": "Impossible de viser là",
+  "Medicine": "Médecine",
+  "Equipment": "Équipement",
+  "Qualifies for jump packs, coolant sleeves and servo harnesses.": "Ouvre l'accès aux packs de saut, manchettes de refroidissement et harnais servomoteurs.",
 };
