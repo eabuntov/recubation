@@ -72,6 +72,12 @@ const fx = new Proxy({
   get(own, name) {
     if (name in own) return own[name];
     return async (...args) => {
+      // An enemy stepping out of the dark shows itself before it acts: the
+      // shooter is revealed, then the shot — never a beam from nowhere.
+      if (battle && battle.limited && args[0] && args[0].side === 'alien') {
+        battle.updateVision();
+        view.syncVision(battle);
+      }
       if (typeof view[name] === 'function') await view[name](...args);
       // During the enemy phase, hostiles stepping in or out of sight must
       // show or vanish right away — not after the next damage number.
