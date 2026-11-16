@@ -608,15 +608,24 @@ export class View {
 
   turn(u) { /* rotation eases toward u.facing in update() */ }
 
-  // Always pull the active hostile to the centre: the no-yank margin in focus()
-  // reads as the camera failing to follow when several aliens act in a row.
-  // What the squad cannot see still moves, but the camera keeps its secret.
-  async activate(u) { if (this.battle.limited && !this.battle.seen.has(u.id)) return; this.focus(u.x, u.y, true); }
+  // Hand the camera to the active hostile without a yank when it is already
+  // roughly in frame: a hard pull only for a unit that is genuinely off the
+  // screen, so a row of neighbours acting in sequence glides instead of
+  // snapping. What the squad cannot see still moves unseen.
+  async activate(u) {
+    if (this.battle.limited && !this.battle.seen.has(u.id)) return;
+    const p = this.pos(u.x, u.y).project(this.camera);
+    this.focus(u.x, u.y, Math.abs(p.x) > 0.85 || Math.abs(p.y) > 0.75);
+  }
 
   async step(u, from, to) {
     const o = this.objs.get(u.id);
     const a = this.pos(from.x, from.y), b = this.pos(to.x, to.y);
     if (u.side === 'marine') { sfx.step(); this.syncLabel(o); } else sfx.skitter();
+    // Follow a hostile's run across the room: the soft focus only nudges once
+    // the runner leaves the centre band, so the camera tracks the middle of
+    // the path instead of watching its start point.
+    if (u.side === 'alien') this.focus(to.x, to.y);
     await this.tween(u.side === 'marine' ? 150 : 115, k => {
       o.group.position.lerpVectors(a, b, k);
       o.group.position.y += Math.sin(k * Math.PI) * 0.07;
