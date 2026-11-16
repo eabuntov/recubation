@@ -688,6 +688,8 @@ export class Battle {
     for (const m of this.marines()) {
       m.ap = m.maxAp;
       m.guard = false;
+      m.rallied = false;
+      m.hurt = false;
       m.weapon.heat = Math.max(0, m.weapon.heat - m.weapon.cool);
       m.weapon.streak = 0;
     }
@@ -729,7 +731,12 @@ export class Battle {
       const from = { x: u.x, y: u.y };
       u.facing = st.d; u.x = st.x; u.y = st.y; u.ap -= 1; u.moved = true;
       await this.fx.step(u, from, st);
-      if (u.side === 'marine') { await this._pickup(u); this._checkEnd(); this._markSightings(u); }
+      if (u.side === 'marine') {
+        await this._pickup(u);
+        this._checkEnd();
+        this._markSightings(u);
+        this._rally(u);
+      }
       else {
         // The brood does not read minefield markings.
         if (this.mines.has(key(st.x, st.y))) await this._detonate(st.x, st.y);
@@ -786,6 +793,12 @@ export class Battle {
     // A hit focuses the brood's attention on whoever dealt it — and the
     // shriek carries to the creatures nearby.
     if (target.side === 'alien' && source && source.side !== 'alien') this._raise(target, source.x, source.y);
+    // Pain teaches the alacritous to move: a hit taken buys back an AP or
+    // three, once a turn.
+    if (target.side === 'marine' && !target.hurt) {
+      const al = target.soldier.skills.alacrity || 0;
+      if (al) { target.ap += al; target.hurt = true; this.fx.note(target, tr('+{n} AP', { n: al }), 'good'); }
+    }
     target.hp = Math.max(0, target.hp - dmg);
     await this.fx.damage(target, dmg, note);
     if (target.hp <= 0) await this._kill(target, source);
@@ -854,6 +867,12 @@ export class Battle {
   async _act(a) {
     const def = a.def;
     a.ap = a.maxAp; a.shots = 0; a.moved = false; a.provoked = false; a.turretShot = false;
+    // A lucky trooper's mere presence gums up the brood's footing: standing
+    // next to one costs the creature its haste, but never its last step.
+    let luck = 0;
+    for (const m of this.marines())
+      if (Math.max(Math.abs(m.x - a.x), Math.abs(m.y - a.y)) <= 1) luck = Math.max(luck, m.soldier.skills.luck || 0);
+    a.ap = Math.max(1, a.ap - luck);
     await this.fx.activate(a);
 
     // The brood hunts by sight and sound. Whatever it has not seen or heard
@@ -901,10 +920,13 @@ export class Battle {
 
   // What this alien can actually perceive right now: foes inside its sense
   // radius along a clear line. Smoke blinds the brood as readily as it blinds
-  // the squad.
+  // the squad, and Stealth-n trained troopers register from closer in — the
+  // floor keeps them from being invisible at knifepoint.
   _sensedFoes(a) {
-    return [...this.marines(), ...this.turrets()].filter(m =>
-      Math.hypot(m.x - a.x, m.y - a.y) <= ALERT.sense + 0.5 && !this.sightBlocked(a.x, a.y, m.x, m.y));
+    return [...this.marines(), ...this.turrets()].filter(m => {
+      const sense = m.side === 'marine' ? Math.max(2, ALERT.sense - 5 * (m.soldier.skills.stealth || 0)) : ALERT.sense;
+      return Math.hypot(m.x - a.x, m.y - a.y) <= sense + 0.5 && !this.sightBlocked(a.x, a.y, m.x, m.y);
+    });
   }
 
   // One alien learns where the squad is, and calls the nearest of its kin to
@@ -955,6 +977,20 @@ export class Battle {
       if (this.sightBlocked(a.x, a.y, u.x, u.y)) continue;
       this.alert.set(a.id, { x: u.x, y: u.y });
     }
+  }
+
+  // Stepping beside a leader puts a spring in the step: +1 AP per Leadership
+  // level, once a turn — the strongest leader nearby sets the pace, and the
+  // extra point can ride above the usual maximum, like a stim.
+  _rally(u) {
+    if (u.rallied) return;
+    let lead = 0;
+    for (const m of this.marines()) {
+      if (m === u) continue;
+      if (Math.max(Math.abs(m.x - u.x), Math.abs(m.y - u.y)) > 1) continue;
+      lead = Math.max(lead, m.soldier.skills.leadership || 0);
+    }
+    if (lead) { u.ap += lead; u.rallied = true; this.fx.note(u, tr('+{n} AP', { n: lead }), 'good'); }
   }
 
   // Face what this alien knows about: a foe in view, else the last place the
