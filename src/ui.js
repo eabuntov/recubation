@@ -62,6 +62,54 @@ export class UI {
     this.confirming = false;
     this.confirmYes = null;
     this.confirmNo = null;
+    this.hudFurniture();
+  }
+
+  // The action panel is furniture: drag the grip to move it, cycle its size,
+  // double-click the grip to put it back. The position survives reloads.
+  hudFurniture() {
+    const box = $('panelbox'), grip = $('panel-grip'), size = $('panel-size');
+    if (!box || !grip || !size) return;
+    const KEY = 'recubation.hud.v1';
+    const SCALES = [1, 0.85, 0.7];
+    let saved = { x: null, y: null, s: 1 };
+    try { saved = { ...saved, ...JSON.parse(localStorage.getItem(KEY) || '{}') }; } catch { /* storage unavailable */ }
+    const store = () => { try { localStorage.setItem(KEY, JSON.stringify(saved)); } catch { /* storage unavailable */ } };
+    const apply = () => {
+      box.style.setProperty('--panel-scale', saved.s);
+      size.textContent = Math.round(saved.s * 100) + '%';
+      if (saved.x != null) {
+        box.style.left = saved.x + 'px';
+        box.style.top = saved.y + 'px';
+        box.style.bottom = 'auto';
+        box.style.transform = 'none';
+      }
+    };
+    apply();
+    let drag = null;
+    grip.addEventListener('pointerdown', e => {
+      const r = box.getBoundingClientRect();
+      drag = { dx: e.clientX - r.left, dy: e.clientY - r.top };
+      grip.setPointerCapture(e.pointerId);
+      e.preventDefault();
+    });
+    grip.addEventListener('pointermove', e => {
+      if (!drag) return;
+      saved.x = Math.max(0, Math.min(window.innerWidth - box.offsetWidth, e.clientX - drag.dx));
+      saved.y = Math.max(0, Math.min(window.innerHeight - box.offsetHeight, e.clientY - drag.dy));
+      apply();
+    });
+    grip.addEventListener('pointerup', () => { if (drag) { drag = null; store(); } });
+    grip.addEventListener('dblclick', () => {
+      saved.x = saved.y = null;
+      box.style.left = box.style.top = box.style.bottom = box.style.transform = '';
+      store();
+    });
+    size.addEventListener('click', () => {
+      saved.s = SCALES[(SCALES.indexOf(saved.s) + 1) % SCALES.length] || 1;
+      apply();
+      store();
+    });
   }
 
   // ---------------------------------------------------------------- screens

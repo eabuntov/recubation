@@ -458,4 +458,6 @@ export default {
   "Limited vision": "Обмежена видимість",
   "The level layout is always drawn; hostiles show only along your troopers' lines of sight, and lost contacts leave ghosts.": "План рівня прорисований завжди; ворогів видно лише вздовж ліній погляду бійців, а втрачені контакти залишають примар.",
   "How far a hostile that spots you may call its nearest kin from. 0 means they never call.": "З якої відстані ворог, що вас помітив, може покликати найближчого родича. 0 — нікого не кличуть.",
+  "Drag the panel; double-click to reset": "Перетягніть панель; подвійний клік — повернути на місце",
+  "Panel size": "Розмір панелі",
 };

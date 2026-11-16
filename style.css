@@ -102,11 +102,27 @@ h3 { font-size: 11px; color: var(--dim); letter-spacing: 0.18em; margin: 18px 0 
 .pips.hp b.armor { background: #6fb3d9; }
 .pips.hp b.lost { background: #47242e; }
 
-#panel {
-  position: absolute; left: 50%; bottom: 12px; transform: translateX(-50%); min-width: 520px; max-width: calc(100vw - 420px);
-  background: var(--panel); border: 1px solid var(--line); padding: 10px 14px; display: flex; gap: 18px; align-items: stretch;
+/* The action panel is the player's furniture: a grip to drag it anywhere, a
+   size button to cycle 100/85/70%, and a stored position between sessions. */
+#panelbox {
+  position: absolute; left: 50%; bottom: 12px; transform: translateX(-50%);
 }
-#panel:empty { display: none; }
+#panelbox:has(#panel:empty) { display: none; }
+#panel-grip {
+  position: absolute; left: -14px; top: 0; bottom: 0; width: 11px;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--panel); border: 1px solid var(--line); border-right: none;
+  color: var(--dim); font-size: 11px; cursor: grab; touch-action: none; user-select: none;
+}
+#panel-grip:hover, #panel-grip:active { color: var(--accent); border-color: var(--accent); cursor: grabbing; }
+#panel-size {
+  position: absolute; right: -32px; top: 0; padding: 3px 6px; font-size: 10px; min-width: 30px;
+}
+#panel {
+  min-width: 520px; max-width: calc(100vw - 420px);
+  background: var(--panel); border: 1px solid var(--line); padding: 10px 14px; display: flex; gap: 18px; align-items: stretch;
+  transform: scale(var(--panel-scale, 1)); transform-origin: 50% 100%;
+}
 #panel .who { min-width: 150px; }
 #panel .who b { font-size: 15px; letter-spacing: 0.1em; text-transform: uppercase; }
 #panel .who small { display: block; color: var(--dim); }
@@ -238,6 +254,7 @@ table.report td.num { font-family: var(--mono); }
 
 @media (max-width: 900px) {
   .cols, .armory, .help, .grid2 { grid-template-columns: 1fr; }
-  #panel { min-width: 0; max-width: calc(100vw - 24px); bottom: 70px; flex-wrap: wrap; }
+  #panelbox { bottom: 70px; }
+  #panel { min-width: 0; max-width: calc(100vw - 24px); flex-wrap: wrap; }
   #squad { width: 132px; }
 }

@@ -458,4 +458,6 @@ export default {
   "Limited vision": "限定視界",
   "The level layout is always drawn; hostiles show only along your troopers' lines of sight, and lost contacts leave ghosts.": "マップの構造は常に表示される。敵は兵士の視線上にのみ現れ、見失った敵は残像として残る。",
   "How far a hostile that spots you may call its nearest kin from. 0 means they never call.": "発見した敵が最寄りの仲間を呼べる距離。0 なら決して呼ばない。",
+  "Drag the panel; double-click to reset": "パネルをドラッグで移動；ダブルクリックで元の位置に戻す",
+  "Panel size": "パネルのサイズ",
 };

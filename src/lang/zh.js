@@ -458,4 +458,6 @@ export default {
   "Limited vision": "受限视野",
   "The level layout is always drawn; hostiles show only along your troopers' lines of sight, and lost contacts leave ghosts.": "关卡布局始终可见；敌人只出现在你士兵的视线之内，失去接触的目标会留下虚影。",
   "How far a hostile that spots you may call its nearest kin from. 0 means they never call.": "发现你的敌人最远可以从多远唤来它的近亲。0 表示它们从不呼唤。",
+  "Drag the panel; double-click to reset": "拖动面板；双击复位",
+  "Panel size": "面板大小",
 };

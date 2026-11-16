@@ -459,4 +459,6 @@ export default {
   "The level layout is always drawn; hostiles show only along your troopers' lines of sight, and lost contacts leave ghosts.": "План уровня прорисован всегда; врагов видно только вдоль линий взгляда бойцов, а потерянные контакты оставляют призраков.",
   "The level layout is always drawn; hostiles show only along your troopers' lines of sight, and lost contacts leave ghosts.": "План уровня прорисован всегда; врагов видно только вдоль линий взгляда бойцов, а потерянные контакты оставляют призраков.",
   "How far a hostile that spots you may call its nearest kin from. 0 means they never call.": "С какого расстояния заметивший вас враг может позвать ближайшего сородича. 0 — не зовут никого.",
+  "Drag the panel; double-click to reset": "Перетащите панель; двойной клик — вернуть на место",
+  "Panel size": "Размер панели",
 };

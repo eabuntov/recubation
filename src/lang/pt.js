@@ -458,4 +458,6 @@ export default {
   "Limited vision": "Visão limitada",
   "The level layout is always drawn; hostiles show only along your troopers' lines of sight, and lost contacts leave ghosts.": "A planta do nível está sempre desenhada; os hostis só aparecem ao longo das linhas de visão das tuas tropas, e os contatos perdidos deixam fantasmas.",
   "How far a hostile that spots you may call its nearest kin from. 0 means they never call.": "De que distância um hostil que te avista pode chamar seu parente mais próximo. 0 significa que nunca chamam.",
+  "Drag the panel; double-click to reset": "Arrasta o painel; duplo clique para repor",
+  "Panel size": "Tamanho do painel",
 };
