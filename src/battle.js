@@ -140,7 +140,7 @@ export class Battle {
       x: pos.x, y: pos.y, facing: this.mission.facing ?? 1,
       hp, maxHp, ap: maxAp, maxAp, alive: true, reduce: armor.reduce, guard: false,
       sight: Math.max(SIGHT, wdef.range) + bonus('rangeBonus'),
-      weapon: { id: s.weapon, def: wdef, ammo: wdef.ammo, heat: 0, streak: 0, range: wdef.range + bonus('rangeBonus'), cool: wdef.cool + bonus('coolBonus') },
+      weapon: { id: s.weapon, def: wdef, ammo: wdef.ammo, heat: 0, streak: 0, range: wdef.range + bonus('rangeBonus') + (s.skills.range || 0), cool: wdef.cool + bonus('coolBonus') },
       gear, medic: s.skills.medic || 0, kills: 0, xp: 0,
     };
     this.units.push(u);
@@ -334,14 +334,30 @@ export class Battle {
 
   // Heat the next shot actually adds. Shots fired without a pause run the
   // barrel hotter: the second costs double, the third triple, so sustained
-  // fire now ends in a lockup instead of a steady state.
-  shotHeat(u, mode) { return mode.heat * (1 + (u.weapon.streak || 0)); }
+  // fire now ends in a lockup instead of a steady state. An experienced hand
+  // keeps the bursts short and the barrel cool.
+  shotHeat(u, mode) {
+    const calm = (u.soldier && 1 - 0.25 * (u.soldier.skills.experience || 0)) || 1;
+    return mode.heat * (1 + (u.weapon.streak || 0)) * calm;
+  }
+
+  // What a fire mode takes out of the magazine. Thrift trims the long bursts;
+  // a round is saved at most, never spent from an empty belt.
+  modeAmmo(u, mode) {
+    if (!mode.ammo || !u.soldier) return mode.ammo || 0;
+    const lv = u.soldier.skills.thrift || 0;
+    if (!lv) return mode.ammo;
+    let n = mode.ammo;
+    if (mode.tag === 'burst') n -= 1;
+    if (mode.tag === 'sustained') n -= lv >= 3 ? 3 : lv >= 2 ? 2 : 0;
+    return Math.max(1, n);
+  }
 
   // Why this marine cannot use this fire mode right now, or null.
   fireProblem(u, mode) {
     if (u.ap < mode.ap) return tr('Not enough AP');
     if (mode.pattern === 'melee') return null;
-    if (u.weapon.ammo < mode.ammo) return tr('Out of ammo');
+    if (u.weapon.ammo < this.modeAmmo(u, mode)) return tr('Out of ammo');
     if (u.weapon.heat + this.shotHeat(u, mode) > u.weapon.def.maxHeat) return tr('Weapon too hot');
     return null;
   }
@@ -350,6 +366,8 @@ export class Battle {
     let dmg = mode.dmg, note = '';
     const dist = Math.hypot(target.x - attacker.x, target.y - attacker.y);
     if (mode.falloff) for (const [r, d] of mode.falloff) if (dist <= r) { dmg = d; break; }
+    const acc = (attacker.soldier && attacker.soldier.skills.accuracy) || 0;
+    if (acc) dmg += acc;
     if (mode.pattern !== 'melee' && this.heightAt(attacker.x, attacker.y) > this.heightAt(target.x, target.y)) {
       dmg += 1; note = tr('high ground');
     }
@@ -752,7 +770,7 @@ export class Battle {
     if (u.side === 'marine' && mode.pattern !== 'melee') {
       if (mode.gear) this._noise(u.x, u.y); // a launched shell is loud, barrel or no barrel
       else {
-        u.weapon.ammo -= mode.ammo;
+        u.weapon.ammo -= this.modeAmmo(u, mode);
         u.weapon.heat += this.shotHeat(u, mode);
         u.weapon.streak = (u.weapon.streak || 0) + 1;
         this._noise(u.x, u.y); // gunfire carries, walls or no walls

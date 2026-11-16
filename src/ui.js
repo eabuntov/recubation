@@ -496,7 +496,7 @@ export class UI {
           },
             h('kbd', String(i + 1)), mode.name,
             h('small', t('{dmg} dmg · {ap} AP', { dmg: mode.dmg, ap: mode.ap })
-              + (mode.ammo ? ' · ' + t('{n} rds', { n: mode.ammo }) : '')
+              + (mode.ammo ? ' · ' + t('{n} rds', { n: battle.modeAmmo(sel, mode) }) : '')
               + (mode.heat ? ` · +${battle.shotHeat(sel, mode)}°` : '')),
           );
         }),

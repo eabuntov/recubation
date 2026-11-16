@@ -50,7 +50,7 @@ export const WEAPONS = {
     desc: 'The workhorse of every boarding action since the Belt Wars.',
     modes: [
       { name: 'Single', ap: 3, dmg: 5, ammo: 1, heat: 2, pattern: 'single' },
-      { name: 'Burst', ap: 4, dmg: 10, ammo: 3, heat: 5, pattern: 'single' },
+      { name: 'Burst', ap: 4, dmg: 10, ammo: 3, heat: 5, pattern: 'single', tag: 'burst' },
     ],
   },
   marksman: {
@@ -62,8 +62,8 @@ export const WEAPONS = {
     name: 'HMG-2 Autocannon', cost: 80, req: { heavy: 1 }, range: 8, ammo: 32, maxHeat: 12, cool: 5,
     desc: 'Belt-fed and bad-tempered. Sustained fire will cook the barrel.',
     modes: [
-      { name: 'Burst', ap: 4, dmg: 11, ammo: 4, heat: 5, pattern: 'single' },
-      { name: 'Sustained', ap: 6, dmg: 21, ammo: 8, heat: 9, pattern: 'single' },
+      { name: 'Burst', ap: 4, dmg: 11, ammo: 4, heat: 5, pattern: 'single', tag: 'burst' },
+      { name: 'Sustained', ap: 6, dmg: 21, ammo: 8, heat: 9, pattern: 'single', tag: 'sustained' },
     ],
   },
 };
@@ -110,6 +110,16 @@ export const SKILLS = {
   medic: { name: 'Medicine', max: 3, cost: l => l, desc: 'Qualifies for medkits; each level heals +3.' },
   knives: { name: 'Knives', max: 3, cost: l => l, desc: 'The bayonet bites deeper: +2 damage per level, and level 3 stabs cost 1 AP less.' },
   traps: { name: 'Traps', max: 3, cost: l => l, desc: 'Qualifies for mines and smoke canisters; level 2 for auto-turrets.' },
+  range: { name: 'Range', max: 3, cost: l => l, desc: '+1 weapon range per level, optics on top.' },
+  accuracy: { name: 'Accuracy', max: 3, cost: l => l, desc: '+1 damage on every hit per level.' },
+  thrift: { name: 'Thrift', max: 3, cost: l => l, desc: 'Burst costs 1 round less; Sustained 2 less at level 2, 3 less at level 3.' },
+  experience: { name: 'Experience', max: 3, cost: l => l, desc: 'A practised hand keeps the barrel cool: heat per shot drops a quarter per level.' },
+  stealth: { name: 'Stealth', max: 3, cost: l => l, desc: 'The brood sees this trooper 5 tiles less far per level.' },
+  luck: { name: 'Luck', max: 3, cost: l => l, desc: 'Hostiles standing next to this trooper start their turn with 1 fewer AP per level.' },
+  leadership: { name: 'Leadership', max: 3, cost: l => l, desc: 'Allies beside this trooper, or stepping past, gain +1 AP per level once a turn.' },
+  alacrity: { name: 'Alacrity', max: 3, cost: l => l, desc: 'Taking a hit grants +1 AP per level, once a turn.' },
+  defense: { name: 'Defense', max: 3, cost: l => l, desc: 'Shrugs 1 (level 1) or 2 (level 2+) off each hostile attack, once a phase; from level 2, allies beside this trooper shrug 1, or 2 at level 3.' },
+  economy: { name: 'Economy', max: 3, cost: l => l, desc: '+1 requisition per own level after a won mission, per skill level; contract renewals cost 5 less per level.' },
   vitality: { name: 'Vitality', max: 3, cost: () => 1, desc: '+2 maximum health per level.' },
   reflexes: { name: 'Reflexes', max: 3, cost: () => 3, desc: '+1 action point per level.' },
 };
