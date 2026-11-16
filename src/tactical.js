@@ -101,7 +101,14 @@ export class Tactical {
         // is the tactically meaningful layer there.
         for (const [k, n] of this.reach) if (n.cost > 0 && !this.base.has(k)) this.base.set(k, 'move');
         for (const a of b.aliens()) if (b.isVisible(a) && b.preview(s, a.x, a.y, this.mode).ok) this.base.set(key(a.x, a.y), 'target');
-        for (const d of DIRS) if (!b.terminalProblem(s, s.x + d.x, s.y + d.y)) this.base.set(key(s.x + d.x, s.y + d.y), 'use');
+        for (const d of DIRS) {
+          const x = s.x + d.x, y = s.y + d.y;
+          if (!b.terminalProblem(s, x, y)) this.base.set(key(x, y), 'use');
+          // Mines can be defused and sentry guns tended from an adjacent tile.
+          if (!b.defuseProblem(s, x, y)) this.base.set(key(x, y), 'use');
+          const t = b.unitAt(x, y);
+          if (t && t.side === 'turret' && (!b.reloadTurretProblem(s, t) || !b.packTurretProblem(s, t))) this.base.set(key(x, y), 'use');
+        }
         // A corner pip on every reachable tile the current fire mode could
         // actually shoot from: where to stand, not just where to walk.
         if (!b.fireProblem(s, this.mode)) {
@@ -147,6 +154,10 @@ export class Tactical {
 
     if (u && u.side === 'turret') {
       lines.push(`<b>${esc(u.name)}</b> <span class="dim">${esc(tr('HP {hp}/{max}', { hp: u.hp, max: u.maxHp }))}</span>`, `<span class="dim">${esc(tr('{n} rds', { n: u.rounds }))}</span>`);
+      if (s && this.ready) {
+        if (!b.reloadTurretProblem(s, u)) lines.push(`<span class="good">${esc(tr('Reload ({n} AP)', { n: 5 }))}</span>`);
+        if (!b.packTurretProblem(s, u)) lines.push(`<span class="good">${esc(tr('Pack up ({n} AP)', { n: 3 }))}</span>`);
+      }
     } else if (u && u.side === 'alien') {
       lines.push(`<b>${esc(u.name)}</b> <span class="dim">${esc(tr('HP {hp}/{max}', { hp: u.hp, max: u.maxHp }))}</span>`, `<span class="dim">${esc(u.def.desc)}</span>`);
       // The hovered hostile's next activation at a glance: how far it can walk
@@ -173,7 +184,10 @@ export class Tactical {
       const when = n == null ? tr('Dormant') : n === 0 ? tr('Opens this turn') : tr('Opens in {n} turns', { n });
       lines.push(`<b>${esc(tr('Brood hatch'))}</b>`, `<span class="dim">${esc(tr('{when}. Stand on it to seal it.', { when }))}</span>`);
     } else if (t.pickup) lines.push(`<b>${esc(tr(t.pickup === 'ammo' ? 'Ammunition' : 'Aid station'))}</b>`, `<span class="dim">${esc(tr('Walk over it to use it.'))}</span>`);
-    else if (b.mines.has(k)) lines.push(`<b>${esc(tr('Proximity Mine'))}</b>`, `<span class="dim">${esc(tr('Armed. It goes off the moment a hostile steps on it.'))}</span>`);
+    else if (b.mines.has(k)) {
+      lines.push(`<b>${esc(tr('Proximity Mine'))}</b>`, `<span class="dim">${esc(tr('Armed. It goes off the moment anyone steps on it.'))}</span>`);
+      if (s && this.ready && !b.defuseProblem(s, hv.x, hv.y)) lines.push(`<span class="good">${esc(tr('Defuse ({n} AP)', { n: 3 }))}</span>`);
+    }
     else if (b.smoke.has(k)) lines.push(`<b>${esc(tr('Smoke'))}</b>`, `<span class="dim">${esc(tr('Blocks every line of sight through it, in both directions.'))}</span>`);
     else if (t.exit) lines.push(`<b>${esc(tr('Extraction zone'))}</b>`);
     else if (t.type === 'crate') lines.push(`<b>${esc(tr('Crate'))}</b>`, `<span class="dim">${esc(tr('Blocks movement, not fire.'))}</span>`);
@@ -292,6 +306,20 @@ export class Tactical {
       const problem = b.terminalProblem(s, x, y);
       if (problem) return this.ui.toast(problem);
       b.useTerminal(s, x, y);
+      return;
+    }
+    // An adjacent mine is defused with a click; a sentry gun is tended with a
+    // click and packed up with Shift+click.
+    if (b.mines.has(key(x, y))) {
+      const problem = b.defuseProblem(s, x, y);
+      if (problem) return this.ui.toast(problem);
+      b.defuse(s, x, y);
+      return;
+    }
+    if (u && u.side === 'turret') {
+      const problem = shift ? b.packTurretProblem(s, u) : b.reloadTurretProblem(s, u);
+      if (problem) return this.ui.toast(problem);
+      if (shift) b.packTurret(s, u); else b.reloadTurret(s, u);
       return;
     }
     const n = this.reach.get(key(x, y));

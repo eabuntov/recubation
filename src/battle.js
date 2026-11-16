@@ -1,7 +1,7 @@
 // Tactical rules engine. No rendering in here: every visible consequence is
 // reported through the async `fx` hooks so the same code runs headless in tests.
 
-import { DIRS, WEAPONS, ARMORS, GEAR, ALIENS, BAYONET, BASE_HP, BASE_AP, RELOAD_AP, TURRET, DIFFICULTIES, SIGHT, ALERT, CALL_RADII } from './data.js';
+import { DIRS, WEAPONS, ARMORS, GEAR, SKILLS, ALIENS, BAYONET, BASE_HP, BASE_AP, RELOAD_AP, TURRET, DIFFICULTIES, SIGHT, ALERT, CALL_RADII } from './data.js';
 import { t as tr } from './i18n.js';
 
 export const key = (x, y) => x + ',' + y;
@@ -626,7 +626,9 @@ export class Battle {
         u.facing = this.dirToward(u, tx, ty);
         u.x = tx; u.y = ty;
         await this.fx.jump(u, from, { x: tx, y: ty });
-        await this._pickup(u);
+        // Landing on an armed mine arms the jumper, so to speak.
+        if (this.mines.has(key(tx, ty))) await this._detonate(tx, ty);
+        if (u.alive && !this.over) await this._pickup(u);
         this._markSightings(u);
         this._checkEnd();
       } else if (kind === 'mine') {
@@ -654,6 +656,70 @@ export class Battle {
         // takes no rounds and heats no barrel of its own.
         await this._attack(u, tx, ty, { ...g.def.mode, ap: 0, ammo: 0, gear: true });
       }
+    });
+  }
+
+  // ---------------------------------------------------------------- field engineering
+
+  // Why this trooper cannot defuse the mine on (tx,ty), or null when they can.
+  // Defusing takes the mine out of play for good; the charge is not recovered.
+  defuseProblem(u, tx, ty) {
+    if ((u.soldier.skills.traps || 0) < 1) return tr('Needs {skill} {n}', { skill: SKILLS.traps.name, n: 1 });
+    const t = this.tile(tx, ty);
+    if (!t || !this.mines.has(key(tx, ty))) return tr('Nothing to defuse');
+    if (Math.abs(tx - u.x) + Math.abs(ty - u.y) !== 1) return tr('Stand next to it');
+    if (u.ap < 3) return tr('Not enough AP');
+    return null;
+  }
+
+  defuse(u, tx, ty) {
+    if (this.defuseProblem(u, tx, ty)) return Promise.resolve(false);
+    return this._run(async () => {
+      u.ap -= 3;
+      u.facing = this.dirToward(u, tx, ty);
+      this.mines.delete(key(tx, ty));
+      await this.fx.mineClear(this.tile(tx, ty));
+    });
+  }
+
+  // Tending a fielded sentry gun: fresh rounds for 5 AP, no ammo carried —
+  // the belts are part of the emplacement.
+  reloadTurretProblem(u, t) {
+    if (Math.abs(t.x - u.x) + Math.abs(t.y - u.y) !== 1) return tr('Stand next to it');
+    if (t.rounds >= TURRET.rounds) return tr('Magazine is full');
+    if (u.ap < 5) return tr('Not enough AP');
+    return null;
+  }
+
+  reloadTurret(u, t) {
+    if (this.reloadTurretProblem(u, t)) return Promise.resolve(false);
+    return this._run(async () => {
+      u.ap -= 5;
+      u.facing = this.dirToward(u, t.x, t.y);
+      t.rounds = TURRET.rounds;
+      await this.fx.turretFed(t, u);
+    });
+  }
+
+  // Packing a sentry gun back into the kit of a Traps-3 trooper who carries
+  // the spent launcher: the turret item gets its charge back.
+  packTurretProblem(u, t) {
+    if ((u.soldier.skills.traps || 0) < 3) return tr('Needs {skill} {n}', { skill: SKILLS.traps.name, n: 3 });
+    if (Math.abs(t.x - u.x) + Math.abs(t.y - u.y) !== 1) return tr('Stand next to it');
+    if (!u.gear.some(g => g.id === 'turret' && g.charges === 0)) return tr('Carry a spent auto-turret');
+    if (u.ap < 3) return tr('Not enough AP');
+    return null;
+  }
+
+  packTurret(u, t) {
+    if (this.packTurretProblem(u, t)) return Promise.resolve(false);
+    return this._run(async () => {
+      u.ap -= 3;
+      u.facing = this.dirToward(u, t.x, t.y);
+      const item = u.gear.find(g => g.id === 'turret' && g.charges === 0);
+      item.charges = 1;
+      t.alive = false;
+      await this.fx.turretPacked(t, u);
     });
   }
 
@@ -733,6 +799,9 @@ export class Battle {
       const from = { x: u.x, y: u.y };
       u.facing = st.d; u.x = st.x; u.y = st.y; u.ap -= 1; u.moved = true;
       await this.fx.step(u, from, st);
+      // Mines do not read uniforms: anything that walks onto one sets it off.
+      if (this.mines.has(key(st.x, st.y))) await this._detonate(st.x, st.y);
+      if (!u.alive || this.over) break;
       if (u.side === 'marine') {
         await this._pickup(u);
         this._checkEnd();
@@ -740,9 +809,6 @@ export class Battle {
         this._rally(u);
       }
       else {
-        // The brood does not read minefield markings.
-        if (this.mines.has(key(st.x, st.y))) await this._detonate(st.x, st.y);
-        if (!u.alive || this.over) break;
         this._spreadAlert(u, st.x, st.y);
         await this._reactions(u);
       }

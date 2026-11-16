@@ -839,6 +839,14 @@ export class View {
     await this.explosion(x, y, 1);
   }
 
+  async mineClear(t) {
+    const g = this.mineMeshes.get(key(t.x, t.y));
+    if (g) { this.root.remove(g); this.mineMeshes.delete(key(t.x, t.y)); }
+    sfx.clang();
+    this.floatText(this.pos(t.x, t.y, 0.9), tr('DEFUSED'), 'good');
+    await this.wait(200);
+  }
+
   async smokeSet(center, tiles) {
     for (const t of tiles) {
       if (this.smokeMeshes.has(key(t.x, t.y))) continue;
@@ -871,6 +879,25 @@ export class View {
     sfx.good();
     this.floatText(this.above(tur), tr('TURRET UP'), 'good');
     await this.tween(300, k => o.group.scale.setScalar(0.05 + 0.95 * k));
+  }
+
+  async turretFed(t) {
+    sfx.good();
+    this.floatText(this.above(t), tr('RELOADED'), 'good');
+    await this.wait(220);
+  }
+
+  // A packed-up sentry gun folds back into the kit it came from.
+  async turretPacked(t) {
+    const o = this.objs.get(t.id);
+    if (!o) return;
+    sfx.good();
+    this.floatText(this.above(t), tr('PACKED UP'), 'good');
+    o.label.remove();
+    this.pickables = this.pickables.filter(p => p !== o.hit);
+    await this.tween(300, k => o.group.scale.setScalar(Math.max(0.05, 1 - k)));
+    this.root.remove(o.group);
+    this.objs.delete(t.id);
   }
 
   async terminal(u, t, doors) {
