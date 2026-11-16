@@ -461,4 +461,10 @@ export default {
   "Medicine": "Médecine",
   "Equipment": "Équipement",
   "Qualifies for jump packs, coolant sleeves and servo harnesses.": "Ouvre l'accès aux packs de saut, manchettes de refroidissement et harnais servomoteurs.",
+  "SG-5 Assault Shotgun": "Fusil à pompe d'assaut SG-5",
+  "One fat shell per doorway. Everyone huddled beside the target catches a pellet too.": "Un gros obus par embrasure. Quiconque se blottit contre la cible ramasse aussi une grenaille.",
+  "SG-6 Double Shotgun": "Fusil à pompe double SG-6",
+  "Two barrels, reloaded as you fire: one spent shell swaps for 1 AP, both for 2.": "Deux canons, rechargés en tirant : une cartouche perdue s'échange pour 1 PA, les deux pour 2.",
+  "Doublet": "Doublé",
+  "splash": "éclaboussure",
 };

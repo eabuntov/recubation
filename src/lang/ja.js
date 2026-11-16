@@ -461,4 +461,10 @@ export default {
   "Medicine": "医療",
   "Equipment": "装備",
   "Qualifies for jump packs, coolant sleeves and servo harnesses.": "ジャンプパック、冷却スリーブ、サーボハーネスの使用資格。",
+  "SG-5 Assault Shotgun": "SG-5 アサルトショットガン",
+  "One fat shell per doorway. Everyone huddled beside the target catches a pellet too.": "射口ごとに太弾一発。目標の横に集まった者も弾丸を食らう。",
+  "SG-6 Double Shotgun": "SG-6 ダブルショットガン",
+  "Two barrels, reloaded as you fire: one spent shell swaps for 1 AP, both for 2.": "二連装銃身、撃ちながら装填：空薬莢一発の交換は 1 AP、両方で 2 AP。",
+  "Doublet": "両撃ち",
+  "splash": "跳弾",
 };

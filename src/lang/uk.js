@@ -461,4 +461,10 @@ export default {
   "Medicine": "Медицина",
   "Equipment": "Обладнання",
   "Qualifies for jump packs, coolant sleeves and servo harnesses.": "Відкриває стрибкові ранці, охолоджувальні рукави та серво-жгути.",
+  "SG-5 Assault Shotgun": "Штурмовий дробовик SG-5",
+  "One fat shell per doorway. Everyone huddled beside the target catches a pellet too.": "Один товстий набій на прохід. І всі, хто збився біля цілі докупи, ловлять дробину.",
+  "SG-6 Double Shotgun": "Двоствольний штурмовий дробовик SG-6",
+  "Two barrels, reloaded as you fire: one spent shell swaps for 1 AP, both for 2.": "Два стволи, перезарядка на ходу: один стріляний набій змінюється за 1 ОД, обидва — за 2.",
+  "Doublet": "Дуплет",
+  "splash": "розліт",
 };

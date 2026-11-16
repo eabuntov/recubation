@@ -461,4 +461,10 @@ export default {
   "Medicine": "Medizin",
   "Equipment": "Ausrüstung",
   "Qualifies for jump packs, coolant sleeves and servo harnesses.": "Qualifiziert für Sprungpacks, Kühlmanschetten und Servogeschirre.",
+  "SG-5 Assault Shotgun": "SG-5 Sturmschrotflinte",
+  "One fat shell per doorway. Everyone huddled beside the target catches a pellet too.": "Eine dicke Patrone pro Türrahmen. Wer sich am Ziel drängelt, fängt ebenfalls ein Schrotkorn.",
+  "SG-6 Double Shotgun": "SG-6 Doppelschrotflinte",
+  "Two barrels, reloaded as you fire: one spent shell swaps for 1 AP, both for 2.": "Zwei Läufe, im Feuer nachgeladen: Eine verschossene Patrone wechselt für 1 AP, beide für 2.",
+  "Doublet": "Doppelschuss",
+  "splash": "Streuung",
 };

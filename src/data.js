@@ -32,6 +32,19 @@ export const WEAPONS = {
     desc: 'Devastating at arm\'s length, a rumour at four tiles.',
     modes: [{ name: 'Blast', ap: 3, dmg: 9, falloff: [[1.5, 9], [3.2, 6], [99, 3]], ammo: 1, heat: 3, pattern: 'single' }],
   },
+  sg5: {
+    name: 'SG-5 Assault Shotgun', cost: 45, req: { heavy: 1 }, range: 4, ammo: 1, maxHeat: 6, cool: 3,
+    desc: 'One fat shell per doorway. Everyone huddled beside the target catches a pellet too.',
+    modes: [{ name: 'Single', ap: 4, dmg: 7, ammo: 1, heat: 3, pattern: 'single', splash: 1 }],
+  },
+  sg6: {
+    name: 'SG-6 Double Shotgun', cost: 60, req: { heavy: 2 }, range: 4, ammo: 2, maxHeat: 7, cool: 3, reloadPerRound: 1,
+    desc: 'Two barrels, reloaded as you fire: one spent shell swaps for 1 AP, both for 2.',
+    modes: [
+      { name: 'Single', ap: 4, dmg: 7, ammo: 1, heat: 2, pattern: 'single', splash: 1 },
+      { name: 'Doublet', ap: 4, dmg: 14, ammo: 2, heat: 4, pattern: 'single', splash: 1 },
+    ],
+  },
   rifle: {
     name: 'AR-9 Assault Rifle', cost: 65, req: { light: 2 }, range: 7, ammo: 30, maxHeat: 10, cool: 4,
     desc: 'The workhorse of every boarding action since the Belt Wars.',

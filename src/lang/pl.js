@@ -461,4 +461,10 @@ export default {
   "Medicine": "Medycyna",
   "Equipment": "Sprzęt",
   "Qualifies for jump packs, coolant sleeves and servo harnesses.": "Uprawnia do pleców odrzutowych, rękawów chłodzących i uprzęży serwo.",
+  "SG-5 Assault Shotgun": "Strzelbova szturmowa SG-5",
+  "One fat shell per doorway. Everyone huddled beside the target catches a pellet too.": "Jeden gruby nabój na przedsionek. Każdy, kto zbije się przy celu, też łapie śrut.",
+  "SG-6 Double Shotgun": "Strzelboowa podwójna SG-6",
+  "Two barrels, reloaded as you fire: one spent shell swaps for 1 AP, both for 2.": "Dwie lufy, przeładowanie w trakcie ostrzału: jeden wystrzelony nabój wymienia się za 1 PK, oba za 2.",
+  "Doublet": "Dublet",
+  "splash": "rozprysk",
 };

@@ -411,6 +411,17 @@ export class Battle {
         hits.push({ unit: v, ...this.calcDamage(u, v, mode) });
       }
     }
+    // Shotgun spread: hostiles crowded beside the target tile each catch a
+    // pellet. Friendlies are safe — the spread goes forward, not sideways.
+    if (mode.splash) {
+      for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) {
+        if (!dx && !dy) continue;
+        const v = this.unitAt(tx + dx, ty + dy);
+        if (!v || v === u || v.side !== 'alien') continue;
+        if (hits.some(h => h.unit === v)) continue;
+        hits.push({ unit: v, dmg: Math.max(1, mode.splash - v.reduce), note: tr('splash') });
+      }
+    }
     return hits;
   }
 
@@ -467,8 +478,13 @@ export class Battle {
     this.fx.refresh();
   }
 
-  // Swapping magazines costs RELOAD_AP unless the weapon is slower about it.
-  reloadAp(u) { return u.weapon.def.reloadAp ?? RELOAD_AP; }
+  // Swapping magazines costs RELOAD_AP unless the weapon is slower about it;
+  // break-open shotguns pay per spent barrel instead of per magazine.
+  reloadAp(u) {
+    const def = u.weapon.def;
+    if (def.reloadPerRound) return def.reloadPerRound * (def.ammo - u.weapon.ammo);
+    return def.reloadAp ?? RELOAD_AP;
+  }
 
   // Why this trooper cannot swap magazines right now, or null when they can.
   reloadProblem(u) {

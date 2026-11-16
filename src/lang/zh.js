@@ -461,4 +461,10 @@ export default {
   "Medicine": "医学",
   "Equipment": "装备",
   "Qualifies for jump packs, coolant sleeves and servo harnesses.": "解锁跳跃背包、冷却套管和伺服护具。",
+  "SG-5 Assault Shotgun": "SG-5 突击霰弹枪",
+  "One fat shell per doorway. Everyone huddled beside the target catches a pellet too.": "每个门口一发大号弹。挤在目标旁边的敌人也会挨一颗弹丸。",
+  "SG-6 Double Shotgun": "SG-6 双管突击霰弹枪",
+  "Two barrels, reloaded as you fire: one spent shell swaps for 1 AP, both for 2.": "双管齐下，边打边装：换一发耗弹花 1 AP，换两发花 2。",
+  "Doublet": "双发",
+  "splash": "溅射",
 };

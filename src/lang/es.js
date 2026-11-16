@@ -461,4 +461,10 @@ export default {
   "Medicine": "Medicina",
   "Equipment": "Equipamiento",
   "Qualifies for jump packs, coolant sleeves and servo harnesses.": "Habilita para mochilas de salto, manguitos refrigerantes y arneses servo.",
+  "SG-5 Assault Shotgun": "Escopeta de asalto SG-5",
+  "One fat shell per doorway. Everyone huddled beside the target catches a pellet too.": "Un cartucho gordo por puerta. Quien se apiñe junto al objetivo también recibe un perdigón.",
+  "SG-6 Double Shotgun": "Escopeta doble SG-6",
+  "Two barrels, reloaded as you fire: one spent shell swaps for 1 AP, both for 2.": "Dos cañones, recargados mientras disparas: un cartucho gastado se cambia por 1 PA, ambos por 2.",
+  "Doublet": "Doble",
+  "splash": "dispersión",
 };
