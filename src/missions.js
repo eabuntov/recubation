@@ -19,6 +19,7 @@ export const MISSIONS = [
     name: 'Cold Start',
     squad: 2,
     reward: 40,
+    turnLimit: 15,
     objective: { type: 'eliminate' },
     brief: [
       'Halcyon Deep went dark eleven hours ago. The last transmission from the ice-moon colony was a maintenance request for the bore shaft, then a lot of screaming.',
@@ -47,6 +48,7 @@ export const MISSIONS = [
     name: 'Pressure Doors',
     squad: 3,
     reward: 50,
+    turnLimit: 15,
     objective: { type: 'exit' },
     brief: [
       'The colony locked itself down when the breach alarms tripped. The habitat ring is behind a blast door and the override is in the pump room.',
@@ -76,6 +78,7 @@ export const MISSIONS = [
     name: 'The Gantry',
     squad: 3,
     reward: 60,
+    turnLimit: 15,
     objective: { type: 'eliminate' },
     brief: [
       'The ore-sorting hall. A maintenance gantry runs the length of the north wall and the things have learned to use it.',
@@ -138,6 +141,7 @@ export const MISSIONS = [
     squad: 4,
     reward: 80,
     scaling: { hp: 1.1 },
+    turnLimit: 15,
     objective: { type: 'eliminate' },
     brief: [
       'Survivors report something new in the workshops: slow, plated, and entirely unbothered by rifle fire.',
@@ -198,6 +202,7 @@ export const MISSIONS = [
     squad: 3,
     reward: 95,
     scaling: { hp: 1.1 },
+    turnLimit: 15,
     objective: { type: 'eliminate' },
     brief: [
       'The maintenance crawlspace behind the reactor hall is where the stalkers den. The engineers who took that route never came out.',
