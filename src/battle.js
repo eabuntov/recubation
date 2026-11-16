@@ -580,6 +580,7 @@ export class Battle {
         u.x = tx; u.y = ty;
         await this.fx.jump(u, from, { x: tx, y: ty });
         await this._pickup(u);
+        this._markSightings(u);
         this._checkEnd();
       } else if (kind === 'mine') {
         u.facing = this.dirToward(u, tx, ty);
@@ -677,7 +678,7 @@ export class Battle {
       const from = { x: u.x, y: u.y };
       u.facing = st.d; u.x = st.x; u.y = st.y; u.ap -= 1; u.moved = true;
       await this.fx.step(u, from, st);
-      if (u.side === 'marine') { await this._pickup(u); this._checkEnd(); }
+      if (u.side === 'marine') { await this._pickup(u); this._checkEnd(); this._markSightings(u); }
       else {
         // The brood does not read minefield markings.
         if (this.mines.has(key(st.x, st.y))) await this._detonate(st.x, st.y);
@@ -870,6 +871,18 @@ export class Battle {
     }
   }
 
+  // A trooper moving where the brood can see keeps teaching it where the
+  // squad is: whoever holds them in sense range right now marks this tile, so
+  // a marine breaking line of sight is chased to the last tile they were seen
+  // on — not to where they stood a whole turn ago.
+  _markSightings(u) {
+    for (const a of this.aliens()) {
+      if (Math.hypot(u.x - a.x, u.y - a.y) > ALERT.sense + 0.5) continue;
+      if (this.sightBlocked(a.x, a.y, u.x, u.y)) continue;
+      this.alert.set(a.id, { x: u.x, y: u.y });
+    }
+  }
+
   // Face what this alien knows about: a foe in view, else the last place the
   // brood caught wind of the squad, else wherever it was looking.
   _faceThreat(a) {
@@ -885,19 +898,25 @@ export class Battle {
     if (tx != null) a.facing = this.dirToward(a, tx, ty);
   }
 
-  // Nothing sensed, nothing heard: the creature shuffles about and re-tastes
-  // the air. It never wanders onto the brood's own hatches.
+  // Nothing sensed, nothing heard: the creature picks a bearing and walks it
+  // — up to four tiles, swerving around whatever blocks it, and never onto
+  // the brood's own hatches. It stops the moment anything comes into view.
   async _mill(a) {
-    const steps = Math.floor(Math.random() * 3);
-    for (let i = 0; i < steps && a.alive && !this.over && a.ap >= 1; i++) {
-      const dirs = [0, 1, 2, 3].sort(() => Math.random() - 0.5);
-      for (const d of dirs) {
+    let dir = Math.floor(Math.random() * 4);
+    for (let steps = 0; steps < 4 && a.alive && !this.over && a.ap >= 1; steps++) {
+      if (this._sensedFoes(a).length) return;
+      let moved = false;
+      // Straight on if possible, then either side, and only then about-turn.
+      for (const d of [dir, (dir + 1) % 4, (dir + 3) % 4, (dir + 2) % 4]) {
         const x = a.x + DIRS[d].x, y = a.y + DIRS[d].y;
         if (this.stepOk(a.x, a.y, d) && !this.unitAt(x, y) && !this.tiles[y][x].hatch) {
           await this._move(a, [{ x, y, d }]);
+          dir = d;
+          moved = true;
           break;
         }
       }
+      if (!moved) return; // boxed in: stand and taste the air
     }
   }
 
