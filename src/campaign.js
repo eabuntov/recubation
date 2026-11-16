@@ -1,6 +1,6 @@
 // Campaign state: roster, progression, requisition, persistence.
 
-import { WEAPONS, ARMORS, GEAR, SKILLS, SOLDIER_NAMES, SQUAD_COLORS, BASE_HP, xpForLevel, meetsReq, DIFFICULTIES, CALL_RADII, ALERT, RETIRED_WEAPONS } from './data.js';
+import { WEAPONS, ARMORS, GEAR, SKILLS, SOLDIER_NAMES, SQUAD_COLORS, BASE_HP, xpForLevel, meetsReq, DIFFICULTIES, CALL_RADII, ALERT, RETIRED_WEAPONS, CLONE } from './data.js';
 import { MISSIONS } from './missions.js';
 import { t } from './i18n.js';
 
@@ -13,7 +13,7 @@ export function newCampaign(difficulty = 'normal', limitedVision = false, callRa
     const j = Math.floor(Math.random() * (i + 1));
     [names[i], names[j]] = [names[j], names[i]];
   }
-  const state = { mission: 0, difficulty: DIFFICULTIES[difficulty] ? difficulty : 'normal', limitedVision: !!limitedVision, callRadius: CALL_RADII.includes(callRadius) ? callRadius : ALERT.spread, rp: 0, squad: [], fallen: [], names, nextId: 1, complete: false };
+  const state = { mission: 0, difficulty: DIFFICULTIES[difficulty] ? difficulty : 'normal', limitedVision: !!limitedVision, callRadius: CALL_RADII.includes(callRadius) ? callRadius : ALERT.spread, rp: 0, squad: [], fallen: [], names, nextId: 1, complete: false, clone: null, maps: {} };
   // The standing strength: five slots, or whatever a mission fields if it
   // fields more. The bench is not asked for — it fills on its own.
   const size = Math.max(5, MISSIONS[0] ? MISSIONS[0].squad : 4);
@@ -89,6 +89,46 @@ export function demobilize(state, s) {
   topUp(state);
 }
 
+// The clone: bought once for the campaign, then leased per drop. It fields
+// as a tenth of a trooper on paper and a whole extra body on the board.
+export function buyClone(state) {
+  if (state.clone) return t('Only one clone at a time');
+  if (state.rp < CLONE.cost) return t('Not enough requisition');
+  state.rp -= CLONE.cost;
+  state.clone = { paid: false, weapon: 'carbine', gear: new Array(GEAR_SLOTS).fill(null) };
+  return null;
+}
+
+export function payClone(state) {
+  if (!state.clone || state.clone.paid) return null;
+  if (state.rp < CLONE.fee) return t('Not enough requisition');
+  state.rp -= CLONE.fee;
+  state.clone.paid = true;
+  return null;
+}
+
+// What the clone looks like to the rules engine for one drop. Its prod hits
+// harder the deeper the campaign goes; nothing else about it ever changes.
+export function cloneDrop(state) {
+  return {
+    clone: true, id: CLONE.id, name: t('Clone'), level: 1, xp: 0, sp: 0,
+    skills: {}, weapon: state.clone.weapon, armor: 'none', gear: state.clone.gear,
+    hp: CLONE.hp, missed: 0, prodDmg: CLONE.prod(state.mission),
+  };
+}
+
+// A live view of the clone for the armoury: gear writes straight through (the
+// array is shared), the weapon is written back by the caller after a swap.
+// It is rated for everything — the vat did not skip the handling course.
+export function cloneView(state) {
+  return {
+    clone: true, id: CLONE.id, name: t('Clone'), level: 1, xp: 0, sp: 0,
+    skills: { light: 3, heavy: 3, tech: 3, medic: 0, knives: 0, traps: 3 },
+    weapon: state.clone.weapon, armor: 'none', gear: state.clone.gear,
+    kills: 0, missions: 0,
+  };
+}
+
 // XP cash-in shared by mission debriefs (and, quietly, by the debug cheats):
 // levels resolve immediately, each one paying two skill points.
 export function grantXp(state, s, n) {
@@ -112,6 +152,8 @@ export function applyResult(state, summary) {
         report.rows.push({ soldier: s, kills: r.kills, alive: false, xp: 0, levels: 0 });
       }
       buryDead(state, report, mission);
+      // A real wipe takes the leased hardware down with the squad.
+      if (state.clone && summary.marines.some(r => r.id === CLONE.id && !r.alive)) state.clone = null;
     }
     return report;
   }
@@ -131,6 +173,9 @@ export function applyResult(state, summary) {
     report.rows.push(row);
   }
   buryDead(state, report, mission);
+  // The clone is hardware: a simulation failure puts it back in its bay, a
+  // won mission simply bills the next drop.
+  if (state.clone && summary.marines.some(r => r.id === CLONE.id && !r.alive)) state.clone = null;
   // Wounds carry over: survivors keep whatever they walked out with, and
   // everyone heals a quarter of their maximum health per mission boundary —
   // plus another quarter for every mission they sat out on the bench.
@@ -258,6 +303,16 @@ function sanitize(s) {
     };
   });
   s.rp += refunds;
+  // The leased clone: hardware data only, arriving unpaid for its next drop.
+  s.clone = s.clone && typeof s.clone === 'object'
+    ? {
+        paid: false,
+        weapon: WEAPONS[s.clone.weapon] ? s.clone.weapon : 'carbine',
+        gear: Array.from({ length: GEAR_SLOTS }, (_, g) => Array.isArray(s.clone.gear) && GEAR[s.clone.gear[g]] ? s.clone.gear[g] : null),
+      }
+    : null;
+  // Map rolls per mission (see genmap.js); anything odd resets to none.
+  s.maps = s.maps && typeof s.maps === 'object' && !Array.isArray(s.maps) ? s.maps : {};
   if (s.mission >= MISSIONS.length) s.complete = true;
   return s;
 }

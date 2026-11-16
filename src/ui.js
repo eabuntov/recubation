@@ -1,8 +1,8 @@
 // DOM interface: menus, armoury, debrief and the tactical HUD.
 
-import { WEAPONS, ARMORS, GEAR, SKILLS, RANKS, BASE_HP, BASE_AP, rankColor, xpForLevel, meetsReq, reqText, DIFFICULTIES, ALERT, CALL_RADII } from './data.js';
+import { WEAPONS, ARMORS, GEAR, SKILLS, RANKS, BASE_HP, BASE_AP, CLONE, rankColor, xpForLevel, meetsReq, reqText, DIFFICULTIES, ALERT, CALL_RADII } from './data.js';
 import { objectiveText, MISSIONS } from './missions.js';
-import { GEAR_SLOTS, maxHpOf, canRaise, raiseSkill, skillCost, equip, equipProblem, byLevel, contractDue, contractPrice } from './campaign.js';
+import { GEAR_SLOTS, maxHpOf, canRaise, raiseSkill, skillCost, equip, equipProblem, byLevel, contractDue, contractPrice, cloneView } from './campaign.js';
 import { byUnit } from './battle.js';
 import { sfx } from './audio.js';
 import { t, LANGS, savedLang, browserLang } from './i18n.js';
@@ -199,8 +199,9 @@ export class UI {
   }
 
   // `picked` is the set of soldier ids marching on this drop; clicking a card
-  // toggles them through onPick (up to what the mission fields).
-  staging(state, mission, fresh, { onDeploy, onArmory, onQuit, onPay, onDemobilize }, picked = new Set(), onPick = null) {
+  // toggles them through onPick (up to what the mission fields, minus a slot
+  // for the clone when it rides along).
+  staging(state, mission, fresh, { onDeploy, onArmory, onQuit, onPay, onDemobilize, onBuyClone, onPayClone, onToggleClone }, picked = new Set(), onPick = null, clonePicked = false, cap = mission.squad) {
     const unspent = state.squad.some(s => s.sp > 0);
     const diff = DIFFICULTIES[state.difficulty] || DIFFICULTIES.normal;
     this.show(h('div.sheet',
@@ -228,7 +229,7 @@ export class UI {
               style: { '--c': hex(rankColor(s.level)) },
               onclick: onPick && click(() => {
                 if (unpaid) return this.toast(t('Contract unpaid'));
-                if (!on && picked.size >= mission.squad) return this.toast(t('The drop ship takes at most {n}.', { n: mission.squad }));
+                if (!on && picked.size >= cap) return this.toast(t('The drop ship takes at most {n}.', { n: cap }));
                 onPick(s.id, !on);
               }),
             },
@@ -246,6 +247,21 @@ export class UI {
               ),
             );
           })),
+          h('div.clonebox', state.clone
+            ? [
+              h('div.card.pick' + (clonePicked ? '.sel' : ''), {
+                style: { '--c': '#9aa7b0' },
+                onclick: onToggleClone && click(() => onToggleClone()),
+              },
+                h('div.row',
+                  h('span.name', t('Clone')),
+                  state.clone.paid ? h('span.badge.new', t('PAID')) : h('span.badge.unpaid', t('UNPAID'))),
+                h('div.kit', `${t('HP {hp}/{max} · {ap} AP', { hp: CLONE.hp, max: CLONE.hp, ap: CLONE.ap })} · ${t('Prod: {n} dmg', { n: CLONE.prod(state.mission) })}`),
+                h('div.kit', WEAPONS[state.clone.weapon].name + (state.clone.gear.filter(Boolean).length ? ' · ' + state.clone.gear.filter(Boolean).map(g => GEAR[g].name).join(', ') : '')),
+              ),
+              !state.clone.paid && onPayClone && btn(t('Pay for 1 battle ({n})', { n: CLONE.fee }), () => onPayClone(), '', { style: { marginTop: '6px' } }),
+            ]
+            : [onBuyClone && btn(t('Buy clone ({n})', { n: CLONE.cost }), () => onBuyClone(), '', { disabled: state.rp < CLONE.cost, style: { marginTop: '6px' } })]),
           state.fallen.length > 0 && h('p', { style: { marginTop: '14px', fontSize: '12px' } }, t('In memoriam: {names}.', { names: state.fallen.map(f => f.name).join(', ') })),
         ),
       ),
@@ -253,15 +269,22 @@ export class UI {
         btn(t('Main menu'), onQuit),
         h('span.spacer'),
         btn(t(unspent ? 'Armoury · points to spend' : 'Armoury'), onArmory, unspent ? 'on' : ''),
-        btn(t('Deploy'), onDeploy, 'primary', { disabled: !picked.size }),
+        btn(t('Deploy'), onDeploy, 'primary', { disabled: !picked.size && !clonePicked }),
       ),
     ));
   }
 
   armory(state, { onBack, onChange }, pickId, scroll = 0) {
-    const s = state.squad.find(q => q.id === pickId) || state.squad[0];
+    // The leased clone gets a card of its own: gun and gear only, no
+    // training, no armour — nothing about it ever improves but its prod.
+    const isClone = pickId === CLONE.id && !!state.clone;
+    const s = (isClone && cloneView(state)) || state.squad.find(q => q.id === pickId) || state.squad[0];
     // Rebuilding the sheet after a change must not throw the player back to the top of the list.
-    const redraw = () => { onChange(); this.armory(state, { onBack, onChange }, s.id, this.screen.querySelector('.body').scrollTop); };
+    const redraw = () => {
+      if (isClone) state.clone.weapon = s.weapon; // the view object is not the lease
+      onChange();
+      this.armory(state, { onBack, onChange }, s.id, this.screen.querySelector('.body').scrollTop);
+    };
     const st = soldierStats(s);
 
     const itemRow = (table, kind, id) => {
@@ -303,19 +326,28 @@ export class UI {
         h('div.roster', [...state.squad].sort(byLevel).map(q => h('div.card' + (q === s ? '.sel' : ''), { style: { '--c': hex(rankColor(q.level)) }, onclick: click(() => this.armory(state, { onBack, onChange }, q.id)) },
           h('div.row', h('span.name', q.name), q.sp > 0 && h('span.badge', t('{n} SP', { n: q.sp }))),
           h('div.num', `${rankOf(q)} · ${t('L{n}', { n: q.level })}`),
-        ))),
+        )),
+        state.clone && h('div.card' + (isClone ? '.sel' : ''), { style: { '--c': '#9aa7b0' }, onclick: click(() => this.armory(state, { onBack, onChange }, CLONE.id)) },
+          h('div.row', h('span.name', t('Clone'))))),
         h('div',
-          h('div.stats',
-            h('span', h('b', s.name), ` · ${rankOf(s)}`),
-            h('span', t('Level') + ' ', h('b', s.level)),
-            h('span', t('XP') + ' ', h('b', s.xp), ` / ${xpForLevel(s.level)}`),
-            h('span', t('Health') + ' ', h('b', st.hp)),
-            h('span', t('AP') + ' ', h('b', st.ap)),
-            h('span', t('Kills') + ' ', h('b', s.kills)),
-            h('span', t('Skill points') + ' ', h('b', { style: { color: s.sp ? 'var(--warn)' : '' } }, s.sp)),
-          ),
-          h('h3', t('Training')),
-          Object.keys(SKILLS).map(id => {
+          isClone
+            ? h('div.stats',
+              h('span', h('b', s.name)),
+              h('span', t('Health') + ' ', h('b', CLONE.hp)),
+              h('span', t('AP') + ' ', h('b', CLONE.ap)),
+              h('span', t('Prod') + ' ', h('b', CLONE.prod(state.mission)), ' ' + t('dmg')),
+            )
+            : h('div.stats',
+              h('span', h('b', s.name), ` · ${rankOf(s)}`),
+              h('span', t('Level') + ' ', h('b', s.level)),
+              h('span', t('XP') + ' ', h('b', s.xp), ` / ${xpForLevel(s.level)}`),
+              h('span', t('Health') + ' ', h('b', st.hp)),
+              h('span', t('AP') + ' ', h('b', st.ap)),
+              h('span', t('Kills') + ' ', h('b', s.kills)),
+              h('span', t('Skill points') + ' ', h('b', { style: { color: s.sp ? 'var(--warn)' : '' } }, s.sp)),
+            ),
+          !isClone && h('h3', t('Training')),
+          !isClone && Object.keys(SKILLS).map(id => {
             const sk = SKILLS[id], lvl = s.skills[id], maxed = lvl >= sk.max;
             return h('div.skill',
               h('span', sk.name),
@@ -327,7 +359,7 @@ export class UI {
           h('div.grid2',
             h('div', h('h3', t('Weapon')), Object.keys(WEAPONS).map(id => itemRow(WEAPONS, 'weapon', id))),
             h('div',
-              h('h3', t('Armour')), Object.keys(ARMORS).map(id => itemRow(ARMORS, 'armor', id)),
+              !isClone && h('h3', t('Armour')), !isClone && Object.keys(ARMORS).map(id => itemRow(ARMORS, 'armor', id)),
               h('h3', t('Gear')), Array.from({ length: GEAR_SLOTS }, (_, i) => slot(i)),
             ),
           ),

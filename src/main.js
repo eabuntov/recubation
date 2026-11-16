@@ -5,7 +5,7 @@ import { UI } from './ui.js';
 import { Tactical } from './tactical.js';
 import { Battle } from './battle.js';
 import { MISSIONS } from './missions.js';
-import { newCampaign, currentMission, topUp, applyResult, save, load, clearSave, byLevel, contractDue, payContract, demobilize } from './campaign.js';
+import { newCampaign, currentMission, topUp, applyResult, save, load, clearSave, byLevel, contractDue, payContract, demobilize, buyClone, payClone, cloneDrop, cloneView } from './campaign.js';
 import { initCheats } from './cheats.js';
 import { sfx, unlock, ambience } from './audio.js';
 import { t, initLang, setLang } from './i18n.js';
@@ -128,6 +128,7 @@ function title() {
 }
 
 let deployIds = null; // soldier ids picked for the next drop; null = best of the roster
+let deployClone = false; // whether the leased clone takes a slot on the next drop
 let freshIds = new Set(); // recently hired, for the NEW badge
 
 function staging() {
@@ -137,13 +138,17 @@ function staging() {
   const mission = currentMission(state);
   // Replacements walk off the drop ship on their own now; badge them NEW.
   for (const s of topUp(state)) freshIds.add(s.id);
+  // An unpaid clone cannot take a slot; a missing one ends the lease talk.
+  if (!state.clone || !state.clone.paid) deployClone = false;
   save(state);
   // Keep what the player last picked; bury whoever has since been lost, drop
   // whoever is off-contract, and fall back to the top of the roster.
   const deployable = s => !contractDue(s);
-  const top = () => [...state.squad].filter(deployable).sort(byLevel).slice(0, mission.squad).map(s => s.id);
+  const cap = mission.squad - (deployClone ? 1 : 0);
+  const top = () => [...state.squad].filter(deployable).sort(byLevel).slice(0, cap).map(s => s.id);
   const alive = new Set(state.squad.filter(deployable).map(s => s.id));
   deployIds = new Set([...(deployIds || top())].filter(id => alive.has(id)));
+  while (deployIds.size > cap) deployIds.delete([...deployIds].pop());
   if (!deployIds.size) deployIds = new Set(top());
   ui.staging(state, mission, state.squad.filter(s => freshIds.has(s.id)), {
     onDeploy: () => deploy(state.squad.filter(s => deployIds.has(s.id))),
@@ -151,7 +156,15 @@ function staging() {
     onQuit: () => { deployIds = null; title(); },
     onPay: s => { const err = payContract(state, s); if (err) ui.toast(err); save(state); staging(); },
     onDemobilize: s => { demobilize(state, s); save(state); staging(); },
-  }, deployIds, (id, add) => { add ? deployIds.add(id) : deployIds.delete(id); staging(); });
+    onBuyClone: () => { const err = buyClone(state); if (err) ui.toast(err); save(state); staging(); },
+    onPayClone: () => { const err = payClone(state); if (err) ui.toast(err); save(state); staging(); },
+    onToggleClone: () => {
+      if (!state.clone) return;
+      if (!state.clone.paid) return ui.toast(t('Pay for the drop first'));
+      deployClone = !deployClone;
+      staging();
+    },
+  }, deployIds, (id, add) => { add ? deployIds.add(id) : deployIds.delete(id); staging(); }, deployClone, cap);
 }
 
 function armory() {
@@ -163,11 +176,18 @@ async function deploy(soldiers) {
   freshIds.clear();
   const squad = soldiers && soldiers.length
     ? soldiers
-    : [...state.squad].sort(byLevel).slice(0, mission.squad);
+    : [...state.squad].filter(s => !contractDue(s)).sort(byLevel).slice(0, mission.squad);
+  const drop = [...squad];
+  // The clone takes a slot, its fee burns with the drop.
+  if (deployClone && state.clone && state.clone.paid) {
+    state.clone.paid = false;
+    drop.push(cloneDrop(state));
+    deployClone = false;
+  }
   ui.hide();
   document.body.classList.remove('menu');
   view.attract = false;
-  battle = new Battle(mission, squad, fx, state.difficulty, state.limitedVision, state.callRadius);
+  battle = new Battle(mission, drop, fx, state.difficulty, state.limitedVision, state.callRadius);
   view.load(battle);
   tactical.start(battle);
   ui.hudShow(true);

@@ -227,6 +227,11 @@ export const ALIENS = {
 // Sentry gun fielded by the turret gear (built in Battle.addTurret).
 export const TURRET = { hp: 8, rounds: 6, range: 5, dmg: 4 };
 
+// The vat-grown helper a rich commander can lease: bought once, paid for per
+// drop, half-sized, four health, eleven action points, a shock prod that
+// hardens every ten missions, and no head for learning anything.
+export const CLONE = { id: -1, cost: 50, fee: 15, hp: 4, ap: 11, prod: mission => 3 + Math.floor(mission / 10) };
+
 export const SOLDIER_NAMES = [
   'Vega', 'Okafor', 'Lindqvist', 'Marrow', 'Tanaka', 'Reyes', 'Kowal', 'Idris', 'Brandt', 'Solano',
   'Petrov', 'Achebe', 'Nakai', 'Dufresne', 'Halloran', 'Moreau', 'Zielinski', 'Castellan', 'Ibarra', 'Quist',

@@ -495,4 +495,13 @@ export default {
   "Demobilize": "Desmobilizar",
   "Demobilized": "Desmobilizado",
   "Past the fifth level troopers serve on contracts: a renewal buys three missions ahead, a rested bench burns none, and an unpaid trooper waits on the bench until command pays up or demobilizes them with a full kit refund.": "Depois do quinto nível, os soldados servem por contrato: uma renovação compra três missões adiantadas, o banco não gasta nenhuma, e um soldado não pago espera no banco até o comando pagar ou desmobilizá-lo com reembolso total do equipamento.",
+  "Clone": "Clone",
+  "Prod": "Choque",
+  "Prod: {n} dmg": "Choque: {n} de dano",
+  "dmg": "de dano",
+  "PAID": "PAGO",
+  "Only one clone at a time": "Apenas um clone de cada vez",
+  "Pay for the drop first": "Paga primeiro o desembarque",
+  "Pay for 1 battle ({n})": "Pagar 1 batalha ({n})",
+  "Buy clone ({n})": "Comprar clone ({n})",
 };

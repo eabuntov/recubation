@@ -1,7 +1,7 @@
 // Tactical rules engine. No rendering in here: every visible consequence is
 // reported through the async `fx` hooks so the same code runs headless in tests.
 
-import { DIRS, WEAPONS, ARMORS, GEAR, SKILLS, ALIENS, BAYONET, BASE_HP, BASE_AP, RELOAD_AP, TURRET, DIFFICULTIES, SIGHT, ALERT, CALL_RADII } from './data.js';
+import { DIRS, WEAPONS, ARMORS, GEAR, SKILLS, ALIENS, BAYONET, BASE_HP, BASE_AP, RELOAD_AP, TURRET, CLONE, DIFFICULTIES, SIGHT, ALERT, CALL_RADII } from './data.js';
 import { t as tr } from './i18n.js';
 
 export const key = (x, y) => x + ',' + y;
@@ -128,6 +128,7 @@ export class Battle {
   // ---------------------------------------------------------------- setup
 
   addMarine(s, pos, slot) {
+    if (s.clone) return this._addClone(s, pos, slot);
     const wdef = WEAPONS[s.weapon], armor = ARMORS[s.armor];
     const gear = (s.gear || []).filter(Boolean).map(id => ({ id, def: GEAR[id], charges: GEAR[id].charges || 0 }));
     const bonus = k => gear.reduce((n, g) => n + (g.def[k] || 0), 0);
@@ -143,6 +144,24 @@ export class Battle {
       sight: Math.max(SIGHT, wdef.range) + bonus('rangeBonus'),
       weapon: { id: s.weapon, def: wdef, ammo: wdef.ammo, heat: 0, streak: 0, range: wdef.range + bonus('rangeBonus') + (s.skills.range || 0), cool: wdef.cool + bonus('coolBonus') },
       gear, medic: s.skills.medic || 0, kills: 0, xp: 0,
+    };
+    this.units.push(u);
+    return u;
+  }
+
+  // The vat-grown helper: four health, eleven action points, no armour, no
+  // learning — a shock prod plus whatever gun it was issued. See CLONE in
+  // data.js for the numbers.
+  _addClone(s, pos, slot) {
+    const wdef = WEAPONS[s.weapon];
+    const gear = (s.gear || []).filter(Boolean).map(id => ({ id, def: GEAR[id], charges: GEAR[id].charges || 0 }));
+    const u = {
+      id: this.nextId++, side: 'marine', kind: 'clone', clone: true, name: s.name, soldier: s, slot,
+      x: pos.x, y: pos.y, facing: this.mission.facing ?? 1,
+      hp: CLONE.hp, maxHp: CLONE.hp, ap: CLONE.ap, maxAp: CLONE.ap, alive: true, reduce: 0, guard: false,
+      sight: Math.max(SIGHT, wdef.range),
+      weapon: { id: s.weapon, def: wdef, ammo: wdef.ammo, heat: 0, streak: 0, range: wdef.range, cool: wdef.cool },
+      gear, medic: 0, kills: 0, xp: 0,
     };
     this.units.push(u);
     return u;
@@ -331,7 +350,16 @@ export class Battle {
     return { ...BAYONET, dmg: BAYONET.dmg + 2 * lv, ap: lv >= 3 ? BAYONET.ap - 1 : BAYONET.ap };
   }
 
-  modes(u) { return [...u.weapon.def.modes, this.bayonet(u)]; }
+  modes(u) {
+    if (u.clone) return [...u.weapon.def.modes, this.cloneProd(u)];
+    return [...u.weapon.def.modes, this.bayonet(u)];
+  }
+
+  // The clone's shock prod: fixed by the campaign's depth, not by anything
+  // the clone could ever learn.
+  cloneProd(u) {
+    return { name: tr('Prod'), ap: 2, dmg: u.soldier.prodDmg, ammo: 0, heat: 0, pattern: 'melee' };
+  }
 
   // Heat the next shot actually adds. Shots fired without a pause run the
   // barrel hotter: the second costs double, the third triple, so sustained
@@ -899,7 +927,8 @@ export class Battle {
   async _kill(target, source) {
     target.alive = false;
     this.ghosts.delete(target.id);
-    if (source && source.side === 'marine' && target.side === 'alien') { source.kills++; source.xp += target.xpValue ?? target.def.xp; }
+    // The clone racks up kills with the best of them and learns nothing.
+    if (source && source.side === 'marine' && target.side === 'alien') { source.kills++; if (!source.clone) source.xp += target.xpValue ?? target.def.xp; }
     await this.fx.death(target);
     const ex = target.def && target.def.explode;
     if (ex) {

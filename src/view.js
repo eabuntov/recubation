@@ -350,8 +350,13 @@ export class View {
 
   addUnit(u) {
     const group = new THREE.Group();
-    const built = u.side === 'marine' ? buildMarine(rankColor(u.soldier.level))
-      : u.side === 'turret' ? buildTurret() : buildAlien(u.kind);
+    let built;
+    if (u.side === 'marine') {
+      built = buildMarine(u.clone ? 0x9aa7b0 : rankColor(u.soldier.level));
+      // The clone is vat-grown at seventy percent scale; its colour is grey.
+      if (u.clone) { built.model.scale.setScalar(0.72); built.height *= 0.72; }
+    } else if (u.side === 'turret') built = buildTurret();
+    else built = buildAlien(u.kind);
     // Elites get a hot tint so the player can read the threat off the board.
     if (u.elite) for (const m of new Set(built.mats)) {
       if (m.color) m.color.offsetHSL(-0.05, 0.25, 0.06);
@@ -368,7 +373,7 @@ export class View {
     this.pickables.push(hit);
 
     if (u.side === 'marine') {
-      const base = new THREE.Mesh(new THREE.RingGeometry(0.3, 0.35, 32), new THREE.MeshBasicMaterial({ color: rankColor(u.soldier.level), transparent: true, opacity: 0.7, side: THREE.DoubleSide, depthWrite: false }));
+      const base = new THREE.Mesh(new THREE.RingGeometry(0.3, 0.35, 32), new THREE.MeshBasicMaterial({ color: u.clone ? 0x9aa7b0 : rankColor(u.soldier.level), transparent: true, opacity: 0.7, side: THREE.DoubleSide, depthWrite: false }));
       base.rotation.x = -Math.PI / 2;
       base.position.y = 0.03;
       const nose = new THREE.Mesh(new THREE.CircleGeometry(0.1, 3), base.material);

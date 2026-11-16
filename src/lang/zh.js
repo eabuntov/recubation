@@ -495,4 +495,13 @@ export default {
   "Demobilize": "退役",
   "Demobilized": "已退役",
   "Past the fifth level troopers serve on contracts: a renewal buys three missions ahead, a rested bench burns none, and an unpaid trooper waits on the bench until command pays up or demobilizes them with a full kit refund.": "五级之后士兵按合同服役：续约一次预付三场任务，坐冷板凳不消耗场次，欠饷的士兵会一直坐板凳，直到指挥部付款或让其退役并全额退还装备。",
+  "Clone": "克隆体",
+  "Prod": "电击棒",
+  "Prod: {n} dmg": "电击棒：{n} 伤害",
+  "dmg": "伤害",
+  "PAID": "已付",
+  "Only one clone at a time": "同一时间只能有一个克隆体",
+  "Pay for the drop first": "请先支付部署费",
+  "Pay for 1 battle ({n})": "支付1场战斗（{n}）",
+  "Buy clone ({n})": "购买克隆体（{n}）",
 };

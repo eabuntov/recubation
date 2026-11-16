@@ -495,4 +495,13 @@ export default {
   "Demobilize": "Демобілізувати",
   "Demobilized": "Демобілізований",
   "Past the fifth level troopers serve on contracts: a renewal buys three missions ahead, a rested bench burns none, and an unpaid trooper waits on the bench until command pays up or demobilizes them with a full kit refund.": "Після п'ятого рівня бійці служать за контрактом: продовження купує три місії наперед, на лавці запасу контракт не тікає, а неоплачений боєць чекає, поки командування не заплатить або не демобілізує його з повним поверненням за обладнання.",
+  "Clone": "Клон",
+  "Prod": "Електрошок",
+  "Prod: {n} dmg": "Електрошок: {n} шк.",
+  "dmg": "шк.",
+  "PAID": "ОПЛАЧЕНИЙ",
+  "Only one clone at a time": "Одночасний клон — лише один",
+  "Pay for the drop first": "Спочатку оплатіть висадку",
+  "Pay for 1 battle ({n})": "Оплатити 1 бій ({n})",
+  "Buy clone ({n})": "Купити клона ({n})",
 };
