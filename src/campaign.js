@@ -107,7 +107,10 @@ export function applyResult(state, summary) {
     const now = s.hp == null ? max : Math.min(s.hp, max);
     s.hp = Math.min(max, now + Math.round(max / 4) * (1 + (s.missed || 0)));
   }
-  report.reward = Math.round(mission.reward * diff.rpMul);
+  // Quartermasters trained in Economy scrape extra requisition out of every
+  // win: their own level per skill level, on top of the mission reward.
+  const eco = report.rows.reduce((n, r) => n + (r.alive ? r.soldier.level * (r.soldier.skills.economy || 0) : 0), 0);
+  report.reward = Math.round(mission.reward * diff.rpMul) + eco;
   state.rp += report.reward;
   state.mission++;
   if (state.mission >= MISSIONS.length) state.complete = true;

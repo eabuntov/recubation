@@ -102,6 +102,7 @@ export class Battle {
     this.maxAlive = (mission.spawn && mission.spawn.maxAlive) || 10;
     this.spawnCount = 0;
     this.engaged = {};        // marine id -> alien attacks against them this phase
+    this.shielded = new Set(); // marine ids that already spent their Defence this phase
     this.mines = new Map();   // tile key -> {x, y}: armed, hostile-triggered
     this.smoke = new Map();   // tile key -> turns of cloud left
     this.seen = new Set();    // alien ids currently in some trooper's sight
@@ -662,6 +663,7 @@ export class Battle {
       for (const m of this.marines()) { m.guard = true; m.weapon.streak = 0; }
       this.phase = 'alien';
       this.engaged = {};        // focus-fire bookkeeping for the alien phase
+      this.shielded = new Set(); // Defence soaks are fresh for the new phase
       this._threatCache = null; // guard arcs may have changed; recompute lazily
       await this.fx.phase('alien', this);
       for (const a of this.aliens()) {
@@ -785,7 +787,31 @@ export class Battle {
     }
     u.facing = this.dirToward(u, tx, ty);
     await this.fx.attack(u, { x: tx, y: ty }, mode, tiles);
-    for (const h of hits) if (h.unit.alive) await this._damage(h.unit, h.dmg, u, h.note);
+    for (const h of hits) {
+      if (!h.unit.alive) continue;
+      if (u.side === 'alien' && h.unit.side === 'marine' && h.dmg > 0) {
+        const soak = this._soak(h.unit);
+        if (soak) h.dmg = Math.max(0, h.dmg - soak);
+      }
+      await this._damage(h.unit, h.dmg, u, h.note);
+    }
+  }
+
+  // How much of a hostile attack a Defence-trained trooper — or anyone
+  // standing beside one — shrugs off. Each protected marine gets one soak
+  // per hostile phase; the strongest nearby protector sets the amount.
+  _soak(u) {
+    if (this.shielded.has(u.id)) return 0;
+    let best = 0;
+    const lv = u.soldier.skills.defense || 0;
+    if (lv) best = lv >= 2 ? 2 : 1;
+    for (const d of this.marines()) {
+      if (d === u || Math.max(Math.abs(d.x - u.x), Math.abs(d.y - u.y)) > 1) continue;
+      const dl = d.soldier.skills.defense || 0;
+      if (dl >= 2) best = Math.max(best, dl >= 3 ? 2 : 1);
+    }
+    if (best) this.shielded.add(u.id);
+    return best;
   }
 
   async _damage(target, dmg, source, note) {
