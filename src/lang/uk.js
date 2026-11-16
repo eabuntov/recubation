@@ -325,7 +325,6 @@ export default {
   "Recruit trooper": "Найми бійця",
   "Roster is full": "Загін укомплектований",
   "Brood call radius": "Радіус сигналу виводка",
-  "How far a hostile that spots you passes your position to the brood around it. 0 means they never call.": "Як далеко ворог, що вас помітив, передає вашу позицію навколишньому виводку. 0 — вони ніколи не подають сигнал.",
   "The brood hunts by sight and sound. Hostiles that have not seen or heard you do not know where you are, but gunfire carries through walls, and one that spots you calls the ones nearby.": "Виводок полює на зір і слух. Вороги, які не бачили й не чули вас, не знають, де ви, але постріли чутно крізь стіни, а той, хто вас помітив, кличе ближніх.",
   "Cancel": "Скасувати",
 
@@ -458,4 +457,5 @@ export default {
   "TURRET DOWN": "ТУРЕЛЬ ЗНИЩЕНА",
   "Limited vision": "Обмежена видимість",
   "The level layout is always drawn; hostiles show only along your troopers' lines of sight, and lost contacts leave ghosts.": "План рівня прорисований завжди; ворогів видно лише вздовж ліній погляду бійців, а втрачені контакти залишають примар.",
+  "How far a hostile that spots you may call its nearest kin from. 0 means they never call.": "З якої відстані ворог, що вас помітив, може покликати найближчого родича. 0 — нікого не кличуть.",
 };

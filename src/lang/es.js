@@ -325,7 +325,6 @@ export default {
   "Recruit trooper": "Reclutar soldado",
   "Roster is full": "La plantilla está completa",
   "Brood call radius": "Radio de aviso de la cría",
-  "How far a hostile that spots you passes your position to the brood around it. 0 means they never call.": "Hasta dónde pasa un hostil que te divisa tu posición a la cría que lo rodea. 0 significa que nunca avisarán.",
   "The brood hunts by sight and sound. Hostiles that have not seen or heard you do not know where you are, but gunfire carries through walls, and one that spots you calls the ones nearby.": "La cría caza por vista y oído. Los hostiles que no te han visto ni oído no saben dónde estás, pero los disparos traspasan los muros, y el que te divisa avisa a los cercanos.",
   "Cancel": "Cancelar",
 
@@ -458,4 +457,5 @@ export default {
   "TURRET DOWN": "TORRETA DESTRUIDA",
   "Limited vision": "Visión limitada",
   "The level layout is always drawn; hostiles show only along your troopers' lines of sight, and lost contacts leave ghosts.": "El plano del nivel siempre está dibujado; los hostiles solo se muestran en las líneas de visión de tus tropas, y los contactos perdidos dejan fantasmas.",
+  "How far a hostile that spots you may call its nearest kin from. 0 means they never call.": "Desde qué distancia un hostil que te detecta puede llamar a su pariente más cercano. 0 significa que nunca llaman.",
 };

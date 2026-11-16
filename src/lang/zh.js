@@ -325,7 +325,6 @@ export default {
   "Recruit trooper": "招募士兵",
   "Roster is full": "编制已满",
   "Brood call radius": "虫群呼叫半径",
-  "How far a hostile that spots you passes your position to the brood around it. 0 means they never call.": "发现你的敌人向周围同伴传递你位置的距离。0 表示它们从不呼叫。",
   "The brood hunts by sight and sound. Hostiles that have not seen or heard you do not know where you are, but gunfire carries through walls, and one that spots you calls the ones nearby.": "虫群靠视觉和听觉狩猎。没有看见或听到你的敌人不知道你的位置，但枪声能穿透墙壁，发现你的那只会呼叫附近的同伴。",
   "Cancel": "取消",
 
@@ -458,4 +457,5 @@ export default {
   "TURRET DOWN": "炮塔被毁",
   "Limited vision": "受限视野",
   "The level layout is always drawn; hostiles show only along your troopers' lines of sight, and lost contacts leave ghosts.": "关卡布局始终可见；敌人只出现在你士兵的视线之内，失去接触的目标会留下虚影。",
+  "How far a hostile that spots you may call its nearest kin from. 0 means they never call.": "发现你的敌人最远可以从多远唤来它的近亲。0 表示它们从不呼唤。",
 };

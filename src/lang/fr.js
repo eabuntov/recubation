@@ -325,7 +325,6 @@ export default {
   "Recruit trooper": "Recruter un soldat",
   "Roster is full": "L'effectif est au complet",
   "Brood call radius": "Portée d'appel de la couvée",
-  "How far a hostile that spots you passes your position to the brood around it. 0 means they never call.": "Jusqu'où un hostile qui vous repère transmet votre position à la couvée autour de lui. 0 : ils ne s'appellent jamais.",
   "The brood hunts by sight and sound. Hostiles that have not seen or heard you do not know where you are, but gunfire carries through walls, and one that spots you calls the ones nearby.": "La couvée chasse à la vue et au bruit. Les hostiles qui ne vous ont ni vu ni entendu ignorent où vous êtes, mais les tirs traversent les cloisons, et celui qui vous repère appelle ceux qui sont proches.",
   "Cancel": "Annuler",
 
@@ -458,4 +457,5 @@ export default {
   "TURRET DOWN": "TOURELLE DÉTRUITE",
   "Limited vision": "Vision limitée",
   "The level layout is always drawn; hostiles show only along your troopers' lines of sight, and lost contacts leave ghosts.": "Le plan du niveau est toujours affiché ; les hostiles ne se montrent que le long des lignes de vue de vos soldats, et les contacts perdus laissent des fantômes.",
+  "How far a hostile that spots you may call its nearest kin from. 0 means they never call.": "Distance à laquelle un hostile qui vous repère peut appeler son plus proche semblable. 0 : ils n'appellent jamais.",
 };

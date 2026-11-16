@@ -325,7 +325,6 @@ export default {
   "Recruit trooper": "Recrutar soldado",
   "Roster is full": "O efetivo está completo",
   "Brood call radius": "Alcance do chamado da ninhada",
-  "How far a hostile that spots you passes your position to the brood around it. 0 means they never call.": "Até onde um hostil que avista você repassa sua posição à ninhada ao redor. 0 significa que nunca chamam.",
   "The brood hunts by sight and sound. Hostiles that have not seen or heard you do not know where you are, but gunfire carries through walls, and one that spots you calls the ones nearby.": "A ninhada caça pela vista e pelo som. Hostis que não os viram nem ouviram não sabem onde vocês estão, mas os tiros atravessam as paredes, e quem os avista chama os que estão perto.",
   "Cancel": "Cancelar",
 
@@ -458,4 +457,5 @@ export default {
   "TURRET DOWN": "TORRE DESTRUÍDA",
   "Limited vision": "Visão limitada",
   "The level layout is always drawn; hostiles show only along your troopers' lines of sight, and lost contacts leave ghosts.": "A planta do nível está sempre desenhada; os hostis só aparecem ao longo das linhas de visão das tuas tropas, e os contatos perdidos deixam fantasmas.",
+  "How far a hostile that spots you may call its nearest kin from. 0 means they never call.": "De que distância um hostil que te avista pode chamar seu parente mais próximo. 0 significa que nunca chamam.",
 };

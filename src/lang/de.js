@@ -325,7 +325,6 @@ export default {
   "Recruit trooper": "Soldaten anwerben",
   "Roster is full": "Der Kader ist voll",
   "Brood call radius": "Rufweite der Brut",
-  "How far a hostile that spots you passes your position to the brood around it. 0 means they never call.": "Wie weit ein Feind, der euch erspäht, eure Position an die Brut um ihn herum weitergibt. 0 heißt: sie rufen nie.",
   "The brood hunts by sight and sound. Hostiles that have not seen or heard you do not know where you are, but gunfire carries through walls, and one that spots you calls the ones nearby.": "Die Brut jagt nach Sicht und Geräusch. Feinde, die euch weder gesehen noch gehört haben, wissen nicht, wo ihr seid — aber Schüsse tragen durch Wände, und wer euch erspäht, ruft die Nahen herbei.",
   "Cancel": "Abbrechen",
 
@@ -458,4 +457,5 @@ export default {
   "TURRET DOWN": "TURM ZERSTÖRT",
   "Limited vision": "Eingeschränkte Sicht",
   "The level layout is always drawn; hostiles show only along your troopers' lines of sight, and lost contacts leave ghosts.": "Der Lageplan ist immer sichtbar; Feinde zeigen sich nur entlang der Sichtlinien deiner Soldaten, und verlorene Kontakte hinterlassen Geister.",
+  "How far a hostile that spots you may call its nearest kin from. 0 means they never call.": "Aus welcher Entfernung ein Feind, das euch entdeckt, sein nächstes Artgenossen rufen darf. 0 heißt: es ruft nie.",
 };

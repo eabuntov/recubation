@@ -325,7 +325,6 @@ export default {
   "Recruit trooper": "兵士を募集",
   "Roster is full": "部隊は満員です",
   "Brood call radius": "仲間への報告範囲",
-  "How far a hostile that spots you passes your position to the brood around it. 0 means they never call.": "こちらを見つけた敵が、周囲の仲間にあなたの位置を伝える距離。0なら報告しない。",
   "The brood hunts by sight and sound. Hostiles that have not seen or heard you do not know where you are, but gunfire carries through walls, and one that spots you calls the ones nearby.": "敵は視覚と音で狩る。お前たちを見てもいないし聞いてもいない敵は、お前たちの居場所を知らない。だが銃声は壁越しに届き、こちらを見つけた個体は近くの仲間を呼ぶ。",
   "Cancel": "キャンセル",
 
@@ -458,4 +457,5 @@ export default {
   "TURRET DOWN": "タレット破壊",
   "Limited vision": "限定視界",
   "The level layout is always drawn; hostiles show only along your troopers' lines of sight, and lost contacts leave ghosts.": "マップの構造は常に表示される。敵は兵士の視線上にのみ現れ、見失った敵は残像として残る。",
+  "How far a hostile that spots you may call its nearest kin from. 0 means they never call.": "発見した敵が最寄りの仲間を呼べる距離。0 なら決して呼ばない。",
 };

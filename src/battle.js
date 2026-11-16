@@ -683,6 +683,7 @@ export class Battle {
         // The brood does not read minefield markings.
         if (this.mines.has(key(st.x, st.y))) await this._detonate(st.x, st.y);
         if (!u.alive || this.over) break;
+        this._spreadAlert(u, st.x, st.y);
         await this._reactions(u);
       }
     }
@@ -852,15 +853,34 @@ export class Battle {
       Math.hypot(m.x - a.x, m.y - a.y) <= ALERT.sense + 0.5 && !this.sightBlocked(a.x, a.y, m.x, m.y));
   }
 
-  // One alien learns where the squad is, and shrieks the find to the brood
-  // around it — one hop only, as far as the campaign's call radius allows.
+  // One alien learns where the squad is, and calls the nearest of its kin to
+  // come along. The call is a whisper, not a shout: at most three creatures
+  // per sighting end up converging — the spotter, its nearest neighbour, and
+  // one more that the neighbour brushes past on the way.
   _raise(a, x, y) {
     if (!a.alive) return;
-    this.alert.set(a.id, { x, y });
+    this.alert.set(a.id, { x, y, left: 2 });
     if (!this.spread) return;
+    let best = null, bd = Infinity;
     for (const b of this.aliens()) {
-      if (b === a) continue;
-      if (Math.hypot(b.x - a.x, b.y - a.y) <= this.spread + 0.5) this.alert.set(b.id, { x, y });
+      if (b === a || this.alert.has(b.id)) continue;
+      const d = Math.hypot(b.x - a.x, b.y - a.y);
+      if (d <= this.spread + 0.5 && d < bd) { bd = d; best = b; }
+    }
+    if (best) this.alert.set(best.id, { x, y, left: 1 });
+  }
+
+  // An alerted creature on the move passes the call to whoever it runs past,
+  // one hop at a time and only while the sighting's budget of recruits lasts.
+  _spreadAlert(u, x, y) {
+    const call = this.alert.get(u.id);
+    if (!call || !call.left) return;
+    for (const b of this.aliens()) {
+      if (b === u || this.alert.has(b.id)) continue;
+      if (Math.max(Math.abs(b.x - x), Math.abs(b.y - y)) > 1) continue;
+      call.left--;
+      this.alert.set(b.id, { x: call.x, y: call.y, left: call.left });
+      if (!call.left) break;
     }
   }
 

@@ -325,7 +325,6 @@ export default {
   "Recruit trooper": "Zrekrutuj żołnierza",
   "Roster is full": "Stan osobowy jest pełny",
   "Brood call radius": "Zasięg okrzyku lęgu",
-  "How far a hostile that spots you passes your position to the brood around it. 0 means they never call.": "Jak daleko wróg, który cię wypatrzy, przekazuje twoją pozycję otaczającemu go lęgowi. 0 — nigdy nie wołają.",
   "The brood hunts by sight and sound. Hostiles that have not seen or heard you do not know where you are, but gunfire carries through walls, and one that spots you calls the ones nearby.": "Lęg poluje wzrokiem i słuchem. Wrogowie, którzy cię nie widzieli ani nie usłyszeli, nie wiedzą, gdzie jesteś, ale strzały niosą się przez ściany, a ten, kto cię wypatrzy, wzywa pobliskich.",
   "Cancel": "Anuluj",
 
@@ -458,4 +457,5 @@ export default {
   "TURRET DOWN": "WIEŻYCZKA ZNISZCZONA",
   "Limited vision": "Ograniczona widoczność",
   "The level layout is always drawn; hostiles show only along your troopers' lines of sight, and lost contacts leave ghosts.": "Plan poziomu jest zawsze widoczny; wrogowie pokazują się tylko wzdłuż linii wzroku twoich żołnierzy, a utracone kontakty zostawiają duchy.",
+  "How far a hostile that spots you may call its nearest kin from. 0 means they never call.": "Z jakiej odległości wróg, który cię zauważy, może wezwać najbliższego krewniaka. 0 oznacza, że nigdy nie wzywają.",
 };
