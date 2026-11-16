@@ -186,8 +186,8 @@ export class Battle {
 
   // Under limited vision a hostile shows only while some trooper holds it in
   // sight range along a clear line; where one was last seen is remembered.
-  // Sight is its own sense — longer than a carbine's reach, shorter than a
-  // railgun's — so nobody is blind at six tiles and optics see far.
+  // Sight is its own sense, longer than any gun's reach: walls and corners
+  // hide, distance does not (see SIGHT in data.js).
   updateVision() {
     if (!this.limited) return;
     const visible = new Set();

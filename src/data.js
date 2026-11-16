@@ -66,16 +66,6 @@ export const WEAPONS = {
       { name: 'Sustained', ap: 6, dmg: 21, ammo: 8, heat: 9, pattern: 'single' },
     ],
   },
-  lance: {
-    name: 'PL-1 Plasma Lance', cost: 140, req: { heavy: 2, tech: 2 }, range: 9, ammo: 6, maxHeat: 10, cool: 4,
-    desc: 'Prototype. Burns a hole through everything between you and the far wall.',
-    modes: [{ name: 'Beam', ap: 5, dmg: 18, ammo: 1, heat: 8, pattern: 'line', pierce: true, fx: 'plasma' }],
-  },
-  rail: {
-    name: 'M-90 Railgun', cost: 160, req: { light: 3, tech: 2 }, range: 16, ammo: 6, maxHeat: 9, cool: 4,
-    desc: 'A tungsten slug at rail speed. Nothing in this colony walks it off.',
-    modes: [{ name: 'Slug', ap: 4, dmg: 15, ammo: 1, heat: 5, pattern: 'single' }],
-  },
 };
 
 export const ARMORS = {
@@ -144,9 +134,10 @@ export const BASE_AP = 7;
 // A weapon def may override this with its own `reloadAp`.
 export const RELOAD_AP = 2;
 
-// Weapons folded into other roles. A save that still carries one is refunded
-// its price and reissued the standard carbine (see sanitize in campaign.js).
-export const RETIRED_WEAPONS = { incinerator: 70, launcher: 90 };
+// Weapons folded into other roles or cut from the arsenal. A save that still
+// carries one is refunded its price and reissued the standard carbine (see
+// sanitize in campaign.js).
+export const RETIRED_WEAPONS = { incinerator: 70, launcher: 90, lance: 140, rail: 160 };
 
 // How far a trooper spots hostiles, whatever their gun's reach. At 25 tiles
 // the whole level is within sight on paper: what hides an enemy is a wall, a
