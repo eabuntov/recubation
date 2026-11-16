@@ -140,7 +140,7 @@ export class UI {
         )),
         h('label.diff-opt', limited,
           h('span', t('Limited vision'),
-            h('div.desc', t('Hostiles are only visible along your troopers\' lines of sight. Last-known positions show as ghosts.')))),
+            h('div.desc', t('The level layout is always drawn; hostiles show only along your troopers\' lines of sight, and lost contacts leave ghosts.')))),
         h('label.diff-opt',
           h('span', t('Brood call radius'),
             h('div.desc', t('How far a hostile that spots you passes your position to the brood around it. 0 means they never call.'))),

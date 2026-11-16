@@ -457,5 +457,5 @@ export default {
   "TURRET UP": "ТУРЕЛЬ ГОТОВА",
   "TURRET DOWN": "ТУРЕЛЬ ЗНИЩЕНА",
   "Limited vision": "Обмежена видимість",
-  "Hostiles are only visible along your troopers' lines of sight. Last-known positions show as ghosts.": "Ворогів видно лише вздовж ліній погляду ваших бійців. Останні відомі позиції позначаються примарами.",
+  "The level layout is always drawn; hostiles show only along your troopers' lines of sight, and lost contacts leave ghosts.": "План рівня прорисований завжди; ворогів видно лише вздовж ліній погляду бійців, а втрачені контакти залишають примар.",
 };

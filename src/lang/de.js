@@ -457,5 +457,5 @@ export default {
   "TURRET UP": "TURM AKTIV",
   "TURRET DOWN": "TURM ZERSTÖRT",
   "Limited vision": "Eingeschränkte Sicht",
-  "Hostiles are only visible along your troopers' lines of sight. Last-known positions show as ghosts.": "Feinde sind nur entlang der Sichtlinien Ihrer Truppen sichtbar. Zuletzt bekannte Positionen erscheinen als Geister.",
+  "The level layout is always drawn; hostiles show only along your troopers' lines of sight, and lost contacts leave ghosts.": "Der Lageplan ist immer sichtbar; Feinde zeigen sich nur entlang der Sichtlinien deiner Soldaten, und verlorene Kontakte hinterlassen Geister.",
 };

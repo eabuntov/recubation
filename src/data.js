@@ -129,10 +129,11 @@ export const BASE_AP = 7;
 // A weapon def may override this with its own `reloadAp`.
 export const RELOAD_AP = 2;
 
-// How far a trooper spots hostiles, whatever their gun's reach: a carbine
-// cannot outsee its own nose, but nobody is blind past six tiles either.
-// Long optics (marksman, rail) still see further than this.
-export const SIGHT = 9;
+// How far a trooper spots hostiles, whatever their gun's reach. At 25 tiles
+// the whole level is within sight on paper: what hides an enemy is a wall, a
+// corner or a smoke cloud, never the distance. The brood's own senses stay
+// short (see ALERT) — the asymmetry is the point of limited vision.
+export const SIGHT = 25;
 
 // The brood's own fog of war: it hunts by sight and sound, not omniscience.
 // sense is how far an alien sees along a clear line, hearing how far gunfire

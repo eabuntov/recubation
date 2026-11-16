@@ -457,5 +457,5 @@ export default {
   "TURRET UP": "WIEŻYCZKA GOTOWA",
   "TURRET DOWN": "WIEŻYCZKA ZNISZCZONA",
   "Limited vision": "Ograniczona widoczność",
-  "Hostiles are only visible along your troopers' lines of sight. Last-known positions show as ghosts.": "Wrogowie są widoczni tylko wzdłuż linii wzroku twoich żołnierzy. Ostatnie znane pozycje oznaczane są duchami.",
+  "The level layout is always drawn; hostiles show only along your troopers' lines of sight, and lost contacts leave ghosts.": "Plan poziomu jest zawsze widoczny; wrogowie pokazują się tylko wzdłuż linii wzroku twoich żołnierzy, a utracone kontakty zostawiają duchy.",
 };

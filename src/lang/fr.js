@@ -457,5 +457,5 @@ export default {
   "TURRET UP": "TOURELLE EN PLACE",
   "TURRET DOWN": "TOURELLE DÉTRUITE",
   "Limited vision": "Vision limitée",
-  "Hostiles are only visible along your troopers' lines of sight. Last-known positions show as ghosts.": "Les hostiles ne sont visibles que le long des lignes de vue de vos troupes. Les dernières positions connues apparaissent en fantômes.",
+  "The level layout is always drawn; hostiles show only along your troopers' lines of sight, and lost contacts leave ghosts.": "Le plan du niveau est toujours affiché ; les hostiles ne se montrent que le long des lignes de vue de vos soldats, et les contacts perdus laissent des fantômes.",
 };

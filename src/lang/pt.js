@@ -457,5 +457,5 @@ export default {
   "TURRET UP": "TORRE PRONTA",
   "TURRET DOWN": "TORRE DESTRUÍDA",
   "Limited vision": "Visão limitada",
-  "Hostiles are only visible along your troopers' lines of sight. Last-known positions show as ghosts.": "Hostis só são visíveis ao longo das linhas de visão das suas tropas. As últimas posições conhecidas aparecem como fantasmas.",
+  "The level layout is always drawn; hostiles show only along your troopers' lines of sight, and lost contacts leave ghosts.": "A planta do nível está sempre desenhada; os hostis só aparecem ao longo das linhas de visão das tuas tropas, e os contatos perdidos deixam fantasmas.",
 };

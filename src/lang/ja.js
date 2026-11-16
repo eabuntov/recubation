@@ -457,5 +457,5 @@ export default {
   "TURRET UP": "タレット展開",
   "TURRET DOWN": "タレット破壊",
   "Limited vision": "限定視界",
-  "Hostiles are only visible along your troopers' lines of sight. Last-known positions show as ghosts.": "敵は兵士の視線上でのみ見える。最後に目撃された位置は亡霊として表示される。",
+  "The level layout is always drawn; hostiles show only along your troopers' lines of sight, and lost contacts leave ghosts.": "マップの構造は常に表示される。敵は兵士の視線上にのみ現れ、見失った敵は残像として残る。",
 };
