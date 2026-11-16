@@ -21,6 +21,7 @@ export function localize() {
   }
   for (const def of Object.values(DIFFICULTIES)) apply(def, ['name', 'desc']);
   for (const w of Object.values(WEAPONS)) for (const m of w.modes) apply(m, ['name']);
+  for (const g of Object.values(GEAR)) if (g.mode) apply(g.mode, ['name']);
   apply(BAYONET, ['name']);
   RANKS_EN.forEach((r, i) => { RANKS[i] = t(r); });
   for (const m of MISSIONS) apply(m, ['name', 'brief', 'tips']);
@@ -38,6 +39,7 @@ export function tableStrings() {
   }
   for (const def of Object.values(DIFFICULTIES)) { add(def.name); add(def.desc); }
   for (const w of Object.values(WEAPONS)) for (const m of w.modes) add(m.name);
+  for (const g of Object.values(GEAR)) if (g.mode) add(g.mode.name);
   add(BAYONET.name);
   RANKS_EN.forEach(add);
   for (const m of MISSIONS) { add(m.name); add(m.brief); add(m.tips); }

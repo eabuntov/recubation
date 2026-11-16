@@ -1,6 +1,6 @@
 // Campaign state: roster, progression, requisition, persistence.
 
-import { WEAPONS, ARMORS, GEAR, SKILLS, SOLDIER_NAMES, SQUAD_COLORS, BASE_HP, xpForLevel, meetsReq, DIFFICULTIES, CALL_RADII, ALERT } from './data.js';
+import { WEAPONS, ARMORS, GEAR, SKILLS, SOLDIER_NAMES, SQUAD_COLORS, BASE_HP, xpForLevel, meetsReq, DIFFICULTIES, CALL_RADII, ALERT, RETIRED_WEAPONS } from './data.js';
 import { MISSIONS } from './missions.js';
 import { t } from './i18n.js';
 
@@ -191,9 +191,12 @@ function sanitize(s) {
     ? s.fallen.filter(f => f && typeof f === 'object' && typeof f.name === 'string')
     : [];
   s.names = Array.isArray(s.names) && s.names.length ? s.names : [...SOLDIER_NAMES];
+  let refunds = 0;
   s.squad = s.squad.filter(q => q && typeof q === 'object').map((q, i) => {
     const skills = {};
     for (const k in SKILLS) skills[k] = Math.min(int(q.skills && q.skills[k], 0), SKILLS[k].max);
+    // A weapon the arsenal no longer issues goes back to stores at full price.
+    if (RETIRED_WEAPONS[q.weapon]) { refunds += RETIRED_WEAPONS[q.weapon]; q = { ...q, weapon: 'carbine' }; }
     return {
       id: int(q.id, i + 1, 1),
       name: typeof q.name === 'string' ? q.name : SOLDIER_NAMES[0],
@@ -212,6 +215,7 @@ function sanitize(s) {
       missed: int(q.missed, 0),
     };
   });
+  s.rp += refunds;
   if (s.mission >= MISSIONS.length) s.complete = true;
   return s;
 }

@@ -88,7 +88,7 @@ export class Tactical {
         this.base.set(key(x, y), 'cone');
       }
       const armed = this.armed && this.armed.def.active;
-      if (armed === 'jump' || armed === 'mine' || armed === 'smoke') {
+      if (armed === 'jump' || armed === 'mine' || armed === 'smoke' || armed === 'shell' || armed === 'jet') {
         const r = this.armed.def.range;
         for (let y = s.y - r; y <= s.y + r; y++) for (let x = s.x - r; x <= s.x + r; x++) {
           if (!b.gearProblem(s, this.armed, x, y)) this.base.set(key(x, y), 'use');

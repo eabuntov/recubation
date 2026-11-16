@@ -557,6 +557,18 @@ export class Battle {
       if (!t || !this.walkable(t) || this.unitAt(tx, ty) || this.mines.has(key(tx, ty)) || t.hatch) return tr('Cannot place it there');
       return null;
     }
+    if (kind === 'shell' || kind === 'jet') {
+      // Under-barrel support weapons aim at a tile, not a unit — over heads if
+      // the shell arcs — but never through walls or without a clear sightline.
+      const t = this.tile(tx, ty);
+      if (!t || t.type === 'wall' || t.type === 'void' || t.type === 'door') return tr('Cannot target there');
+      const dist = Math.hypot(tx - u.x, ty - u.y);
+      if (dist === 0) return tr('Invalid target');
+      if (dist > g.def.range + 0.5) return tr('Too far');
+      if (g.def.minRange && dist < g.def.minRange) return tr('Too close');
+      if (this.sightBlocked(u.x, u.y, tx, ty)) return tr('No line of sight');
+      return null;
+    }
     return tr('Cannot be used');
   }
 
@@ -601,6 +613,11 @@ export class Battle {
         u.facing = this.dirToward(u, tx, ty);
         const tur = this.addTurret(tx, ty);
         await this.fx.turretSet(tur, u);
+      } else if (kind === 'shell' || kind === 'jet') {
+        // One charge, one shot: the under-barrel mode rides the normal attack
+        // path so blasts, lines and damage notes all behave — flagged so it
+        // takes no rounds and heats no barrel of its own.
+        await this._attack(u, tx, ty, { ...g.def.mode, ap: 0, ammo: 0, gear: true });
       }
     });
   }
@@ -717,10 +734,13 @@ export class Battle {
       if (h.unit.side === 'marine') this.engaged[h.unit.id] = (this.engaged[h.unit.id] || 0) + 1;
     u.ap -= mode.ap;
     if (u.side === 'marine' && mode.pattern !== 'melee') {
-      u.weapon.ammo -= mode.ammo;
-      u.weapon.heat += this.shotHeat(u, mode);
-      u.weapon.streak = (u.weapon.streak || 0) + 1;
-      this._noise(u.x, u.y); // gunfire carries, walls or no walls
+      if (mode.gear) this._noise(u.x, u.y); // a launched shell is loud, barrel or no barrel
+      else {
+        u.weapon.ammo -= mode.ammo;
+        u.weapon.heat += this.shotHeat(u, mode);
+        u.weapon.streak = (u.weapon.streak || 0) + 1;
+        this._noise(u.x, u.y); // gunfire carries, walls or no walls
+      }
     }
     u.facing = this.dirToward(u, tx, ty);
     await this.fx.attack(u, { x: tx, y: ty }, mode, tiles);

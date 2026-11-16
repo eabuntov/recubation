@@ -149,7 +149,7 @@ export const MISSIONS = [
     ],
     tips: [
       'A Shellback deflects every bullet that arrives through its front arc. Shoot it from the side or rear.',
-      'Incinerators, shells and plasma ignore armour entirely.',
+      'A shell or a flame ignores the plate entirely — under-barrel launchers and flamethrowers are the answer.',
       'It turns to face the nearest trooper at the end of its move. Use one trooper as bait and another as the knife.',
     ],
     map: [
@@ -418,7 +418,7 @@ export const MISSIONS = [
     objective: { type: 'eliminate' },
     brief: [
       'The antechamber to the cavity. Her guard is waiting: plated elites, an elite spitter on the wall, and things that have fed very well.',
-      'This is the last door. Whatever you have been saving — the plasma, the shells, the stims — spend it here.',
+      'This is the last door. Whatever you have been saving — the shells, the fire, the stims — spend it here.',
     ],
     tips: [
       'Elites are tinted red and hit harder. Kill them first or keep them at range.',

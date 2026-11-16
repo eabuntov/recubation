@@ -53,16 +53,6 @@ export const WEAPONS = {
       { name: 'Sustained', ap: 6, dmg: 21, ammo: 8, heat: 9, pattern: 'single' },
     ],
   },
-  incinerator: {
-    name: 'Furnace Incinerator', cost: 70, req: { heavy: 1 }, range: 3, ammo: 12, maxHeat: 10, cool: 4,
-    desc: 'A tongue of burning gel. Scorches everything in a line and ignores armour.',
-    modes: [{ name: 'Jet', ap: 4, dmg: 8, ammo: 2, heat: 5, pattern: 'line', pierce: true, fx: 'flame' }],
-  },
-  launcher: {
-    name: 'GL-3 Launcher', cost: 90, req: { heavy: 2 }, range: 7, minRange: 2, ammo: 6, maxHeat: 8, cool: 4,
-    desc: 'Lobs a fragmentation shell over heads. Mind the blast radius.',
-    modes: [{ name: 'Shell', ap: 5, dmg: 10, ammo: 1, heat: 4, pattern: 'blast', pierce: true, arc: true, fx: 'shell' }],
-  },
   lance: {
     name: 'PL-1 Plasma Lance', cost: 140, req: { heavy: 2, tech: 2 }, range: 9, ammo: 6, maxHeat: 10, cool: 4,
     desc: 'Prototype. Burns a hole through everything between you and the far wall.',
@@ -92,6 +82,18 @@ export const GEAR = {
   mine: { name: 'Proximity Mine', cost: 35, req: { traps: 1 }, charges: 2, ap: 2, active: 'mine', range: 3, desc: 'Throw an armed mine up to 3 tiles. It goes off the moment a hostile steps on it — everything next to it bleeds, friendlies included. 2 uses.' },
   smoke: { name: 'Smoke Canister', cost: 25, req: { traps: 1 }, charges: 2, ap: 1, active: 'smoke', range: 4, desc: 'Pop a 3×3 smoke cloud on a tile for two turns. Nothing sees through it, in either direction. 2 uses.' },
   turret: { name: 'Auto-Turret', cost: 90, req: { traps: 2 }, charges: 1, ap: 3, active: 'turret', desc: 'Deploy a sentry gun on an adjacent tile: 6 rounds, range 5. It watches your back during the enemy phase; the brood will smash it.' },
+  // Under-barrel support weapons: slung under the rifle, so the trooper keeps
+  // shooting while carrying them, and each charge is one shot.
+  incinerator: {
+    name: 'Under-barrel Flamethrower', cost: 70, req: { heavy: 2 }, charges: 4, ap: 4, active: 'jet', range: 3,
+    mode: { name: 'Jet', dmg: 8, pattern: 'line', pierce: true, fx: 'flame' },
+    desc: 'A tongue of burning gel under the barrel. Scorches a short line, armour or no armour, and keeps your rifle free. 4 uses.',
+  },
+  launcher: {
+    name: 'Under-barrel Grenade Launcher', cost: 90, req: { heavy: 2 }, charges: 3, ap: 5, active: 'shell', range: 7, minRange: 2,
+    mode: { name: 'Shell', dmg: 10, pattern: 'blast', pierce: true, arc: true, fx: 'shell' },
+    desc: 'Lobs a shell onto any tile in reach, over heads if need be — including your own people in the blast. 3 uses.',
+  },
   servo: { name: 'Servo Harness', cost: 70, req: { tech: 2 }, apBonus: 1, desc: '+1 action point every turn.' },
   coolant: { name: 'Coolant Sleeve', cost: 35, req: { tech: 1 }, coolBonus: 2, desc: 'Weapon sheds 2 extra heat per turn.' },
   scope: { name: 'Rangefinder', cost: 30, req: { light: 1 }, rangeBonus: 2, desc: '+2 weapon range.' },
@@ -128,6 +130,10 @@ export const BASE_AP = 7;
 // What swapping a fresh magazine costs, for any weapon (see Battle.reload).
 // A weapon def may override this with its own `reloadAp`.
 export const RELOAD_AP = 2;
+
+// Weapons folded into other roles. A save that still carries one is refunded
+// its price and reissued the standard carbine (see sanitize in campaign.js).
+export const RETIRED_WEAPONS = { incinerator: 70, launcher: 90 };
 
 // How far a trooper spots hostiles, whatever their gun's reach. At 25 tiles
 // the whole level is within sight on paper: what hides an enemy is a wall, a
