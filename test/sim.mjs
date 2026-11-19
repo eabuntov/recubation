@@ -83,13 +83,13 @@ console.log('Validating generated maps');
 // but a batch of outright failures is a generator regression.
 const GENERATED = MISSIONS.map((m, i) => {
   let ok = 0;
-  for (let seed = 1; seed <= 10; seed++) {
+  for (let seed = 1; seed <= 20; seed++) {
     const g = generateMap(m, i, seed * 7919);
     if (!g) continue;
     for (const p of mapProblems({ ...m, map: g.map, raised: g.raised })) fail(`${m.id} (roll ${seed}): ${p}`);
     ok++;
   }
-  console.log(`  ${m.id.padEnd(16)} ${ok}/10 rolls valid`);
+  console.log(`  ${m.id.padEnd(16)} ${ok}/20 rolls valid`);
   // One fixed roll becomes the generated campaign the bot plays below.
   const pick = generateMap(m, i, 20261116 + i);
   return pick ? { ...m, map: pick.map, raised: pick.raised } : m;

@@ -1,8 +1,9 @@
 // Procedural level generator. A mission keeps its size, its enemy roster and
 // its spawn schedule from the authored definition; the generator rolls a new
-// floor plan with the same ingredients — rooms on a ring of corridors, blast
-// doors sealing the extraction room, hatches where the brood wants them. The
-// same seed always rolls the same map, so a retried mission is the same map.
+// floor plan with the same ingredients — rooms as open rectangles between
+// single wall lines, blast doors sealing the extraction room, hatches where
+// the brood wants them. The same seed always rolls the same map, so a
+// retried mission is the same map.
 //
 // generateMap returns { map, raised } or null when no roll passed the checks
 // within the attempt budget — the caller then keeps the authored map.
@@ -57,21 +58,24 @@ function stock(mission) {
 
 // ---------------------------------------------------------------- layout
 
-// Split the level into wall-bounded rectangles, each a future room.
+// Split the level into open floor rectangles separated by single wall lines.
+// A cut is one cell of wall; both halves keep at least three floor cells in
+// the cut direction, so no room is ever narrower than 3, and the two-cell
+// "corridors" the old double walls produced are gone.
 function bsp(x0, y0, x1, y1, rng, out) {
   const w = x1 - x0 + 1, h = y1 - y0 + 1;
-  const canV = w >= 11, canH = h >= 9;
+  const canV = w >= 7, canH = h >= 7;
   if ((!canV && !canH) || (out.length >= 3 && rng() < 0.4) || out.length >= 7) {
     out.push({ x0, y0, x1, y1 });
     return;
   }
   if (canV && (!canH || rng() < w / (w + h))) {
-    const cut = x0 + 5 + Math.floor(rng() * (w - 10));
-    bsp(x0, y0, cut, y1, rng, out);
+    const cut = x0 + 3 + Math.floor(rng() * (w - 6));
+    bsp(x0, y0, cut - 1, y1, rng, out);
     bsp(cut + 1, y0, x1, y1, rng, out);
   } else {
-    const cut = y0 + 4 + Math.floor(rng() * (h - 8));
-    bsp(x0, y0, x1, cut, rng, out);
+    const cut = y0 + 3 + Math.floor(rng() * (h - 6));
+    bsp(x0, y0, x1, cut - 1, rng, out);
     bsp(x0, cut + 1, x1, y1, rng, out);
   }
 }
@@ -83,56 +87,126 @@ function tryMap(mission, index, rng) {
   const set = (x, y, c) => { grid[y][x] = c; };
   const at = (x, y) => grid[y][x];
 
+  // Rooms are the open rectangles; everything between them is wall.
   const rooms = [];
   bsp(1, 1, W - 2, H - 2, rng, rooms);
-  const inner = r => ({ x0: r.x0 + 1, y0: r.y0 + 1, x1: r.x1 - 1, y1: r.y1 - 1 });
-  for (const r of rooms) {
-    const i = inner(r);
-    for (let y = i.y0; y <= i.y1; y++) for (let x = i.x0; x <= i.x1; x++) set(x, y, '.');
+  for (const r of rooms)
+    for (let y = r.y0; y <= r.y1; y++) for (let x = r.x0; x <= r.x1; x++) set(x, y, '.');
+
+  // Where two rooms face each other across one wall line, and the span they
+  // share it on.
+  const links = [];
+  for (let i = 0; i < rooms.length; i++) for (let j = i + 1; j < rooms.length; j++) {
+    const a = rooms[i], b = rooms[j];
+    const span = (p, q) => { const lo = Math.max(p.y0, q.y0), hi = Math.min(p.y1, q.y1); return lo <= hi ? { lo, hi } : null; };
+    const spanX = (p, q) => { const lo = Math.max(p.x0, q.x0), hi = Math.min(p.x1, q.x1); return lo <= hi ? { lo, hi } : null; };
+    if (a.x1 + 2 === b.x0) { const s = span(a, b); if (s) links.push({ a: i, b: j, vert: true, wall: a.x1 + 1, ...s }); }
+    if (b.x1 + 2 === a.x0) { const s = span(a, b); if (s) links.push({ a: j, b: i, vert: true, wall: b.x1 + 1, ...s }); }
+    if (a.y1 + 2 === b.y0) { const s = spanX(a, b); if (s) links.push({ a: i, b: j, vert: false, wall: a.y1 + 1, ...s }); }
+    if (b.y1 + 2 === a.y0) { const s = spanX(a, b); if (s) links.push({ a: j, b: i, vert: false, wall: b.y1 + 1, ...s }); }
   }
 
-  // A ring of corridors: every room connects to the next, so there are no
-  // dead corners, and the loop keeps one sealed room from stranding anybody.
-  const order = [...rooms.keys()];
-  for (let n = order.length - 1; n > 0; n--) { // shuffle
-    const k = Math.floor(rng() * (n + 1));
-    [order[n], order[k]] = [order[k], order[n]];
+  // Every opening punched into a wall line; each connects rooms a and b.
+  const openings = [];
+  const punch = (l, p) => {
+    const x = l.vert ? l.wall : p, y = l.vert ? p : l.wall;
+    set(x, y, '.');
+    openings.push({ x, y, a: l.a, b: l.b });
+  };
+
+  // Connectivity first: one opening along a spanning tree of the adjacency
+  // graph, so no sealed pocket can strand anybody.
+  const inTree = new Set([0]);
+  const treeLinks = [...links].sort(() => rng() - 0.5);
+  for (const l of treeLinks) {
+    if (inTree.has(l.a) === inTree.has(l.b)) continue;
+    const span = l.hi - l.lo;
+    punch(l, l.lo + Math.floor(rng() * (span + 1)));
+    inTree.add(l.a); inTree.add(l.b);
   }
-  const centre = r => {
-    const i = inner(r);
-    return { x: Math.floor((i.x0 + i.x1) / 2), y: Math.floor((i.y0 + i.y1) / 2) };
+
+  // Does this opening sit on one of the room's four walls?
+  const touches = (r, o) =>
+    (o.x === r.x0 - 1 && o.y >= r.y0 && o.y <= r.y1) ||
+    (o.x === r.x1 + 1 && o.y >= r.y0 && o.y <= r.y1) ||
+    (o.y === r.y0 - 1 && o.x >= r.x0 && o.x <= r.x1) ||
+    (o.y === r.y1 + 1 && o.x >= r.x0 && o.x <= r.x1);
+
+  // Distinct entrances: openings merged when they sit on adjacent cells of
+  // the same wall, so one wide gap counts once.
+  const entrancesOf = ri => {
+    const r = rooms[ri];
+    const bySide = new Map();
+    for (const o of openings) {
+      if (!touches(r, o)) continue;
+      const side = o.y === r.y0 - 1 ? 'N' : o.y === r.y1 + 1 ? 'S' : o.x === r.x0 - 1 ? 'W' : 'E';
+      const c = side === 'N' || side === 'S' ? o.x : o.y;
+      if (!bySide.has(side)) bySide.set(side, []);
+      bySide.get(side).push(c);
+    }
+    let n = 0;
+    for (const arr of bySide.values()) {
+      arr.sort((p, q) => p - q);
+      let prev = -10;
+      for (const c of arr) { if (c - prev > 1) n++; prev = c; }
+    }
+    return n;
   };
-  const corridor = (a, b) => {
-    let x = a.x, y = a.y;
-    const horizontalFirst = rng() < 0.5;
-    const stepTo = (tx, ty) => {
-      while (x !== tx) { x += Math.sign(tx - x); if (at(x, y) === '#') set(x, y, '.'); }
-      while (y !== ty) { y += Math.sign(ty - y); if (at(x, y) === '#') set(x, y, '.'); }
-    };
-    if (horizontalFirst) stepTo(b.x, a.y), stepTo(b.x, b.y);
-    else stepTo(a.x, b.y), stepTo(b.x, b.y);
-  };
-  for (let n = 0; n < order.length; n++) {
-    const a = rooms[order[n]], b = rooms[order[(n + 1) % order.length]];
-    corridor(centre(a), centre(b));
+
+  // The request: at least two ways in and out of every room. Rooms short of
+  // that get another opening punched toward a neighbour; a roll with no
+  // room left to punch fails and another is drawn.
+  for (let ri = 0; ri < rooms.length; ri++) {
+    let guard = 0;
+    while (entrancesOf(ri) < 2 && guard++ < 20) {
+      const spots = [];
+      for (const l of links) {
+        if (l.a !== ri && l.b !== ri) continue;
+        for (let p = l.lo; p <= l.hi; p++) {
+          const x = l.vert ? l.wall : p, y = l.vert ? p : l.wall;
+          if (at(x, y) !== '#') continue;
+          const clash = openings.some(o => l.vert
+            ? (o.x === x && Math.abs(o.y - y) <= 1)
+            : (o.y === y && Math.abs(o.x - x) <= 1));
+          if (!clash) spots.push({ x, y });
+        }
+      }
+      if (!spots.length) break;
+      const s = pick(rng, spots);
+      set(s.x, s.y, '.');
+      openings.push(s);
+    }
+    if (entrancesOf(ri) < 2) return null;
   }
 
   const walkableTilesIn = r => {
-    const i = inner(r), out = [];
-    for (let y = i.y0; y <= i.y1; y++) for (let x = i.x0; x <= i.x1; x++) if (at(x, y) === '.') out.push({ x, y });
+    const out = [];
+    for (let y = r.y0; y <= r.y1; y++) for (let x = r.x0; x <= r.x1; x++) if (at(x, y) === '.') out.push({ x, y });
     return out;
   };
 
   // Start room: the roomiest floor on the level, so the squad does not spawn
   // packed into a closet. Extraction runs then take the room farthest from it
   // along the ring, which gets the exit zone and every door sealing it.
-  let startIdx = order[0];
-  for (const n of order) if (walkableTilesIn(rooms[n]).length > walkableTilesIn(rooms[startIdx]).length) startIdx = n;
-  const ringNext = n => order[(order.indexOf(n) + 1) % order.length];
-  let far = startIdx;
-  for (let n = 0, cur = startIdx; n < order.length; n++, cur = ringNext(cur)) far = cur;
-  const startRoom = rooms[startIdx], exitRoom = rooms[far];
-  const otherRooms = order.map(i => rooms[i]).filter(r => r !== startRoom && r !== exitRoom);
+  let startIdx = 0;
+  for (let ri = 0; ri < rooms.length; ri++) if (walkableTilesIn(rooms[ri]).length > walkableTilesIn(rooms[startIdx]).length) startIdx = ri;
+  const startRoom = rooms[startIdx];
+
+  // The room farthest from the start along the room ring: walk the adjacency
+  // graph breadth-first and take the last room reached.
+  const adj = new Map();
+  for (const l of links) {
+    if (!adj.has(l.a)) adj.set(l.a, []);
+    if (!adj.has(l.b)) adj.set(l.b, []);
+    adj.get(l.a).push(l.b);
+    adj.get(l.b).push(l.a);
+  }
+  let exitIdx = startIdx;
+  const seen = new Set([startIdx]);
+  const q = [startIdx];
+  for (let i = 0; i < q.length; i++) for (const n of adj.get(q[i]) || []) if (!seen.has(n)) { seen.add(n); q.push(n); exitIdx = n; }
+  const exitRoom = rooms[exitIdx];
+  const otherRooms = rooms.filter(r => r !== startRoom && r !== exitRoom);
 
   // Squad starts in the start room, kept spread: no two troopers on adjacent
   // tiles when the room affords it, a compact clump only as the fallback.
@@ -169,48 +243,46 @@ function tryMap(mission, index, rng) {
   const items = stock(mission);
 
   // A raised deck for the missions that teach height: seal a room off the
-  // ring entirely, then punch one ramp into it. The ring loses that room and
-  // stays a path, so the level remains connected; the ramp is the only way
-  // up. When no clean ramp site exists, the roll simply stays flat.
-  let raised = null;
-  if (mission.raised) {
-    const candidates = rooms.filter(r => r !== startRoom && r !== exitRoom
-      && inner(r).x1 - inner(r).x0 >= 2 && inner(r).y1 - inner(r).y0 >= 2);
+  // floor plan entirely, then punch one ramp into it. The ramp is the only
+  // way up. When no clean ramp site exists, the roll simply stays flat.
+  let raised = null, deckRoom = null;
+  if (mission.raised && otherRooms.length) {
+    const candidates = otherRooms.filter(r => r.x1 - r.x0 >= 2 && r.y1 - r.y0 >= 2);
     if (candidates.length) {
       const room = pick(rng, candidates);
-      // Seal every opening on the room's walls.
-      for (let x = room.x0; x <= room.x1; x++) for (const y of [room.y0, room.y1]) if (at(x, y) === '.') set(x, y, '#');
-      for (let y = room.y0; y <= room.y1; y++) for (const x of [room.x0, room.x1]) if (at(x, y) === '.') set(x, y, '#');
-      // Punch a ramp: room wall tile plus a short carved approach outward.
       const sides = [
-        { wall: x => [x, room.y0, 'v', room.y0 - 2], range: [room.x0 + 1, room.x1 - 1] }, // north wall: the room lies south, so the ramp points south
-        { wall: x => [x, room.y1, '^', room.y1 + 2], range: [room.x0 + 1, room.x1 - 1] }, // south wall: the room lies north
-        { wall: y => [room.x0, y, '>', room.x0 - 2], range: [room.y0 + 1, room.y1 - 1] }, // west wall: the room lies east
-        { wall: y => [room.x1, y, '<', room.x1 + 2], range: [room.y0 + 1, room.y1 - 1] }, // east wall: the room lies west
+        { wall: x => [x, room.y0 - 1, 'v'], range: [room.x0, room.x1], step: [0, -1] }, // deck lies south of its top wall
+        { wall: x => [x, room.y1 + 1, '^'], range: [room.x0, room.x1], step: [0, 1] },  // deck lies north of its bottom wall
+        { wall: y => [room.x0 - 1, y, '>'], range: [room.y0, room.y1], step: [-1, 0] }, // deck lies east of its west wall
+        { wall: y => [room.x1 + 1, y, '<'], range: [room.y0, room.y1], step: [1, 0] },  // deck lies west of its east wall
       ].sort(() => rng() - 0.5);
       outer: for (const side of sides) {
         const spots = [];
         for (let p = side.range[0]; p <= side.range[1]; p++) spots.push(p);
         spots.sort(() => rng() - 0.5);
         for (const p of spots) {
-          const [wx, wy, ch, outward] = side.wall(p);
+          const [wx, wy, ch] = side.wall(p);
+          if (at(wx, wy) !== '#') continue; // never over an opening or the border
           // Carve straight out until floor is met; the ramp's lower landing
           // is that first floor tile. Never touch the map border.
-          const step = (ch === '^' || ch === 'v') ? [0, Math.sign(outward - wy)] : [Math.sign(outward - wx), 0];
-          let cx = wx + step[0], cy = wy + step[1], hit = null;
+          const [sx, sy] = side.step;
+          let cx = wx + sx, cy = wy + sy, hit = null;
           for (let n = 0; n < 4 && cx > 0 && cy > 0 && cx < W - 1 && cy < H - 1; n++) {
             if (at(cx, cy) !== '#') { hit = { x: cx, y: cy }; break; }
-            cx += step[0]; cy += step[1];
+            cx += sx; cy += sy;
           }
           if (cx <= 0 || cy <= 0 || cx >= W - 1 || cy >= H - 1) continue;
           if (!hit) hit = { x: cx, y: cy };
           if (at(hit.x, hit.y) === '#') continue; // ran out of level before floor
+          // Seal the room: every opening into it becomes wall again.
+          for (const o of openings.filter(o => touches(room, o))) set(o.x, o.y, '#');
+          for (let k = openings.length - 1; k >= 0; k--) if (touches(room, openings[k])) openings.splice(k, 1);
           // Carve the approach up to the hit.
-          let ax = wx + step[0], ay = wy + step[1];
-          while (ax !== hit.x || ay !== hit.y) { set(ax, ay, '.'); ax += step[0]; ay += step[1]; }
+          let ax = wx + sx, ay = wy + sy;
+          while (ax !== hit.x || ay !== hit.y) { set(ax, ay, '.'); ax += sx; ay += sy; }
           set(wx, wy, ch);
-          const i = inner(room);
-          raised = [i.x0, i.y0, i.x1, i.y1];
+          raised = [room.x0, room.y0, room.x1, room.y1];
+          deckRoom = room;
           break outer;
         }
       }
@@ -219,31 +291,24 @@ function tryMap(mission, index, rng) {
 
   // Extraction zone in the far room; the blast doors seal every opening into
   // it, and a terminal elsewhere buys them open.
+  const placeRooms = rooms.filter(r => r !== deckRoom);
   if (mission.objective.type === 'exit') {
     const exitsPlaced = take([exitRoom], Math.max(items.exits, mission.squad), t => set(t.x, t.y, 'X'));
     if (exitsPlaced < Math.min(items.exits || Infinity, mission.squad)) return null;
     let doors = 0;
-    for (let x = exitRoom.x0; x <= exitRoom.x1; x++) {
-      for (const y of [exitRoom.y0, exitRoom.y1]) {
-        if (at(x, y) === '.') { set(x, y, 'D'); doors++; }
-      }
-    }
-    for (let y = exitRoom.y0; y <= exitRoom.y1; y++) {
-      for (const x of [exitRoom.x0, exitRoom.x1]) {
-        if (at(x, y) === '.') { set(x, y, 'D'); doors++; }
-      }
-    }
-    if (!doors) return null;
-    if (!take(otherRooms.length ? otherRooms : [exitRoom], 1, t => set(t.x, t.y, 'T'))) return null;
+    for (const o of openings) if (touches(exitRoom, o)) { set(o.x, o.y, 'D'); doors++; }
+    if (doors < 2) return null;
+    if (!take(otherRooms.filter(r => r !== deckRoom).length ? otherRooms.filter(r => r !== deckRoom) : [exitRoom], 1, t => set(t.x, t.y, 'T'))) return null;
   } else if (items.terminals) {
     // A flavour terminal with no doors to open: keep it out of the start room.
-    take(otherRooms.length ? otherRooms : rooms.slice(1), items.terminals, t => set(t.x, t.y, 'T'));
+    take(otherRooms.filter(r => r !== deckRoom).length ? otherRooms.filter(r => r !== deckRoom) : placeRooms.slice(1), items.terminals, t => set(t.x, t.y, 'T'));
   }
 
   // Hatches never open under the squad's boots.
+  const hatchRooms = otherRooms.filter(r => r !== deckRoom);
   const hatchTiles = [];
   if (mission.spawn) {
-    const placed = take(otherRooms.length ? otherRooms : rooms.slice(1), items.hatches, t => { set(t.x, t.y, 'H'); hatchTiles.push(t); });
+    const placed = take(hatchRooms.length ? hatchRooms : placeRooms.slice(1), items.hatches, t => { set(t.x, t.y, 'H'); hatchTiles.push(t); });
     if (placed < items.hatches) return null;
   }
 
@@ -251,7 +316,7 @@ function tryMap(mission, index, rng) {
   // room and at least six manhattan from every start tile, so turn one is a
   // choice of moves rather than a mugging. A roll with nowhere far enough to
   // put someone fails and another is drawn.
-  const broodRooms = rooms.filter(r => r !== startRoom);
+  const broodRooms = placeRooms.filter(r => r !== startRoom);
   const clearOfSquad = (x, y) => starts.every(s => Math.abs(s.x - x) + Math.abs(s.y - y) >= 6);
   if (items.aliens.length) {
     const placed = take(broodRooms, items.aliens.length, (t, i) => set(t.x, t.y, items.aliens[i]), clearOfSquad);
@@ -271,10 +336,7 @@ function tryMap(mission, index, rng) {
     }
     return ring;
   };
-  const roomOf = t => rooms.find(r => {
-    const i = inner(r);
-    return t.x >= i.x0 && t.x <= i.x1 && t.y >= i.y0 && t.y <= i.y1;
-  });
+  const roomOf = t => placeRooms.find(r => t.x >= r.x0 && t.x <= r.x1 && t.y >= r.y0 && t.y <= r.y1);
   let cashPlaced = 0;
   if (hatchTiles.length) {
     for (let guard = 0; cashPlaced < cashCount && guard++ < 200;) {
@@ -303,7 +365,7 @@ function tryMap(mission, index, rng) {
       }
     }
     let best = null;
-    for (const r of rooms) {
+    for (const r of placeRooms) {
       if (r === startRoom) continue;
       const tiles = walkableTilesIn(r).filter(t => at(t.x, t.y) === '.' && dist.has(t.x + ',' + t.y));
       if (!tiles.length) continue;
@@ -320,9 +382,9 @@ function tryMap(mission, index, rng) {
   }
   if (cashPlaced < cashCount) return null;
 
-  take(rooms, items.crates, t => set(t.x, t.y, 'c'));
-  take(rooms, items.ammo, t => set(t.x, t.y, 'A'));
-  take(rooms, items.med, t => set(t.x, t.y, '+'));
+  take(placeRooms, items.crates, t => set(t.x, t.y, 'c'));
+  take(placeRooms, items.ammo, t => set(t.x, t.y, 'A'));
+  take(placeRooms, items.med, t => set(t.x, t.y, '+'));
 
   return { map: grid.map(r => r.join('')), raised: raised ? [raised] : [] };
 }
