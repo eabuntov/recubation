@@ -334,11 +334,16 @@ export class View {
   buildPickup(t) {
     const g = new THREE.Group();
     g.position.set(t.x, t.h * HU + 0.4, t.y);
-    const ammo = t.pickup === 'ammo';
-    const color = ammo ? 0xffd23d : 0x4dff88;
+    const ammo = t.pickup === 'ammo', cash = t.pickup === 'cash';
+    const color = ammo ? 0xffd23d : cash ? 0x37e08c : 0x4dff88;
     const mat = new THREE.MeshStandardMaterial({ color, emissive: color, emissiveIntensity: 0.9, roughness: 0.4 });
     if (ammo) {
       g.add(new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.2, 0.18), mat));
+    } else if (cash) {
+      // A coin standing on edge: the frame loop's spin makes it turn like one.
+      const coin = new THREE.Mesh(new THREE.CylinderGeometry(0.17, 0.17, 0.05, 14), mat);
+      coin.rotation.z = Math.PI / 2;
+      g.add(coin);
     } else {
       g.add(new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.1, 0.1), mat), new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.32, 0.1), mat));
     }

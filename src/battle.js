@@ -17,6 +17,9 @@ const ALIEN_CHARS = { s: 'skitter', p: 'spitter', k: 'carapace', b: 'bloater', t
 // Uppercase letters place an elite of the same species: more health, more damage.
 const ELITE_CHARS = { S: 'skitter', P: 'spitter', K: 'carapace', B: 'bloater', T: 'stalker' };
 const DOOR_FOR_TERMINAL = { T: 'D', U: 'E' };
+// The requisition cache lying around on the level: walking over it banks the
+// amount, and a won mission pays it out with the reward (see applyResult).
+const CASH_VALUE = 15;
 
 export function parseMap(mission) {
   const rows = mission.map;
@@ -39,6 +42,7 @@ export function parseMap(mission) {
       else if (c in DOOR_FOR_TERMINAL) { t.type = 'terminal'; t.terminal = { group: DOOR_FOR_TERMINAL[c], used: false }; }
       else if (c === 'A') t.pickup = 'ammo';
       else if (c === '+') t.pickup = 'med';
+      else if (c === '$') t.pickup = 'cash';
       else if (c === 'X') t.exit = true;
       else if (c === 'H') { t.hatch = true; hatches.push(t); }
       else if (c >= '1' && c <= '9') starts.push({ x, y, slot: +c });
@@ -101,6 +105,7 @@ export class Battle {
     // the wave is delayed, not cancelled, so holding still costs something.
     this.maxAlive = (mission.spawn && mission.spawn.maxAlive) || 10;
     this.spawnCount = 0;
+    this.cash = 0;            // requisition picked up off the floor this battle
     this.engaged = {};        // marine id -> alien attacks against them this phase
     this.shielded = new Set(); // marine ids that already spent their Defence this phase
     this.mines = new Map();   // tile key -> {x, y}: armed, hostile-triggered
@@ -871,6 +876,9 @@ export class Battle {
     } else if (t.pickup === 'med' && u.hp < u.maxHp) {
       u.hp = u.maxHp; t.pickup = null;
       await this.fx.pickup(u, t, tr('PATCHED UP'));
+    } else if (t.pickup === 'cash') {
+      this.cash += CASH_VALUE; t.pickup = null;
+      await this.fx.pickup(u, t, tr('{n} RP', { n: CASH_VALUE }));
     }
   }
 
@@ -1356,6 +1364,7 @@ export class Battle {
       win: !!(this.result && this.result.win),
       text: this.result ? this.result.text : '',
       turns: this.turn,
+      cash: this.cash,
       marines: this.units.filter(u => u.side === 'marine').map(u => ({ id: u.soldier.id, alive: u.alive, kills: u.kills, xp: u.xp, hp: u.hp })),
     };
   }

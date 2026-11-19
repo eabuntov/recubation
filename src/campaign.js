@@ -198,9 +198,12 @@ export function applyResult(state, summary) {
     s.hp = Math.min(max, now + Math.round(max / 4) * (1 + (s.missed || 0)));
   }
   // Quartermasters trained in Economy scrape extra requisition out of every
-  // win: their own level per skill level, on top of the mission reward.
+  // win: their own level per skill level, on top of the mission reward — and
+  // whatever cash the squad carried off the level. A lost mission pays
+  // nothing, simulation or not; on a real wipe nobody is left to carry it.
   const eco = report.rows.reduce((n, r) => n + (r.alive ? r.soldier.level * (r.soldier.skills.economy || 0) : 0), 0);
-  report.reward = Math.round(mission.reward * diff.rpMul) + eco;
+  report.cash = summary.cash || 0;
+  report.reward = Math.round(mission.reward * diff.rpMul) + eco + report.cash;
   state.rp += report.reward;
   state.mission++;
   if (state.mission >= MISSIONS.length) state.complete = true;

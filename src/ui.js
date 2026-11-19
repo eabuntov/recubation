@@ -377,7 +377,7 @@ export class UI {
   debrief(report, mission, { onContinue, onRetry }) {
     const body = report.win
       ? h('div',
-        h('p', `${report.text} ${t('Completed in {n} turns.', { n: report.turns })} ${t('Requisition awarded: {n} RP.', { n: report.reward })}`),
+        h('p', `${report.text} ${t('Completed in {n} turns.', { n: report.turns })} ${t('Requisition awarded: {n} RP.', { n: report.reward })}${report.cash ? ' ' + t('Found on the level: {n} RP.', { n: report.cash }) : ''}`),
         h('table.report',
           h('tr', h('th', t('Trooper')), h('th', t('Kills')), h('th', t('Experience')), h('th', t('Status'))),
           [...report.rows].sort((a, b) => byLevel(a.soldier, b.soldier)).map(r => h('tr',

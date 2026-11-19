@@ -37,7 +37,7 @@ export function generateMap(mission, index, seed, attempts = 200) {
 // alien letters (elites included), hatches, crates and pickups.
 function stock(mission) {
   const aliens = [];
-  let hatches = 0, crates = 0, ammo = 0, med = 0, exits = 0, terminals = 0;
+  let hatches = 0, crates = 0, ammo = 0, med = 0, exits = 0, terminals = 0, cash = 0;
   for (const row of mission.map) for (const c of row) {
     if ('spkbtM'.includes(c)) aliens.push(c);
     // No 'T' here: the engine parses an authored 'T' as a terminal before it
@@ -50,8 +50,9 @@ function stock(mission) {
     else if (c === '+') med++;
     else if (c === 'X') exits++;
     else if (c === 'T') terminals++;
+    else if (c === '$') cash++;
   }
-  return { aliens, hatches, crates, ammo, med, exits, terminals };
+  return { aliens, hatches, crates, ammo, med, exits, terminals, cash };
 }
 
 // ---------------------------------------------------------------- layout
@@ -229,8 +230,9 @@ function tryMap(mission, index, rng) {
   }
 
   // Hatches never open under the squad's boots.
+  const hatchTiles = [];
   if (mission.spawn) {
-    const placed = take(otherRooms.length ? otherRooms : rooms.slice(1), items.hatches, t => set(t.x, t.y, 'H'));
+    const placed = take(otherRooms.length ? otherRooms : rooms.slice(1), items.hatches, t => { set(t.x, t.y, 'H'); hatchTiles.push(t); });
     if (placed < items.hatches) return null;
   }
 
@@ -241,6 +243,68 @@ function tryMap(mission, index, rng) {
     const placed = take(broodRooms, items.aliens.length, (t, i) => set(t.x, t.y, items.aliens[i]));
     if (placed < items.aliens.length) return null;
   }
+
+  // The cash bonus: at least one per mission. Beside a hatch when the brood
+  // has any - the ring of tiles around it, its room when those are taken;
+  // without hatches, in the room farthest from the starts along the floor.
+  const cashCount = Math.max(1, items.cash);
+  const freeRing = h => {
+    const ring = [];
+    for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) {
+      if (!dx && !dy) continue;
+      const x = h.x + dx, y = h.y + dy;
+      if (at(x, y) === '.') ring.push({ x, y });
+    }
+    return ring;
+  };
+  const roomOf = t => rooms.find(r => {
+    const i = inner(r);
+    return t.x >= i.x0 && t.x <= i.x1 && t.y >= i.y0 && t.y <= i.y1;
+  });
+  let cashPlaced = 0;
+  if (hatchTiles.length) {
+    for (let guard = 0; cashPlaced < cashCount && guard++ < 200;) {
+      const h = pick(rng, hatchTiles);
+      const ring = freeRing(h);
+      if (ring.length) { const t = pick(rng, ring); set(t.x, t.y, '$'); cashPlaced++; continue; }
+      const r = roomOf(h);
+      const tiles = r ? walkableTilesIn(r).filter(q => at(q.x, q.y) === '.') : [];
+      if (tiles.length) { const t = pick(rng, tiles); set(t.x, t.y, '$'); cashPlaced++; }
+    }
+  } else {
+    // Doors block the flood, so a sealed exit room is out of the running.
+    // Anything else already on the board (brood, terminals, exits) is floor
+    // to walk over as far as placement is concerned.
+    const passable = c => c !== '#' && c !== 'D';
+    const dist = new Map();
+    const q = starts.map(s => ({ x: s.x, y: s.y }));
+    for (const s of q) dist.set(s.x + ',' + s.y, 0);
+    for (let i = 0; i < q.length; i++) {
+      const { x, y } = q[i];
+      for (const [dx, dy] of [[0, -1], [1, 0], [0, 1], [-1, 0]]) {
+        const nx = x + dx, ny = y + dy, k = nx + ',' + ny;
+        if (dist.has(k) || !passable(at(nx, ny))) continue;
+        dist.set(k, dist.get(x + ',' + y) + 1);
+        q.push({ x: nx, y: ny });
+      }
+    }
+    let best = null;
+    for (const r of rooms) {
+      if (r === startRoom) continue;
+      const tiles = walkableTilesIn(r).filter(t => at(t.x, t.y) === '.' && dist.has(t.x + ',' + t.y));
+      if (!tiles.length) continue;
+      const d = Math.min(...tiles.map(t => dist.get(t.x + ',' + t.y)));
+      if (!best || d > best.d) best = { r, tiles, d };
+    }
+    if (best) {
+      const far = Math.max(...best.tiles.map(t => dist.get(t.x + ',' + t.y)));
+      const corner = best.tiles.filter(t => dist.get(t.x + ',' + t.y) === far);
+      const t = pick(rng, corner);
+      set(t.x, t.y, '$');
+      cashPlaced++;
+    }
+  }
+  if (cashPlaced < cashCount) return null;
 
   take(rooms, items.crates, t => set(t.x, t.y, 'c'));
   take(rooms, items.ammo, t => set(t.x, t.y, 'A'));

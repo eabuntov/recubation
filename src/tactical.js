@@ -183,7 +183,10 @@ export class Tactical {
       const n = b.nextSpawnIn();
       const when = n == null ? tr('Dormant') : n === 0 ? tr('Opens this turn') : tr('Opens in {n} turns', { n });
       lines.push(`<b>${esc(tr('Brood hatch'))}</b>`, `<span class="dim">${esc(tr('{when}. Stand on it to seal it.', { when }))}</span>`);
-    } else if (t.pickup) lines.push(`<b>${esc(tr(t.pickup === 'ammo' ? 'Ammunition' : 'Aid station'))}</b>`, `<span class="dim">${esc(tr('Walk over it to use it.'))}</span>`);
+    } else if (t.pickup) {
+      const name = t.pickup === 'ammo' ? tr('Ammunition') : t.pickup === 'cash' ? tr('Cash bonus') : tr('Aid station');
+      lines.push(`<b>${esc(name)}</b>`, `<span class="dim">${esc(tr('Walk over it to use it.'))}</span>`);
+    }
     else if (b.mines.has(k)) {
       lines.push(`<b>${esc(tr('Proximity Mine'))}</b>`, `<span class="dim">${esc(tr('Armed. It goes off the moment anyone steps on it.'))}</span>`);
       if (s && this.ready && !b.defuseProblem(s, hv.x, hv.y)) lines.push(`<span class="good">${esc(tr('Defuse ({n} AP)', { n: 3 }))}</span>`);
