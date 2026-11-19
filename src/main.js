@@ -49,6 +49,9 @@ const fx = new Proxy({
   async phase(name, b) {
     tactical.refresh();
     if (name === 'alien') { sfx.alarm(); ui.banner(t('Hostile phase'), 'alien'); await view.wait(650); return; }
+    // Spawns may have dragged the camera to a visible hatch; the player's turn
+    // starts looking at the squad. Soft focus: no yank when they are in frame.
+    if (tactical.sel) view.focus(tactical.sel.x, tactical.sel.y);
     const m = b.mission, left = m.turnLimit ? m.turnLimit - b.turn : null;
     const sub = m.objective.type === 'survive' ? t('{n} to hold', { n: m.objective.turns - b.turn + 1 })
       : left != null && left <= 4 ? (left === 0 ? t('Final turn') : t('{n} turns remain', { n: left + 1 })) : '';
