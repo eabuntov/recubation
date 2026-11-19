@@ -118,10 +118,11 @@ export class Battle {
     squad.slice(0, map.starts.length).forEach((s, i) => this.addMarine(s, map.starts[i], i));
     for (const a of map.aliens) {
       this.addAlien(a.kind, a.x, a.y, a.elite);
-      // The Matriarch is one of a kind; everything else arrives with backup.
+      // The Matriarch is one of a kind; everything else arrives with backup,
+      // kept as far from the squad's start tiles as the original was.
       if (a.kind === 'behemoth') continue;
       for (let n = 1; n < this.countMul; n++) {
-        const spot = this._freeTileNear(a.x, a.y);
+        const spot = this._freeTileNear(a.x, a.y, 4, (x, y) => this.marines().every(m => Math.abs(m.x - x) + Math.abs(m.y - y) >= 6));
         if (!spot) break;
         this.addAlien(a.kind, spot.x, spot.y, a.elite);
       }
@@ -1305,12 +1306,16 @@ export class Battle {
   }
 
   // Nearest unoccupied walkable tile that is not a hatch — the brood never
-  // clogs its own hatches. Null when the neighbourhood is full.
-  _freeTileNear(x, y, max = 4) {
+  // clogs its own hatches. An optional predicate narrows the candidates (the
+  // opening backup keeps its distance from the squad); null when the
+  // neighbourhood is full.
+  _freeTileNear(x, y, max = 4, ok = null) {
     let best = null;
     for (const n of this.flood(x, y, max).values()) {
       if (n.cost === 0) continue;
-      if (!this.tiles[n.y][n.x].hatch && (!best || n.cost < best.cost)) best = n;
+      if (this.tiles[n.y][n.x].hatch) continue;
+      if (ok && !ok(n.x, n.y)) continue;
+      if (!best || n.cost < best.cost) best = n;
     }
     return best ? { x: best.x, y: best.y } : null;
   }

@@ -123,30 +123,41 @@ function tryMap(mission, index, rng) {
     return out;
   };
 
-  // Start room, then — for extraction runs — the room farthest from it along
-  // the ring, which gets the exit zone and every door sealing it.
-  const startIdx = order[0];
+  // Start room: the roomiest floor on the level, so the squad does not spawn
+  // packed into a closet. Extraction runs then take the room farthest from it
+  // along the ring, which gets the exit zone and every door sealing it.
+  let startIdx = order[0];
+  for (const n of order) if (walkableTilesIn(rooms[n]).length > walkableTilesIn(rooms[startIdx]).length) startIdx = n;
   const ringNext = n => order[(order.indexOf(n) + 1) % order.length];
   let far = startIdx;
   for (let n = 0, cur = startIdx; n < order.length; n++, cur = ringNext(cur)) far = cur;
   const startRoom = rooms[startIdx], exitRoom = rooms[far];
   const otherRooms = order.map(i => rooms[i]).filter(r => r !== startRoom && r !== exitRoom);
 
-  // Squad starts: a run of adjacent free tiles in the start room.
+  // Squad starts in the start room, kept spread: no two troopers on adjacent
+  // tiles when the room affords it, a compact clump only as the fallback.
   const free = walkableTilesIn(startRoom);
   const starts = [];
   for (const t of free) {
     if (starts.length >= mission.squad) break;
-    if (starts.every(s => Math.abs(s.x - t.x) + Math.abs(s.y - t.y) <= starts.length)) starts.push(t);
+    if (starts.every(s => Math.abs(s.x - t.x) + Math.abs(s.y - t.y) >= 2)) starts.push(t);
+  }
+  if (starts.length < mission.squad) {
+    starts.length = 0;
+    for (const t of free) {
+      if (starts.length >= mission.squad) break;
+      if (starts.every(s => Math.abs(s.x - t.x) + Math.abs(s.y - t.y) <= starts.length)) starts.push(t);
+    }
   }
   if (starts.length < mission.squad) return null;
   starts.forEach((t, i) => set(t.x, t.y, String(i + 1)));
 
-  const take = (roomList, count, place) => {
-    let placed = 0, guard = 0;
-    while (placed < count && guard++ < 500) {
+  const take = (roomList, count, place, ok = null) => {
+    let placed = 0, guard = 500;
+    while (placed < count && guard-- > 0) {
       const room = pick(rng, roomList.length ? roomList : rooms);
-      const tiles = walkableTilesIn(room).filter(t => at(t.x, t.y) === '.');
+      let tiles = walkableTilesIn(room).filter(t => at(t.x, t.y) === '.');
+      if (ok) tiles = tiles.filter(t => ok(t.x, t.y));
       if (!tiles.length) continue;
       const t = pick(rng, tiles);
       place(t, placed);
@@ -237,10 +248,13 @@ function tryMap(mission, index, rng) {
   }
 
   // The brood, exactly as the authored map stocked it, kept out of the start
-  // room so turn one is still a choice rather than a mugging.
+  // room and at least six manhattan from every start tile, so turn one is a
+  // choice of moves rather than a mugging. A roll with nowhere far enough to
+  // put someone fails and another is drawn.
   const broodRooms = rooms.filter(r => r !== startRoom);
+  const clearOfSquad = (x, y) => starts.every(s => Math.abs(s.x - x) + Math.abs(s.y - y) >= 6);
   if (items.aliens.length) {
-    const placed = take(broodRooms, items.aliens.length, (t, i) => set(t.x, t.y, items.aliens[i]));
+    const placed = take(broodRooms, items.aliens.length, (t, i) => set(t.x, t.y, items.aliens[i]), clearOfSquad);
     if (placed < items.aliens.length) return null;
   }
 
