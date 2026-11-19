@@ -488,6 +488,16 @@ export class Battle {
     return since === 0 ? 0 : sp.every - since;
   }
 
+  // True when a trooper stands on every live hatch: the schedule keeps
+  // ticking, but each wave it produces is sealed away, so a countdown would
+  // promise hatches that cannot open.
+  hatchesSealed() {
+    return this.hatches.length > 0 && this.hatches.every(t => {
+      const u = this.unitAt(t.x, t.y);
+      return !!u && u.side === 'marine';
+    });
+  }
+
   // ---------------------------------------------------------------- player actions
 
   async _run(fn) {

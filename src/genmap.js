@@ -40,7 +40,10 @@ function stock(mission) {
   let hatches = 0, crates = 0, ammo = 0, med = 0, exits = 0, terminals = 0;
   for (const row of mission.map) for (const c of row) {
     if ('spkbtM'.includes(c)) aliens.push(c);
-    else if ('SPKBT'.includes(c)) aliens.push(c);
+    // No 'T' here: the engine parses an authored 'T' as a terminal before it
+    // could ever be an elite, and reading it as a stalker ate both the
+    // terminal count and a flavour terminal on every generated map.
+    else if ('SPKB'.includes(c)) aliens.push(c);
     else if (c === 'H') hatches++;
     else if (c === 'c') crates++;
     else if (c === 'A') ammo++;
@@ -48,7 +51,7 @@ function stock(mission) {
     else if (c === 'X') exits++;
     else if (c === 'T') terminals++;
   }
-  return { aliens, hatches, crates, ammo, med, exits };
+  return { aliens, hatches, crates, ammo, med, exits, terminals };
 }
 
 // ---------------------------------------------------------------- layout

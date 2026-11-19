@@ -497,7 +497,7 @@ export class UI {
     } else parts.push(h('span', t('TURN {n}', { n: battle.turn })));
     const hostile = battle.knownAliens().length;
     const next = battle.nextSpawnIn();
-    parts.push(h('small', t('{n} hostiles', { n: hostile }) + (next == null ? '' : ' · ' + (next === 0 ? t('hatches open this turn') : t('hatches open in {n}', { n: next })))));
+    parts.push(h('small', t('{n} hostiles', { n: hostile }) + (next == null ? '' : ' · ' + (battle.hatchesSealed() ? t('hatches sealed') : next === 0 ? t('hatches open this turn') : t('hatches open in {n}', { n: next })))));
     clock.replaceChildren(...parts);
 
     const mine = battle.units.filter(u => u.side === 'marine').sort(byUnit);

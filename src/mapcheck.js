@@ -39,5 +39,9 @@ export function mapProblems(m) {
   }
   if (m.objective.type === 'exit' && exits < m.squad) fail(`${exits} exit tiles for squad of ${m.squad}`);
   if (m.spawn && !map.hatches.length) fail('spawn schedule without hatches');
+  // And the reverse: a hatch with no schedule behind it is the level lying
+  // about waves that will never come (and never rendering its red ring's
+  // promise true).
+  if (!m.spawn && map.hatches.length) fail(`hatches without a spawn schedule (${map.hatches.length})`);
   return out;
 }

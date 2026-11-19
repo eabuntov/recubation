@@ -113,7 +113,7 @@ export const MISSIONS = [
     objective: { type: 'survive', turns: 8 },
     spawn: { start: 1, every: 2, total: 10, maxAlive: 8, pool: ['skitter', 'skitter', 'spitter', 'skitter', 'bloater'] },
     brief: [
-      'The evacuation lift needs eight minutes to cycle and the junction it opens onto is ringed with hatches. They are coming up through the floor.',
+      'The evacuation lift needs eight minutes to cycle and the floor around it is riddled with brood hatches. They are coming up through it.',
       'Hold the junction until the lift arrives. Nobody has to be a hero. Everybody has to be alive.',
     ],
     tips: [
@@ -175,7 +175,7 @@ export const MISSIONS = [
     objective: { type: 'survive', turns: 8 },
     spawn: { start: 1, every: 2, total: 24, pool: ['skitter', 'skitter', 'spitter', 'bloater', 'skitter'] },
     brief: [
-      'The transit junction opens onto two breeding chambers at once. Command wants the junction held for eight minutes while the demolition charges are armed on the far side.',
+      'The transit junction sits among breeding chambers, and the brood boils up on every side. Command wants the junction held for eight minutes while the demolition charges are armed on the far side.',
       'There are twice the hatches and half the cover. Pick a corner, seal what you can stand on, and do not let the line fold.',
     ],
     tips: [
@@ -240,7 +240,7 @@ export const MISSIONS = [
     ],
     tips: [
       'The whole squad must be standing in the extraction zone before turn 10. Do not race ahead alone.',
-      'Waves chase you from the start hatch. A rearguard facing backwards is worth more than a fast pair of legs.',
+      'The hatches will not stop, and they open between you and the lift as readily as anywhere. A rearguard facing backwards is worth more than a fast pair of legs.',
     ],
     map: [
       '########################',
@@ -328,10 +328,10 @@ export const MISSIONS = [
     spawn: { start: 2, every: 2, total: 16, pool: ['stalker', 'skitter', 'bloater', 'skitter'] },
     brief: [
       'The demolition charges are failing and the bore shaft is coming down. Fourteen minutes, then the whole shaft is rubble.',
-      'The override for the lift door is in the middle gallery. The hatches will keep the pressure on until the ceiling does it for them.',
+      'The override for the lift door is hidden somewhere along the way. The hatches will keep the pressure on until the ceiling does it for them.',
     ],
     tips: [
-      'Find the terminal in the middle gallery before the timer bites; the lift door will not open without it.',
+      'Find the terminal before the timer bites; the lift door will not open without it.',
       'The pool here runs to stalkers. Leave AP for reactions on the flanks.',
     ],
     map: [
@@ -388,10 +388,10 @@ export const MISSIONS = [
     spawn: { start: 2, every: 3, total: 12, pool: ['skitter', 'stalker', 'skitter', 'bloater'] },
     brief: [
       'This is where they came from: the bore head, eleven kilometres down. The drill broke into a warm cavity under the ice and the cavity was not empty.',
-      'The charge has to go on the upper gallery, past the control room. The hatches here never stop. Keep moving.',
+      'The charge has to go down at the far end of the bore, and the hatches here never stop. Keep moving.',
     ],
     tips: [
-      'Find the terminal to open the lift door; a ramp leads up to the demolition gallery.',
+      'Find the terminal to open the lift door before you push for the extraction zone.',
       'Stalkers cover eight tiles a turn. Keep someone watching the flanks.',
     ],
     raised: [[16, 1, 26, 4]],
