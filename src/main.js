@@ -6,6 +6,7 @@ import { Tactical } from './tactical.js';
 import { Battle } from './battle.js';
 import { MISSIONS } from './missions.js';
 import { newCampaign, currentMission, topUp, applyResult, save, load, clearSave, byLevel, contractDue, payContract, demobilize, buyClone, payClone, cloneDrop, cloneView } from './campaign.js';
+import { CLONE } from './data.js';
 import { initCheats } from './cheats.js';
 import { generateMap } from './genmap.js';
 import { sfx, unlock, ambience } from './audio.js';
@@ -24,7 +25,15 @@ const tactical = new Tactical(view, ui, {
     if (!(battle && tactical.ready)) return;
     // A battle with nobody left to fight is lost whatever the difficulty says.
     if (state.difficulty === 'ironman' && battle.marines().length) { ui.toast(t('On Ironman the mission has to be seen through.')); return; }
-    ui.confirm(t('Abandon this mission? Nothing is lost; you return to the briefing.'), t('Abort'), staging);
+    ui.confirm(t('Abandon this mission? Nothing is lost; you return to the briefing.'), t('Abort'), () => {
+      // The promise says nothing is lost: the clone's escrowed drop fee comes
+      // back when the clone is on this drop.
+      if (state.clone && state.clone.paid && battle.marines().some(m => m.clone)) {
+        state.rp += CLONE.fee;
+        state.clone.paid = false;
+      }
+      staging();
+    });
   },
 });
 
@@ -196,9 +205,9 @@ async function deploy(soldiers) {
     ? soldiers
     : [...state.squad].filter(s => !contractDue(s)).sort(byLevel).slice(0, mission.squad);
   const drop = [...squad];
-  // The clone takes a slot, its fee burns with the drop.
+  // The clone takes a slot; its fee stays in escrow until the outcome
+  // settles it (applyResult bills a win, refunds a loss, abort hands it back).
   if (deployClone && state.clone && state.clone.paid) {
-    state.clone.paid = false;
     drop.push(cloneDrop(state));
     deployClone = false;
   }

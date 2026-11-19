@@ -499,6 +499,7 @@ export default {
   "Only one clone at a time": "Tylko jeden klon naraz",
   "Pay for the drop first": "Najpierw opłać zrzut",
   "Pay for 1 battle ({n})": "Opłać 1 bitwę ({n})",
+  "Clone fee refunded: {n} RP.": "Opłata za klon została zwrócona: {n} PZ.",
   "Buy clone ({n})": "Kup klona ({n})",
   "The ore-sorting hall. A maintenance gantry hangs over one corner of the floor and the things have learned to use it.": "Hala sortowania rudy. Nad jednym z narożników podłogi wisi pomost serwisowy, a stworzenia nauczyły się go używać.",
   "Take the ramp up, or push through the floor below. Whoever holds the deck holds the room.": "Wejdź rampą albo przebij się dołem. Kto trzyma pokład, trzyma salę.",

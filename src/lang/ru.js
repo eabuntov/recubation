@@ -499,6 +499,7 @@ export default {
   "Only one clone at a time": "Одновременный клон — только один",
   "Pay for the drop first": "Сначала оплатите высадку",
   "Pay for 1 battle ({n})": "Оплатить 1 бой ({n})",
+  "Clone fee refunded: {n} RP.": "Оплата клона возвращена: {n} ОС.",
   "Buy clone ({n})": "Купить клона ({n})",
   "The ore-sorting hall. A maintenance gantry hangs over one corner of the floor and the things have learned to use it.": "Зал сортировки руды. Над одним из углов пола нависает техническая гантри, и твари научились ею пользоваться.",
   "Take the ramp up, or push through the floor below. Whoever holds the deck holds the room.": "Поднимитесь по пандусу или продавите низ. Кто держит палубу — держит зал.",

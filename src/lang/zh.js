@@ -499,6 +499,7 @@ export default {
   "Only one clone at a time": "同一时间只能有一个克隆体",
   "Pay for the drop first": "请先支付部署费",
   "Pay for 1 battle ({n})": "支付1场战斗（{n}）",
+  "Clone fee refunded: {n} RP.": "克隆费用已退还：{n} 补给点。",
   "Buy clone ({n})": "购买克隆体（{n}）",
   "The ore-sorting hall. A maintenance gantry hangs over one corner of the floor and the things have learned to use it.": "矿石分拣厅。一座维修栈桥悬在场地一角上方，而那些东西已经学会了利用它。",
   "Take the ramp up, or push through the floor below. Whoever holds the deck holds the room.": "从坡道上去，或从下方强推。谁占住高台谁就占住了整个房间。",

@@ -143,6 +143,14 @@ export function applyResult(state, summary) {
   const diff = DIFFICULTIES[state.difficulty] || DIFFICULTIES.normal;
   const report = { win: summary.win, text: summary.text, turns: summary.turns, reward: 0, rows: [], ironmanLoss: false };
   if (!summary.win) {
+    // Escrow: the drop fee rides through the battle, so a lost mission hands
+    // it back - the vat got paid for a drop that never happened. On ironman
+    // the hardware is still gone; only the money comes home.
+    if (state.clone && summary.marines.some(r => r.id === CLONE.id)) {
+      state.rp += CLONE.fee;
+      state.clone.paid = false;
+      report.cloneRefund = CLONE.fee;
+    }
     // On ironman a failure is not a simulation: everyone deployed is gone.
     if (diff.ironman) {
       report.ironmanLoss = true;
@@ -176,6 +184,8 @@ export function applyResult(state, summary) {
   // The clone is hardware: a simulation failure puts it back in its bay, a
   // won mission simply bills the next drop.
   if (state.clone && summary.marines.some(r => r.id === CLONE.id && !r.alive)) state.clone = null;
+  // Escrow settled: a won mission rendered the service, fee or no fee.
+  if (state.clone && summary.marines.some(r => r.id === CLONE.id)) state.clone.paid = false;
   // Wounds carry over: survivors keep whatever they walked out with, and
   // everyone heals a quarter of their maximum health per mission boundary —
   // plus another quarter for every mission they sat out on the bench.

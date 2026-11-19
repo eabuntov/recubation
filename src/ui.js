@@ -401,7 +401,8 @@ export class UI {
             h('td.num', r.kills),
             h('td', h('span.kia', t('Killed in action'))),
           )),
-        ));
+        ),
+        report.cloneRefund != null && h('p', t('Clone fee refunded: {n} RP.', { n: report.cloneRefund })));
     this.show(h('div.sheet', { style: { width: 'min(720px, 100%)' } },
       h('header', h('h2', { style: { color: report.win ? 'var(--good)' : 'var(--bad)' } }, t(report.win ? 'Mission complete' : 'Mission failed')), h('span.tag', mission.name)),
       h('div.body', body),

@@ -499,6 +499,7 @@ export default {
   "Only one clone at a time": "クローンは同時に一体まで",
   "Pay for the drop first": "まず出撃費用を払え",
   "Pay for 1 battle ({n})": "1戦分を支払う（{n}）",
+  "Clone fee refunded: {n} RP.": "クローンの費用が返金されました：{n} RP。",
   "Buy clone ({n})": "クローンを購入（{n}）",
   "The ore-sorting hall. A maintenance gantry hangs over one corner of the floor and the things have learned to use it.": "選鉱ホール。床の一角に整備用ガントリーがせり出しており、奴らはそれを使いこなすようになった。",
   "Take the ramp up, or push through the floor below. Whoever holds the deck holds the room.": "坂を上るか、下の階を押し通るか。デッキを抑える者が部屋を制する。",
