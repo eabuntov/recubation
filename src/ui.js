@@ -114,11 +114,15 @@ export class UI {
 
   // ---------------------------------------------------------------- screens
 
-  show(node, modal = false) {
+  show(node, modal = false, scroll = 0) {
     this.screen.replaceChildren(node);
     this.screen.classList.toggle('modal', modal);
     this.screen.hidden = false;
-    this.screen.scrollTop = 0;
+    // Rebuilding a sheet must not throw the player back to its top: the caller
+    // passes whatever was on screen, and both scrollers get it back.
+    this.screen.scrollTop = scroll;
+    const body = node.querySelector('.body');
+    if (body) body.scrollTop = scroll;
     this.tip(null);
   }
 
@@ -201,7 +205,7 @@ export class UI {
   // `picked` is the set of soldier ids marching on this drop; clicking a card
   // toggles them through onPick (up to what the mission fields, minus a slot
   // for the clone when it rides along).
-  staging(state, mission, fresh, { onDeploy, onArmory, onQuit, onPay, onDemobilize, onBuyClone, onPayClone, onToggleClone }, picked = new Set(), onPick = null, clonePicked = false, cap = mission.squad) {
+  staging(state, mission, fresh, { onDeploy, onArmory, onQuit, onPay, onDemobilize, onBuyClone, onPayClone, onToggleClone }, picked = new Set(), onPick = null, clonePicked = false, cap = mission.squad, scroll = 0) {
     const unspent = state.squad.some(s => s.sp > 0);
     const diff = DIFFICULTIES[state.difficulty] || DIFFICULTIES.normal;
     this.show(h('div.sheet',
@@ -271,7 +275,7 @@ export class UI {
         btn(t(unspent ? 'Armoury · points to spend' : 'Armoury'), onArmory, unspent ? 'on' : ''),
         btn(t('Deploy'), onDeploy, 'primary', { disabled: !picked.size && !clonePicked }),
       ),
-    ));
+    ), false, scroll);
   }
 
   armory(state, { onBack, onChange }, pickId, scroll = 0) {
@@ -323,11 +327,11 @@ export class UI {
     this.show(h('div.sheet',
       h('header', h('h2', t('Armoury')), h('span.tag', t('Kit can be swapped freely; old items are refunded in full.')), h('span.rp', t('{n} RP', { n: state.rp }))),
       h('div.body.armory',
-        h('div.roster', [...state.squad].sort(byLevel).map(q => h('div.card' + (q === s ? '.sel' : ''), { style: { '--c': hex(rankColor(q.level)) }, onclick: click(() => this.armory(state, { onBack, onChange }, q.id)) },
+        h('div.roster', [...state.squad].sort(byLevel).map(q => h('div.card' + (q === s ? '.sel' : ''), { style: { '--c': hex(rankColor(q.level)) }, onclick: click(() => this.armory(state, { onBack, onChange }, q.id, this.screen.querySelector('.body').scrollTop)) },
           h('div.row', h('span.name', q.name), q.sp > 0 && h('span.badge', t('{n} SP', { n: q.sp }))),
           h('div.num', `${rankOf(q)} · ${t('L{n}', { n: q.level })}`),
         )),
-        state.clone && h('div.card' + (isClone ? '.sel' : ''), { style: { '--c': '#9aa7b0' }, onclick: click(() => this.armory(state, { onBack, onChange }, CLONE.id)) },
+        state.clone && h('div.card' + (isClone ? '.sel' : ''), { style: { '--c': '#9aa7b0' }, onclick: click(() => this.armory(state, { onBack, onChange }, CLONE.id, this.screen.querySelector('.body').scrollTop)) },
           h('div.row', h('span.name', t('Clone'))))),
         h('div',
           isClone
@@ -366,8 +370,7 @@ export class UI {
         ),
       ),
       h('footer', btn(t('Back to briefing'), onBack, 'primary')),
-    ));
-    this.screen.querySelector('.body').scrollTop = scroll;
+    ), false, scroll);
   }
 
   debrief(report, mission, { onContinue, onRetry }) {

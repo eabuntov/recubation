@@ -222,6 +222,9 @@ h3 { font-size: 11px; color: var(--dim); letter-spacing: 0.18em; margin: 18px 0 
 .contract button { padding: 4px 8px; font-size: 10px; }
 
 .armory { grid-template-columns: 200px 1fr; align-items: start; }
+/* The roster column rides along with the page scroll; pinning it keeps the
+   squad list in view while the kit list scrolls (per the request). */
+.armory .roster { position: sticky; top: 0; }
 .armory .roster .card { cursor: pointer; }
 .stats { display: flex; gap: 22px; font: 13px var(--mono); color: var(--dim); flex-wrap: wrap; }
 .stats b { color: var(--ink); }
@@ -260,6 +263,8 @@ table.report td.num { font-family: var(--mono); }
 
 @media (max-width: 900px) {
   .cols, .armory, .help, .grid2 { grid-template-columns: 1fr; }
+  /* Columns stack into one: a pinned roster would shadow the page as it scrolls. */
+  .armory .roster { position: static; }
   #panelbox { bottom: 70px; }
   #panel { min-width: 0; max-width: calc(100vw - 24px); flex-wrap: wrap; }
   #squad { width: 132px; }

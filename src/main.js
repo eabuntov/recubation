@@ -166,6 +166,8 @@ function staging() {
   deployIds = new Set([...(deployIds || top())].filter(id => alive.has(id)));
   while (deployIds.size > cap) deployIds.delete([...deployIds].pop());
   if (!deployIds.size) deployIds = new Set(top());
+  // Picking a perk rebuilds the sheet; hand the scroll position back to it.
+  const scroll = Math.max(ui.screen.scrollTop, document.querySelector('#screen .body')?.scrollTop || 0);
   ui.staging(state, mission, state.squad.filter(s => freshIds.has(s.id)), {
     onDeploy: () => deploy(state.squad.filter(s => deployIds.has(s.id))),
     onArmory: () => armory(),
@@ -180,7 +182,7 @@ function staging() {
       deployClone = !deployClone;
       staging();
     },
-  }, deployIds, (id, add) => { add ? deployIds.add(id) : deployIds.delete(id); staging(); }, deployClone, cap);
+  }, deployIds, (id, add) => { add ? deployIds.add(id) : deployIds.delete(id); staging(); }, deployClone, cap, scroll);
 }
 
 function armory() {
