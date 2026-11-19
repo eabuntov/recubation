@@ -59,7 +59,7 @@ export const WEAPONS = {
     modes: [{ name: 'Aimed', ap: 4, dmg: 13, ammo: 1, heat: 4, pattern: 'single' }],
   },
   autocannon: {
-    name: 'HMG-2 Autocannon', cost: 80, req: { heavy: 1 }, range: 8, ammo: 32, maxHeat: 12, cool: 5,
+    name: 'HMG-2 Autocannon', cost: 80, req: { heavy: 3 }, range: 8, ammo: 32, maxHeat: 12, cool: 5,
     desc: 'Belt-fed and bad-tempered. Sustained fire will cook the barrel.',
     modes: [
       { name: 'Burst', ap: 4, dmg: 11, ammo: 4, heat: 5, pattern: 'single', tag: 'burst' },
