@@ -66,7 +66,7 @@ const fx = new Proxy({
     endBattle();
     const report = applyResult(state, done.summary());
     save(state);
-    ui.debrief(report, mission, { onContinue: staging, onRetry: staging, onArmory: () => armory() });
+    ui.debrief(report, mission, { onContinue: staging, onRetry: staging });
   },
 }, {
   // Anything not handled above is a visual effect owned by the view.

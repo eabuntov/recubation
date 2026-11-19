@@ -370,7 +370,7 @@ export class UI {
     this.screen.querySelector('.body').scrollTop = scroll;
   }
 
-  debrief(report, mission, { onContinue, onRetry, onArmory }) {
+  debrief(report, mission, { onContinue, onRetry }) {
     const body = report.win
       ? h('div',
         h('p', `${report.text} ${t('Completed in {n} turns.', { n: report.turns })} ${t('Requisition awarded: {n} RP.', { n: report.reward })}`),
@@ -403,7 +403,7 @@ export class UI {
       h('div.body', body),
       h('footer', report.win
         ? [btn(t('Continue'), onContinue, 'primary')]
-        : [btn(t('Armoury'), onArmory), btn(t('Retry'), onRetry, 'primary')]),
+        : [btn(t('Abort'), onRetry, 'primary')]),
     ));
   }
 
