@@ -287,7 +287,6 @@ export default {
   "Killed in action": "阵亡",
   "Command is treating that as a simulation run. The squad is intact and the mission can be attempted again; consider a different loadout.": "指挥部将此视为一次模拟演练。小队完好无损，可以再次尝试该任务；考虑换一套装备吧。",
   "Continue": "继续",
-  "Retry": "重试",
   "Halcyon Deep is quiet": "宁海深井归于寂静",
   "The Matriarch is dead and the cavity is cooling. Without her the brood slows, then stops, like a machine with the power cut.": "母巢女王已死，空洞正在冷却。失去了她，子嗣们先是迟缓，然后停滞，就像一台被切断电源的机器。",
   "The picket ship lifts the survivors off the ice eleven hours later. The bore shaft is sealed with forty metres of foamcrete and a warning in six languages.": "十一小时后，警戒舰将幸存者从冰面上接走。钻井竖井被四十米厚的泡沫混凝土封死，并留下了六种语言的警告。",

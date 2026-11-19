@@ -287,7 +287,6 @@ export default {
   "Killed in action": "戦死",
   "Command is treating that as a simulation run. The squad is intact and the mission can be attempted again; consider a different loadout.": "司令部はこれを模擬演習として扱う。分隊は無事で、任務は再挑戦できる。装備を見直してみよう。",
   "Continue": "続ける",
-  "Retry": "再挑戦",
   "Halcyon Deep is quiet": "ハルシオン・ディープに静寂が戻った",
   "The Matriarch is dead and the cavity is cooling. Without her the brood slows, then stops, like a machine with the power cut.": "マトリアークは死に、空洞は冷えつつある。彼女を失った子らは鈍り、やがて止まった。電源を落とされた機械のように。",
   "The picket ship lifts the survivors off the ice eleven hours later. The bore shaft is sealed with forty metres of foamcrete and a warning in six languages.": "11 時間後、哨戒艦が生存者を氷上から回収する。掘削坑は 40 メートルの発泡コンクリートと六か国語の警告で封じられた。",

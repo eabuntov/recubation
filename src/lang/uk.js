@@ -287,7 +287,6 @@ export default {
   "Killed in action": "Загинув у бою",
   "Command is treating that as a simulation run. The squad is intact and the mission can be attempted again; consider a different loadout.": "Командування вважає це навчальним прогоном. Загін цілий, і місію можна повторити; подумайте про інше спорядження.",
   "Continue": "Продовжити",
-  "Retry": "Повторити",
   "Halcyon Deep is quiet": "У Галсіон-Дипі тихо",
   "The Matriarch is dead and the cavity is cooling. Without her the brood slows, then stops, like a machine with the power cut.": "Матріарх мертва, порожнина холоне. Без неї виводок сповільнюється, а потім завмирає, як машина, яку відключили від живлення.",
   "The picket ship lifts the survivors off the ice eleven hours later. The bore shaft is sealed with forty metres of foamcrete and a warning in six languages.": "За одинадцять годин патрульний корабель знімає тих, хто вижив, із криги. Бурову шахту запечатують сорока метрами пінобетону й попередженням шістьма мовами.",

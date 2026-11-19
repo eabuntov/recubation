@@ -287,7 +287,6 @@ export default {
   "Killed in action": "Caído en combate",
   "Command is treating that as a simulation run. The squad is intact and the mission can be attempted again; consider a different loadout.": "El mando lo considera un simulacro. El pelotón está intacto y la misión puede intentarse de nuevo; plantéate otro equipamiento.",
   "Continue": "Continuar",
-  "Retry": "Reintentar",
   "Halcyon Deep is quiet": "Halcyon Deep está en calma",
   "The Matriarch is dead and the cavity is cooling. Without her the brood slows, then stops, like a machine with the power cut.": "La Matriarca ha muerto y la cavidad se enfría. Sin ella, la progenie se ralentiza y luego se detiene, como una máquina a la que le cortan la corriente.",
   "The picket ship lifts the survivors off the ice eleven hours later. The bore shaft is sealed with forty metres of foamcrete and a warning in six languages.": "Once horas después, la nave de patrulla saca a los supervivientes del hielo. El pozo de perforación queda sellado con cuarenta metros de espumacreto y una advertencia en seis idiomas.",
