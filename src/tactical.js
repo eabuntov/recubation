@@ -177,7 +177,9 @@ export class Tactical {
     } else if (u) {
       lines.push(`<b>${esc(u.name)}</b> <span class="dim">${esc(tr('HP {hp}/{max} · AP {ap}', { hp: u.hp, max: u.maxHp, ap: u.ap }))}</span>`, `<span class="dim">${esc(u.weapon.def.name)} · ${esc(tr('{n} rds', { n: u.weapon.ammo }))}</span>`);
     } else if (t.terminal) {
-      lines.push(`<b>${esc(tr('Terminal'))}</b>`, `<span class="dim">${esc(tr(t.terminal.used ? 'Override accepted' : 'Opens a blast door'))}</span>`);
+      const hasDoors = b.tiles.some(row => row.some(q => q.door && q.door.group === t.terminal.group));
+      const state = t.terminal.used ? tr('Override accepted') : hasDoors ? tr('Opens a blast door') : tr('No doors answer it anymore.');
+      lines.push(`<b>${esc(tr('Terminal'))}</b>`, `<span class="dim">${esc(state)}</span>`);
     } else if (t.type === 'door') lines.push(`<b>${esc(tr('Blast door'))}</b>`, `<span class="dim">${esc(tr('Sealed. Find its terminal.'))}</span>`);
     else if (t.hatch) {
       const n = b.nextSpawnIn();

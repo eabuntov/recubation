@@ -228,6 +228,7 @@ export default {
   "Move": "移动",
   "{n} AP · {left} left": "{n} AP · 剩余 {left}",
   "Override accepted": "授权通过",
+  "No doors answer it anymore.": "已没有任何门会响应它。",
   "Opens a blast door": "可打开一扇防爆门",
 
   // Title screen

@@ -325,6 +325,7 @@ export const MISSIONS = [
     scaling: { hp: 1.15 },
     turnLimit: 14,
     objective: { type: 'exit' },
+    nestedDoors: true,
     spawn: { start: 2, every: 2, total: 16, pool: ['stalker', 'skitter', 'bloater', 'skitter'] },
     brief: [
       'The demolition charges are failing and the bore shaft is coming down. Fourteen minutes, then the whole shaft is rubble.',
@@ -356,6 +357,7 @@ export const MISSIONS = [
     scaling: { hp: 1.15 },
     turnLimit: 12,
     objective: { type: 'exit' },
+    nestedDoors: true,
     brief: [
       'Reactor Two has lost coolant. The service tunnel floods with superheated steam in twelve turns and it is the only way to the bore head.',
       'The far door is sealed; the override is at the end of the lower gallery. Open it and get everyone through. Do not stop to admire the wildlife.',
@@ -385,6 +387,7 @@ export const MISSIONS = [
     scaling: { hp: 1.2 },
     turnLimit: 18,
     objective: { type: 'exit' },
+    nestedDoors: true,
     spawn: { start: 2, every: 3, total: 12, pool: ['skitter', 'stalker', 'skitter', 'bloater'] },
     brief: [
       'This is where they came from: the bore head, eleven kilometres down. The drill broke into a warm cavity under the ice and the cavity was not empty.',

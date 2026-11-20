@@ -228,6 +228,7 @@ export default {
   "Move": "移動",
   "{n} AP · {left} left": "{n} AP · 残り {left}",
   "Override accepted": "認証完了",
+  "No doors answer it anymore.": "もう反応する扉はない。",
   "Opens a blast door": "防爆扉を開ける",
 
   // Title screen

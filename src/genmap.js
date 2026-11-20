@@ -290,18 +290,36 @@ function tryMap(mission, index, rng) {
   }
 
   // Extraction zone in the far room; the blast doors seal every opening into
-  // it, and a terminal elsewhere buys them open.
+  // it, and a terminal elsewhere buys them open. The late exit runs nest the
+  // pair: the door terminal hides in a side room sealed by the second door
+  // group, and the terminal that opens THAT group stays on the open path -
+  // open U, get behind E, open D from inside, walk out.
   const placeRooms = rooms.filter(r => r !== deckRoom);
   if (mission.objective.type === 'exit') {
     const exitsPlaced = take([exitRoom], Math.max(items.exits, mission.squad), t => set(t.x, t.y, 'X'));
     if (exitsPlaced < Math.min(items.exits || Infinity, mission.squad)) return null;
-    let doors = 0;
-    for (const o of openings) if (touches(exitRoom, o)) { set(o.x, o.y, 'D'); doors++; }
-    if (doors < 2) return null;
-    if (!take(otherRooms.filter(r => r !== deckRoom).length ? otherRooms.filter(r => r !== deckRoom) : [exitRoom], 1, t => set(t.x, t.y, 'T'))) return null;
+    const pool = otherRooms.filter(r => r !== deckRoom);
+    if (mission.nestedDoors && pool.length >= 2) {
+      const exitAdj = new Set(adj.get(exitIdx) || []);
+      const termPool = pool.filter(r => exitAdj.has(rooms.indexOf(r)));
+      const termRoom = pick(rng, termPool.length ? termPool : pool);
+      for (const o of openings) if (touches(termRoom, o)) set(o.x, o.y, 'E');
+      take([termRoom], 1, t => set(t.x, t.y, 'T'));
+      const uPool = pool.filter(r => r !== termRoom);
+      take(uPool.length ? uPool : [startRoom], 1, t => set(t.x, t.y, 'U'));
+      let doors = 0;
+      for (const o of openings) if (touches(exitRoom, o) && at(o.x, o.y) === '.') { set(o.x, o.y, 'D'); doors++; }
+      if (!doors) return null;
+    } else {
+      let doors = 0;
+      for (const o of openings) if (touches(exitRoom, o)) { set(o.x, o.y, 'D'); doors++; }
+      if (doors < 2) return null;
+      if (!take(pool.length ? pool : [exitRoom], 1, t => set(t.x, t.y, 'T'))) return null;
+    }
   } else if (items.terminals) {
     // A flavour terminal with no doors to open: keep it out of the start room.
-    take(otherRooms.filter(r => r !== deckRoom).length ? otherRooms.filter(r => r !== deckRoom) : placeRooms.slice(1), items.terminals, t => set(t.x, t.y, 'T'));
+    const flavourRooms = otherRooms.filter(r => r !== deckRoom);
+    take(flavourRooms.length ? flavourRooms : placeRooms.slice(1), items.terminals, t => set(t.x, t.y, 'T'));
   }
 
   // Hatches never open under the squad's boots.

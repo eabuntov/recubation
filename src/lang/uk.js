@@ -228,6 +228,7 @@ export default {
   "Move": "Іти",
   "{n} AP · {left} left": "{n} ОД · залишиться {left}",
   "Override accepted": "Доступ дозволено",
+  "No doors answer it anymore.": "Двері їй більше не підпорядковуються.",
   "Opens a blast door": "Відчиняє гермоворота",
 
   // Title screen

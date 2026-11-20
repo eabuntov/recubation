@@ -228,6 +228,7 @@ export default {
   "Move": "Déplacement",
   "{n} AP · {left} left": "{n} PA · reste {left}",
   "Override accepted": "Accès autorisé",
+  "No doors answer it anymore.": "Aucune porte ne lui obéit plus.",
   "Opens a blast door": "Ouvre une porte blindée",
 
   // Title screen

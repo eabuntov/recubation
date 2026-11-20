@@ -228,6 +228,7 @@ export default {
   "Move": "Ruch",
   "{n} AP · {left} left": "{n} PA · zostanie {left}",
   "Override accepted": "Dostęp przyznany",
+  "No doors answer it anymore.": "Żadne drzwi nie słuchają jej już.",
   "Opens a blast door": "Otwiera grodź pancerną",
 
   // Title screen

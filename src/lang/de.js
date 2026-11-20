@@ -228,6 +228,7 @@ export default {
   "Move": "Bewegen",
   "{n} AP · {left} left": "{n} AP · {left} übrig",
   "Override accepted": "Zugriff gewährt",
+  "No doors answer it anymore.": "Keine Türen gehorchen ihr mehr.",
   "Opens a blast door": "Öffnet ein Panzerschott",
 
   // Title screen
