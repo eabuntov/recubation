@@ -316,10 +316,12 @@ function sanitize(s) {
     };
   });
   s.rp += refunds;
-  // The leased clone: hardware data only, arriving unpaid for its next drop.
+  // The leased clone: hardware data only. Its drop fee lives in escrow in
+  // the paid flag since the fee stopped burning at deploy time, so a save
+  // made between paying and the outcome keeps the money banked.
   s.clone = s.clone && typeof s.clone === 'object'
     ? {
-        paid: false,
+        paid: !!s.clone.paid,
         weapon: WEAPONS[s.clone.weapon] ? s.clone.weapon : 'carbine',
         gear: Array.from({ length: GEAR_SLOTS }, (_, g) => Array.isArray(s.clone.gear) && GEAR[s.clone.gear[g]] ? s.clone.gear[g] : null),
       }
